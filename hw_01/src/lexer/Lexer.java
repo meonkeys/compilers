@@ -9,6 +9,7 @@ public class Lexer {
 
 	char peek = ' ';
 
+	/** The symbol table. */
 	Hashtable words = new Hashtable();
 
 	void reserve(Word w) {

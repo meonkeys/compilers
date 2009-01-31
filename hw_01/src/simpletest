@@ -1,0 +1,12 @@
+{
+   int i; int j;
+
+   i = 5;
+   i = i + 5;
+
+   while (true) {
+       j = j + 1;
+       i = i + 6;
+       if (i == 10) break;
+   }
+}

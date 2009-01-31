@@ -2,6 +2,9 @@ package inter;
 
 import lexer.*;
 
+/**
+ * A node in the parse (or syntax?) tree.
+ */
 public class Node {
 	int lexline = 0;
 

@@ -4,6 +4,9 @@ import java.util.*;
 import lexer.*;
 import inter.*;
 
+/**
+ * For every scope, a new environment will be instantiated.
+ */
 public class Env {
 	private Hashtable table;
 	protected Env prev;
