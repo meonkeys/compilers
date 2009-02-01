@@ -1,7 +1,6 @@
 package inter;
 
 import lexer.*;
-import symbols.*;
 
 public class Not extends Logical {
 	public Not(Token tok, Expr x2) {

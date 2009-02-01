@@ -1,7 +1,6 @@
 package inter;
 
 import lexer.*;
-import symbols.*;
 
 public class Or extends Logical {
 	public Or(Token tok, Expr x1, Expr x2) {

@@ -1,8 +1,11 @@
 package inter;
 
-import lexer.*;
 import symbols.*;
 
+/**
+ * Assignments with an identifier on the left side and an expression on the
+ * right.
+ */
 public class Set extends Stmt {
 	public Id id;
 	public Expr expr;

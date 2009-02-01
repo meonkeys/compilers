@@ -22,6 +22,9 @@ public class Type extends Word {
 			return false;
 	}
 
+	/**
+	 * Returns widest type of two given. Useful for coercion.
+	 */
 	public static Type max(Type p1, Type p2) {
 		if (!numeric(p1) || !numeric(p2))
 			return null;

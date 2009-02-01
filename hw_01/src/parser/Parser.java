@@ -22,7 +22,7 @@ public class Parser {
 	}
 
 	void error(String s) {
-		throw new Error("near line " + lex.line + ": " + s);
+		throw new Error("near line " + Lexer.line + ": " + s);
 	}
 
 	void match(int t) throws IOException {
@@ -93,7 +93,7 @@ public class Parser {
 
 	Stmt stmt() throws IOException {
 		Expr x;
-		Stmt s, s1, s2;
+		Stmt s1, s2;
 		Stmt savedStmt;
 		switch (look.tag) {
 		case ';':
@@ -211,6 +211,9 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * Lower-precedence arithmetic operators + and -.
+	 */
 	Expr expr() throws IOException {
 		Expr x = term();
 		while (look.tag == '+' || look.tag == '-') {
@@ -221,16 +224,17 @@ public class Parser {
 		return x;
 	}
 
+	/**
+	 * Higher-precedence arithmetic operators * and /.
+	 */
 	Expr term() throws IOException {
-		if (look.tag == '-') {
-			move();
-			return new Unary(Word.minus, unary());
-		} else if (look.tag == '!') {
+		Expr x = unary();
+		while (look.tag == '*' || look.tag == '/') {
 			Token tok = look;
 			move();
-			return new Not(tok, unary());
-		} else
-			return factor();
+			x = new Arith(tok, x, unary());
+		}
+		return x;
 	}
 
 	Expr unary() throws IOException {

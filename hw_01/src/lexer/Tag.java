@@ -1,5 +1,10 @@
 package lexer;
 
+/**
+ * Are the values significant?
+ *
+ * FIXME: this should really be an enum.
+ */
 public class Tag {
 	public static final int AND = 256;
 	public static final int BASIC = 257;
@@ -8,12 +13,16 @@ public class Tag {
 	public static final int ELSE = 260;
 	public static final int EQ = 261;
 	public static final int FALSE = 262;
+	/** Greater than or equal. */
 	public static final int GE = 263;
 	public static final int ID = 264;
 	public static final int IF = 265;
 	public static final int INDEX = 266;
+	/** Less than or equal. */
 	public static final int LE = 267;
+	/** Unary minus, like for numeric negation. */
 	public static final int MINUS = 268;
+	/** Not equals. */
 	public static final int NE = 269;
 	public static final int NUM = 270;
 	public static final int OR = 271;

@@ -1,8 +1,11 @@
 package inter;
 
-import lexer.*;
 import symbols.*;
 
+/**
+ * Assignments with an identifier on the left side and an array element on the
+ * right.
+ */
 public class SetElem extends Stmt {
 	public Id array;
 	public Expr index;
