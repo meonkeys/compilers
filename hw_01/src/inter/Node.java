@@ -3,9 +3,10 @@ package inter;
 import lexer.*;
 
 /**
- * A node in the parse (or syntax?) tree.
+ * A node in the syntax tree.
  */
 public class Node {
+	/** Source code line number for this node. */
 	int lexline = 0;
 
 	Node() {

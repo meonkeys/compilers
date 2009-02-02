@@ -7,6 +7,7 @@ package lexer;
  */
 public class Tag {
 	public static final int AND = 256;
+	/** Indicates a "basic" or "primitive" type. */
 	public static final int BASIC = 257;
 	public static final int BREAK = 258;
 	public static final int DO = 259;

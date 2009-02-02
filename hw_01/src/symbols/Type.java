@@ -5,9 +5,9 @@ import lexer.*;
 public class Type extends Word {
 	public int width = 0;
 
-	public Type(String s, int tag, int w) {
-		super(s, tag);
-		width = w;
+	public Type(String lexeme, int tag, int width) {
+		super(lexeme, tag);
+		this.width = width;
 	}
 
 	public static final Type Int = new Type("int", Tag.BASIC, 4);

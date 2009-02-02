@@ -7,9 +7,9 @@ package lexer;
 public class Word extends Token {
 	public String lexeme = "";
 
-	public Word(String s, int tag) {
+	public Word(String lexeme, int tag) {
 		super(tag);
-		lexeme = s;
+		this.lexeme = lexeme;
 	}
 
 	public String toString() {
