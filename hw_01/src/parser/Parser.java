@@ -219,7 +219,8 @@ public class Parser {
 		while (look.tag == '+' || look.tag == '-') {
 			Token tok = look;
 			move();
-			x = new Arith(tok, x, term());
+			//x = new Arith(tok, x, term());
+			x = foldpm(tok, x, term());
 		}
 		return x;
 	}
@@ -231,10 +232,85 @@ public class Parser {
 		Expr x = unary();
 		while (look.tag == '*' || look.tag == '/') {
 			Token tok = look;
+			//System.out.println("Peek: " + lex.peek());
 			move();
-			x = new Arith(tok, x, unary());
+			//System.out.println("Peek: " + lex.peek());
+			//x = new Arith(tok, x, unary());
+			x = foldmd(tok, x, unary());
 		}
 		return x;
+	}
+
+	Expr foldpm(Token op, Expr expr1, Expr expr2){
+
+		if(bothNums(expr1, expr2)){
+			int result = 0;
+			int op1 = Integer.parseInt(expr1.toString());
+			int op2 = Integer.parseInt(expr2.toString());
+			if(op.toString().equals("+")){
+				result = op1 + op2;
+			}
+			else if(op.toString().equals("-")){
+				result = op1 - op2;
+			}
+
+			System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
+
+			return new Constant(new Num(result), Type.Int);
+		}
+		else if(bothFloats(expr1, expr2)){
+			float result = (float)0.0;
+			float op1 = Float.parseFloat(expr1.toString());
+			float op2 = Float.parseFloat(expr2.toString());
+			if(op.toString().equals("+")){
+				result = op1 + op2;
+			}
+			else if(op.toString().equals("-")){
+				result = op1 - op2;
+			}
+
+			System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
+
+			return new Constant(new Real(result), Type.Float);
+		}
+		return new Arith(op, expr1.reduce(), expr2.reduce());
+	}
+
+	Expr foldmd(Token op, Expr expr1, Expr expr2){
+
+		if(bothNums(expr1, expr2)){
+			int result = 0;
+			int op1 = Integer.parseInt(expr1.toString());
+			int op2 = Integer.parseInt(expr2.toString());
+
+			if(op.toString().equals("*")){
+				result = op1 * op2;
+			}
+			else if(op.toString().equals("/")){
+				result = op1 / op2;
+			}
+
+			System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
+
+			return new Constant(new Num(result), Type.Int);
+		}
+		else if(bothFloats(expr1, expr2)){
+			float result = (float)0.0;
+			float op1 = Float.parseFloat(expr1.toString());
+			float op2 = Float.parseFloat(expr2.toString());
+
+			if(op.toString().equals("*")){
+				result = op1 * op2;
+			}
+			else if(op.toString().equals("/")){
+				result = op1 / op2;
+			}
+
+			System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
+
+			return new Constant(new Real(result), Type.Float);
+		}
+		return new Arith(op, expr1.reduce(), expr2.reduce());
 	}
 
 	Expr unary() throws IOException {
@@ -313,5 +389,43 @@ public class Parser {
 			loc = t2;
 		}
 		return new Access(a, loc, type);
+	}
+
+	boolean bothNums(Expr expr1, Expr expr2){
+		boolean isOp1int = true;
+		boolean isOp2int = true;
+
+		try{
+			Integer.parseInt(expr1.toString());
+		}catch(NumberFormatException nfe){
+			isOp1int = false;
+		}
+
+		try{
+			Integer.parseInt(expr2.toString());
+		}catch(NumberFormatException nfe){
+			isOp2int = false;
+		}
+
+		return (isOp1int && isOp2int);
+	}
+
+	boolean bothFloats(Expr expr1, Expr expr2){
+		boolean isOp1float = true;
+		boolean isOp2float = true;
+
+		try{
+			Float.parseFloat(expr1.toString());
+		}catch(NumberFormatException nfe){
+			isOp1float = false;
+		}
+
+		try{
+			Float.parseFloat(expr2.toString());
+		}catch(NumberFormatException nfe){
+			isOp2float = false;
+		}
+
+		return (isOp1float && isOp2float);
 	}
 }

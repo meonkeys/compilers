@@ -20,5 +20,5 @@ symbols/*.class : symbols/*.java
 	$(JavaCompiler) symbols/*.java
 
 clean:
-	rm -f */*.class
+	rm -f */*.class */*~ *~
 

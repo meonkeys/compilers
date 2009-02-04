@@ -123,4 +123,8 @@ public class Lexer {
 		peek = ' ';
 		return tok;
 	}
+
+	public char peek(){
+		return peek;
+	}
 }
