@@ -307,6 +307,7 @@ public class Parser {
 			i = bool();
 			match(']');
 			type = ((Array) type).of;
+			w = new Constant(type.width);
 			t1 = new Arith(new Token('*'), i, w);
 			t2 = new Arith(new Token('+'), loc, t1);
 			loc = t2;
