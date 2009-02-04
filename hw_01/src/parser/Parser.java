@@ -254,7 +254,7 @@ public class Parser {
 				result = op1 - op2;
 			}
 
-			System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
+			//System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
 
 			return new Constant(new Num(result), Type.Int);
 		}
@@ -269,7 +269,7 @@ public class Parser {
 				result = op1 - op2;
 			}
 
-			System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
+			//System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
 
 			return new Constant(new Real(result), Type.Float);
 		}
@@ -290,7 +290,7 @@ public class Parser {
 				result = op1 / op2;
 			}
 
-			System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
+			//System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
 
 			return new Constant(new Num(result), Type.Int);
 		}
@@ -306,7 +306,7 @@ public class Parser {
 				result = op1 / op2;
 			}
 
-			System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
+			//System.out.println("Folding: " + op1 + op + op2 + "\tto: " + result);
 
 			return new Constant(new Real(result), Type.Float);
 		}
