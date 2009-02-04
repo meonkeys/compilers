@@ -3,8 +3,7 @@ package main;
 import java.io.*;
 
 public class Test {
-	// static String[] tests = { "array", "fromBook", "precedence", "simple" };
-	static String[] tests = { "simple" };
+	static String[] tests = { "array", "fromBook", "precedence", "simple" };
 
 	public static void main(String[] args) throws IOException {
 		InputStream old_stdin = System.in;
@@ -13,7 +12,7 @@ public class Test {
 
 		for (String s : tests) {
 			// setUp
-			System.setIn(new FileInputStream("tests" + File.separator + s));
+			System.setIn(new FileInputStream(args[0] + File.separator + s));
 			StringSavePrintStream temp = new StringSavePrintStream();
 			PrintStream pstream = new PrintStream(temp);
 			System.setOut(pstream);
@@ -27,7 +26,7 @@ public class Test {
 			System.setOut(old_stdout);
 
 			// report
-			String expected = slurp("tests" + File.separator + s + ".i");
+			String expected = slurp(args[0] + File.separator + s + ".i");
 			if (!expected.equals(actual)) {
 				System.out.println("ERROR in test: " + s);
 				System.out.println("EXPECTED:\n" + expected);
