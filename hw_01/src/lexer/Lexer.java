@@ -124,10 +124,6 @@ public class Lexer {
 		return tok;
 	}
 
-	public char peek(){
-		return peek;
-	}
-
 	public static void reset() {
 		line = 1;
 	}
