@@ -33,7 +33,7 @@ public class Expr extends Node {
 		else if (f != 0)
 			emit("iffalse " + test + " goto L" + f);
 		else
-			;
+			; // nothing since both t and f fall through
 	}
 
 	public String toString() {

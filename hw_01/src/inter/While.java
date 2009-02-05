@@ -19,9 +19,9 @@ public class While extends Stmt {
 	}
 
 	public void gen(int b, int a) {
-		after = a;
+		after = a; // save label a
 		expr.jumping(0, a);
-		int label = newlabel();
+		int label = newlabel(); // label for stmt
 		emitlabel(label);
 		stmt.gen(label, b);
 		emit("goto L" + b);

@@ -3,6 +3,9 @@ package inter;
 import lexer.*;
 import symbols.*;
 
+/**
+ * Handles "minus". For !, see {@link Not}.
+ */
 public class Unary extends Op {
 	public Expr expr;
 

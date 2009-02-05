@@ -7,7 +7,7 @@ public class Logical extends Expr {
 	public Expr expr1, expr2;
 
 	Logical(Token tok, Expr x1, Expr x2) {
-		super(tok, null);
+		super(tok, null); // null type to start
 		expr1 = x1;
 		expr2 = x2;
 		type = check(expr1.type, expr2.type);

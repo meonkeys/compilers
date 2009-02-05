@@ -6,11 +6,11 @@ import symbols.*;
 import inter.*;
 
 public class Parser {
-	private Lexer lex;
-	private Token look;
+	private Lexer lex; // lexical analyzer for this parser
+	private Token look; // lookahead
 
-	Env top = null;
-	int used = 0;
+	Env top = null; // current or top symbol table
+	int used = 0; // storage used for declarations
 
 	public Parser(Lexer l) throws IOException {
 		lex = l;
@@ -61,17 +61,16 @@ public class Parser {
 			Id id = new Id((Word) tok, p, used);
 			top.put(tok, id);
 			used = used + p.width;
-
 		}
 	}
 
 	Type type() throws IOException {
-		Type p = (Type) look;
+		Type p = (Type) look; // expect look.tag == Tag.BASIC
 		match(Tag.BASIC);
 		if (look.tag != '[')
-			return p;
+			return p; // T -> basic
 		else
-			return dims(p);
+			return dims(p); // return array type
 	}
 
 	Type dims(Type p) throws IOException {

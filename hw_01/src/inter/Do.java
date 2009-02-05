@@ -20,7 +20,7 @@ public class Do extends Stmt {
 
 	public void gen(int b, int a) {
 		after = a;
-		int label = newlabel();
+		int label = newlabel(); // label for expr
 		stmt.gen(b, label);
 		emitlabel(label);
 		expr.jumping(b, 0);
