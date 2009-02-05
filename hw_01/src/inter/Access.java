@@ -22,6 +22,6 @@ public class Access extends Op {
 	}
 
 	public String toString() {
-		return array.toString() + " [ " + index.toString() + " ] ";
+		return array.toString() + " [ " + index.toString() + " ]";
 	}
 }
