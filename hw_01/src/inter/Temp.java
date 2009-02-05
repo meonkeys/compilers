@@ -15,7 +15,7 @@ public class Temp extends Expr {
 	public String toString() {
 		return "t" + number;
 	}
-	
+
 	public static void reset() {
 		count = 0;
 	}
