@@ -127,4 +127,8 @@ public class Lexer {
 	public char peek(){
 		return peek;
 	}
+
+	public static void reset() {
+		line = 1;
+	}
 }

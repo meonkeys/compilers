@@ -22,4 +22,8 @@ public class Stmt extends Node {
 	 * Used for break statements.
 	 */
 	public static Stmt Enclosing = Stmt.Null;
+	
+	public static void reset() {
+		Stmt.Enclosing = Stmt.Null;
+	}
 }

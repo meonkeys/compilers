@@ -21,6 +21,7 @@ public class Test {
 			Main.compile();
 
 			// tearDown
+			temp.flush();
 			String actual = temp.read();
 			System.setIn(old_stdin);
 			System.setOut(old_stdout);

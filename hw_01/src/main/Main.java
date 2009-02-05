@@ -1,5 +1,9 @@
 package main;
 
+import inter.Node;
+import inter.Stmt;
+import inter.Temp;
+
 import java.io.*;
 import lexer.*;
 import parser.*;
@@ -20,5 +24,14 @@ public class Main {
 		Parser parse = new Parser(lex);
 		parse.program();
 		System.out.write('\n');
+		reset();
+	}
+
+	/** Clean up static state for the benefit of unit tests. */
+	private static void reset() {
+		Lexer.reset();
+		Node.reset();
+		Temp.reset();
+		Stmt.reset();
 	}
 }
