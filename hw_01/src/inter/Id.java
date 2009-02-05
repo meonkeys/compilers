@@ -10,4 +10,10 @@ public class Id extends Expr {
 		super(id, p);
 		offset = b;
 	}
+
+	/*
+	 * To distinguish between multiple declarations of the same name, uncomment
+	 * the toString() method, below.
+	 */
+	// public String toString() {return "" + op.toString() + offset;}
 }
