@@ -1,0 +1,14 @@
+{
+   int i; int j; float v; float x; float[100] a;
+
+   i = i + 100 * (5-3);
+   j = j - 5 - 6*7;
+   while ( i < 100*7/2 ) {
+      do i = 3-1*2+i; while( a[i] < v );
+      do j = 3-2*1+j; while( a[j] > v );
+      if( i >= j ) break;
+      x = a[i]; a[i] = a[j]; a[j] = x;
+   }
+   j = 100 * 6/ (4+8) - 15*2 + 65/5*3;
+   i = 200 - i * 5 + (6*5+7 - 39*2/3);
+}
