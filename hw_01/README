@@ -1,3 +1,51 @@
-First homework assignment.
+CSCI 5161 -- Spring 2009
+Assignment 1
+Due February 10, 2009
 
-http://www-users.itlabs.umn.edu/classes/Spring-2009/csci5161/index.php?page=assignment
+AUTHORS
+
+    Joe Myre <myrex013@umn.edu>
+    Adam Monsen <mons0166@umn.edu>
+
+SYNOPSIS
+
+    cd src
+    make
+
+PREREQUISITES
+
+    * Java compiler and virtual machine conformant with the Java 6
+      specification.
+    * POSIX-compatible Make
+
+EXECUTION DETAILS
+
+    Typing "make" in the source directory should compile and run all unit
+    tests.
+
+    * The Java compiler is assumed to be /usr/bin/javac
+    * The Java virtual machine is assumed to be /usr/bin/java
+
+    If these paths are incorrect, edit src/Makefile before compiling and
+    running unit tests.
+
+    The code is known to work on Ubuntu 8.10 with Sun Java 6 and GNU Make.
+
+CODE DETAILS
+
+    Assignment description:
+    http://www-users.itlabs.umn.edu/classes/Spring-2009/csci5161/index.php?page=assignment
+
+    The primary changes were in parser.Parser:
+    
+    * term() was modified to support '*' and '/' operators.
+    * expr() and term() were modified to support constant folding via the
+      fold() method in the same class
+
+    Additionally, a unit test framework was added by:
+
+    * modifying the Main class so compilation could be programmatically
+      directed
+    * adding Main#reset() (and callees) so static global state for the compiler
+      frontend could be cleared
+    * creating a Test class

@@ -1,6 +1,0 @@
-required:
-[_] handle * and / operators
-[_] constant folding
-
-other:
-[_] unit tests

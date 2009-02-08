@@ -1,4 +1,3 @@
-TARGET = main
 OBJECT = main/Main.class inter/*.class lexer/*.class parser/*.class symbols/*.class
 JavaCompiler = /usr/bin/javac
 JavaVirtualMachine = /usr/bin/java
@@ -21,6 +20,8 @@ parser/*.class : parser/*.java
 
 symbols/*.class : symbols/*.java 
 	$(JavaCompiler) symbols/*.java
+
+.PHONY: test clean
 
 test: main
 	$(JavaVirtualMachine) main.Test ../tests
