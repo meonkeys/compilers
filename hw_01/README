@@ -49,3 +49,9 @@ CODE DETAILS
     * adding Main#reset() (and callees) so static global state for the compiler
       frontend could be cleared
     * creating a Test class
+
+BUGS
+
+    parser.Parser#fold() oversimplifies handling of integer and floating point
+    values and will lose precision for very large or very small integer values.
+    More robust type coercion seemed out of the scope of the assignment.
