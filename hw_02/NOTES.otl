@@ -1,0 +1,24 @@
+Flex manual in HTML format: http://flex.sf.net/manual/
+
+globals
+	char *yytext
+		start of match (aka token) (using default setting %pointer)
+	int yyleng
+		length of match
+
+matching
+	longest match wins
+	first matching rule wins
+	if no match: match next character and copy to stdout
+
+hints
+	common regular expressions, including one for C99 comments
+		http://flex.sf.net/manual/Common-Patterns.html
+	C-style comment eater
+		http://flex.sf.net/manual/Actions.html
+		search page for "input()"
+	more on parsing C-style comments:
+		http://flex.sf.net/manual/Start-Conditions.html
+		search page for "C comments"
+	FAQ: "How do I expand backslash-escape sequences in C-style quoted strings?"
+		http://tinyurl.com/af6ju4

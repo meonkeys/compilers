@@ -3,9 +3,10 @@ CFLAGS=-g -Werror -pedantic-errors -ansi
 # add -d to the next line to generate a debugging scanner
 LEX=flex
 
-scan: scan.o
+# uses implicit rules to compile the scanner
+scan:
 
-scan.o: scan.l
+.PHONY: clean
 
 clean:
 	$(RM) *.o scan
