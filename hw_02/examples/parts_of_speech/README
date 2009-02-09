@@ -1,0 +1,7 @@
+Demonstrates a simple state machine and auxiliary functions to dynamically
+create a lookup table used to count occurrences of different parts of speech.
+
+Source code from "lex & yacc, 2nd Edition" by John Levine, Tony Mason, Doug
+Brown. Copyright 1992 O'Reilly Media, Inc.
+ISBN-10: 1-565-92000-7
+ISBN-13: 978-1-565-92000-2

@@ -1,0 +1,9 @@
+noun dog cat horse cow fox
+verb chew eat lick
+adj quick
+
+The quick brown fox jumps over the lazy dog.
+
+FoX
+
+hOrSe

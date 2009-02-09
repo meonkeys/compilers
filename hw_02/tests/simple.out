@@ -1,0 +1,20 @@
+There are 57 tokens /* comments are counted as tokens */
+There are 19 lines
+There are 3 comments:
+/* 1: this is just a sample */
+/* 2: this is a 3-line
+comment
+*/
+/* 3: this is /* the end ***/
+
+Frequency of identifiers:
+a1 1
+abc 4
+b1 1
+def 3
+main 1
+n 3
+new 1
+read 1
+s1 1
+write 2

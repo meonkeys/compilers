@@ -22,3 +22,6 @@ hints
 		search page for "C comments"
 	FAQ: "How do I expand backslash-escape sequences in C-style quoted strings?"
 		http://tinyurl.com/af6ju4
+	--yylineno, %option yylineno
+		scanner keeps track of line numbering
+		http://flex.sf.net/manual/Options-Affecting-Scanner-Behavior.html
