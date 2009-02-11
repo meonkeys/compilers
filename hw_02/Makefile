@@ -4,6 +4,7 @@ CFLAGS=-g -Wall -Werror -pedantic-errors -ansi
 # Add -d to the next line to generate a debugging scanner (or uncomment %option
 # debug in the .l file).
 LEX=flex
+LFLAGS=-t --yylineno
 
 test: scan
 	bash unit_test.sh

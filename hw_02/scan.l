@@ -1,5 +1,5 @@
 %option warn nodefault
-%option noinput nounput noyywrap
+%option noinput nounput noyywrap yylineno
 /* %option debug */
 
 %top{
@@ -9,7 +9,7 @@
 
 %{
 /* could use %option yylineno in __FILE__ instead of num_lines */
-int num_lines = 1, num_tokens = 0, num_comments = 0;
+int num_tokens = 0, num_comments = 0;
 
 void start_comment();
 void end_comment();
@@ -43,7 +43,7 @@ WHITESPACE      [ \t]+
 "/*"                    { BEGIN(comment); start_comment(); }
 <comment>[^*\n]*        /* eat anything that's not a '*' */
 <comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
-<comment>\n             num_lines++; /* blank lines in comments are ok */
+<comment>\n             /* blank lines in comments are ok */
 <comment>"*"+"/"        {
                                 end_comment();
                                 num_comments++;
@@ -53,8 +53,8 @@ WHITESPACE      [ \t]+
 
 
 {WHITESPACE}    num_tokens++;
-\n              num_lines++;
- .              { printf("Unrecognized character: %s\n", yytext); }
+\n				{}
+ .              { printf("Unrecognized character: %s on line: %d\n", yytext, yylineno); }
 
 %%
 
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 {
     yylex();
     printf("There are %d tokens /* comments are counted as tokens */\n", num_tokens);
-    printf("There are %d lines\n", num_lines);
+    printf("There are %d lines\n", yylineno);
     printf("There are %d comments:\n", num_comments);
     return EXIT_SUCCESS;
 }
