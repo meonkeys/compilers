@@ -29,6 +29,9 @@ NUMBER          [0-9]+
 STRING          \"[^"]*\"
 OP              "+"|"-"|"*"|"/"|=
 WHITESPACE      [ \t]+
+SCOPE			[\{\}]
+TERMINALS		;
+PARENS			[\(\)]
 
 %x comment
 
@@ -40,7 +43,7 @@ WHITESPACE      [ \t]+
 {STRING}        num_tokens++;
 {OP}            num_tokens++;
 
-"/*"                    { BEGIN(comment); start_comment(); }
+"/*"                    { BEGIN(comment); start_comment();}
 <comment>[^*\n]*        /* eat anything that's not a '*' */
 <comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
 <comment>\n             /* blank lines in comments are ok */
@@ -53,6 +56,9 @@ WHITESPACE      [ \t]+
 
 
 {WHITESPACE}    num_tokens++;
+{SCOPE}			{}
+{TERMINALS}		{}
+{PARENS}		{}
 \n				{}
  .              { printf("Unrecognized character: %s on line: %d\n", yytext, yylineno); }
 
