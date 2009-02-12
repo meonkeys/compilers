@@ -23,15 +23,17 @@ long num_chars = 0;
 %}
 
 /* reserved words */
-RESERVED        int|float|struct
-ID              [a-z][a-z0-9]*
-NUMBER          [0-9]+
+RESERVED        return|typedef|if|else|int|float|for|struct|union|void|while
+ID              [a-z][a-z0-9\_]*
+INT				[0-9]+
+FLOAT			.[0-9]+|[0-9]+.|[0-9]+.[0-9]+
 STRING          \"[^"]*\"
-OP              "+"|"-"|"*"|"/"|=
-WHITESPACE      [ \t]+
-SCOPE			[\{\}]
-TERMINALS		;
-PARENS			[\(\)]
+ARITHOP         "+"|"-"|"*"|"/"
+RELOP			"<"|">"|">="|"<="|"!="|"=="
+LOGOP			"||"|"&&"|"!"
+ASSIGNOP		"="
+WHITESPACE      [ \t\v\f]+
+SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
 
 %x comment
 
@@ -39,9 +41,13 @@ PARENS			[\(\)]
 
 {RESERVED}      num_tokens++;
 {ID}            num_tokens++;
-{NUMBER}        num_tokens++;
+{INT}			num_tokens++;
+{FLOAT}			num_tokens++;
 {STRING}        num_tokens++;
-{OP}            num_tokens++;
+{ARITHOP}       num_tokens++;
+{RELOP}			num_tokens++;
+{LOGOP}			num_tokens++;
+{ASSIGNOP}      num_tokens++;
 
 "/*"                    { BEGIN(comment); start_comment();}
 <comment>[^*\n]*        /* eat anything that's not a '*' */
@@ -56,9 +62,7 @@ PARENS			[\(\)]
 
 
 {WHITESPACE}    num_tokens++;
-{SCOPE}			{}
-{TERMINALS}		{}
-{PARENS}		{}
+{SEPERATOR}		{}
 \n				{}
  .              { printf("Unrecognized character: %s on line: %d\n", yytext, yylineno); }
 
