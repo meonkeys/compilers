@@ -34,6 +34,7 @@ LOGOP			"||"|"&&"|"!"
 ASSIGNOP		"="
 WHITESPACE      [ \t]+
 SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
+/* we still need to define string literals */
 
 %x comment
 
@@ -47,15 +48,15 @@ SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
 {ARITHOP}       num_tokens++;
 {RELOP}			num_tokens++;
 {LOGOP}			num_tokens++;
-{ASSIGNOP}      num_tokens++;
 {SEPERATOR}		num_tokens++;
+{ASSIGNOP}      num_tokens++;
 
-"/*"                    { BEGIN(comment); start_comment();}
+"/*"                    { BEGIN(comment); }  /* start_comment();} */
 <comment>[^*\n]*        /* eat anything that's not a '*' */
 <comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
 <comment>\n             /* blank lines in comments are ok */
 <comment>"*"+"/"        {
-                                end_comment();
+                                /*end_comment();*/
                                 num_comments++;
                                 num_tokens++;
                                 BEGIN(INITIAL);
@@ -74,6 +75,12 @@ int main(int argc, char *argv[])
     printf("There are %d tokens /* comments are counted as tokens */\n", num_tokens);
     printf("There are %d lines\n", yylineno);
     printf("There are %d comments:\n", num_comments);
+	
+	/* printfs for comments here */
+
+	/* print out the frequency of identifiers here */
+	printf("Frequency of identifiers:\n");
+
     return EXIT_SUCCESS;
 }
 
