@@ -32,7 +32,7 @@ ARITHOP         "+"|"-"|"*"|"/"
 RELOP			"<"|">"|">="|"<="|"!="|"=="
 LOGOP			"||"|"&&"|"!"
 ASSIGNOP		"="
-WHITESPACE      [ \t\v\f]+
+WHITESPACE      [ \t]+
 SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
 
 %x comment
@@ -48,6 +48,7 @@ SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
 {RELOP}			num_tokens++;
 {LOGOP}			num_tokens++;
 {ASSIGNOP}      num_tokens++;
+{SEPERATOR}		num_tokens++;
 
 "/*"                    { BEGIN(comment); start_comment();}
 <comment>[^*\n]*        /* eat anything that's not a '*' */
@@ -61,8 +62,7 @@ SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
                         }
 
 
-{WHITESPACE}    num_tokens++;
-{SEPERATOR}		{}
+{WHITESPACE}    {}
 \n				{}
  .              { printf("Unrecognized character: %s on line: %d\n", yytext, yylineno); }
 
