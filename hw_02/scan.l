@@ -24,16 +24,17 @@ long num_chars = 0;
 
 /* reserved words */
 RESERVED        return|typedef|if|else|int|float|for|struct|union|void|while
-ID              [a-z][a-z0-9\_]*
-INT				[0-9]+
-FLOAT			.[0-9]+|[0-9]+.|[0-9]+.[0-9]+
+ID              [a-z][a-z0-9_]*
+DIGIT           [0-9]
+INT             {DIGIT}+
+FLOAT           \.{DIGIT}+|{DIGIT}+\.|{DIGIT}+\.{DIGIT}+
 STRING          \"[^"]*\"
 ARITHOP         "+"|"-"|"*"|"/"
-RELOP			"<"|">"|">="|"<="|"!="|"=="
-LOGOP			"||"|"&&"|"!"
-ASSIGNOP		"="
+RELOP           "<"|">"|">="|"<="|"!="|"=="
+LOGOP           "||"|"&&"|"!"
+ASSIGNOP        "="
 WHITESPACE      [ \t]+
-SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
+SEPARATOR       "{"|"}"|"["|"]"|"("|")"|";"|","|"."
 /* we still need to define string literals */
 
 %x comment
@@ -42,21 +43,21 @@ SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
 
 {RESERVED}      num_tokens++;
 {ID}            num_tokens++;
-{INT}			num_tokens++;
-{FLOAT}			num_tokens++;
+{INT}           num_tokens++;
+{FLOAT}         num_tokens++;
 {STRING}        num_tokens++;
 {ARITHOP}       num_tokens++;
-{RELOP}			num_tokens++;
-{LOGOP}			num_tokens++;
-{SEPERATOR}		num_tokens++;
+{RELOP}         num_tokens++;
+{LOGOP}         num_tokens++;
+{SEPARATOR}     num_tokens++;
 {ASSIGNOP}      num_tokens++;
 
-"/*"                    { BEGIN(comment); }  /* start_comment();} */
+"/*"                    { BEGIN(comment); start_comment();}
 <comment>[^*\n]*        /* eat anything that's not a '*' */
 <comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
 <comment>\n             /* blank lines in comments are ok */
 <comment>"*"+"/"        {
-                                /*end_comment();*/
+                                end_comment();
                                 num_comments++;
                                 num_tokens++;
                                 BEGIN(INITIAL);
@@ -64,8 +65,9 @@ SEPERATOR		"{"|"}"|"["|"]"|"("|")"|";"|","|"."
 
 
 {WHITESPACE}    {}
-\n				{}
- .              { printf("Unrecognized character: %s on line: %d\n", yytext, yylineno); }
+\n              {}
+ .              { printf("Unrecognized character: %s on line: %d\n",
+                         yytext, yylineno); }
 
 %%
 
@@ -75,22 +77,37 @@ int main(int argc, char *argv[])
     printf("There are %d tokens /* comments are counted as tokens */\n", num_tokens);
     printf("There are %d lines\n", yylineno);
     printf("There are %d comments:\n", num_comments);
-	
-	/* printfs for comments here */
 
-	/* print out the frequency of identifiers here */
-	printf("Frequency of identifiers:\n");
+    /* printfs for comments here */
+
+    /* print out the frequency of identifiers here */
+    printf("Frequency of identifiers:\n");
 
     return EXIT_SUCCESS;
 }
 
 void start_comment()
 {
-    /* subtract 2 for the '/' and the '*' characters starting the comment. */
-    printf("comment %d started at %ld\n", num_comments, num_chars - 2);
+    /*
+     * TODO:
+     * Save file position of yyin at start of comment so we can print it out
+     * later by copying part of yyin to stdout. Start of comment is exactly:
+     *
+     *     num_chars - 2
+     *
+     * since yyin will already have read past the / and the *.
+     */
 }
 
 void end_comment()
 {
-    printf("comment %d ended at %ld\n", num_comments, num_chars);
+    /*
+     * TODO:
+     * Save file position of yyin at end of comment so we can print it out
+     * later by copying part of yyin to stdout. Start of comment is exactly:
+     *
+     *     num_chars
+     *
+     * ...this includes the * and the /.
+     */
 }
