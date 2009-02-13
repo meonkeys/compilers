@@ -5,8 +5,11 @@ CFLAGS=-g -Wall -Werror -pedantic-errors -ansi
 # debug in the .l file).
 LEX=flex
 
-test: scan
+test: scan valgrind
 	bash unit_test.sh
+
+valgrind: scan
+	$@ --quiet ./$< < tests/simple.in > /dev/null
 
 # uses implicit rules to compile the scanner
 scan:
