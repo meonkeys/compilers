@@ -1,7 +1,6 @@
 #!/bin/bash
 set -o errexit
 tmpdir=`mktemp -d`
-#echo "tmpdir: $tmpdir"
 for t in `\ls tests/*.in`
 do
     echo "test: $t"
