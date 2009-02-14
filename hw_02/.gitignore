@@ -1,2 +1,3 @@
 scan
-scan.o
+*.o
+ctest
