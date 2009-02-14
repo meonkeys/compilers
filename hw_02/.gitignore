@@ -1,4 +1,4 @@
 scan
 *.o
-ctest
+test_list
 tags
