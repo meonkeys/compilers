@@ -15,6 +15,7 @@ typedef struct list_s
     Item *first;
     Item *last;
     Item *current;
+    long size;
 }
 List;
 
@@ -31,13 +32,18 @@ Item * next_item(List *list);
 Bool has_next(List *list);
 
 /**
- * Must call this on a list before usage. list must point to NULL.
+ * Must call this on a list before usage.
  */
 List * init_list(void);
 
 /**
+ * Must call this on an item before usage.
+ */
+Item * init_item(void *data);
+
+/**
  * Must call this on a list when done using list.
  */
-void destroy_list(List *list, void (*destroy_item_func)(Item *item));
+void destroy_list(List *list, void (*destroy_item)(Item *item));
 
-#endif /* ifndef LIST_H */
+#endif /* ifndef GLOBAL_H */

@@ -5,20 +5,15 @@ CFLAGS=-g -Wall -Werror -pedantic-errors -ansi -I.
 # debug in the .l file).
 LEX=flex
 
-# XXX - remove
-temp: ctest run_ctest
-
-# XXX - remove
-run_ctest: ctest
-	./$<
-
 test: scan ctest valgrind
 	bash unit_test.sh
+	./ctest
 
 ctest: list.o
 
-valgrind: scan
+valgrind: scan ctest
 	$@ --quiet ./$< < tests/simple.in > /dev/null
+	$@ --quiet ./ctest
 
 # uses implicit rules to compile the scanner
 scan:

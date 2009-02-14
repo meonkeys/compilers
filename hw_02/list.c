@@ -5,11 +5,20 @@
 void
 append (List *list, Item *item)
 {
-    Item *n = NULL;
     assert(NULL != list);
     assert(NULL != item);
-    /* TODO: implement */
-    n = NULL;
+    if (NULL == list->first)
+    {
+        assert(NULL == item->next);
+        list->first = item;
+        list->last = item;
+        list->current = item;
+    }
+    else
+    {
+        list->last->next = item;
+    }
+    list->size++;
 }
 
 Item *
@@ -40,18 +49,29 @@ init_list(void)
     list->first = NULL;
     list->last = NULL;
     list->current = NULL;
+    list->size = 0;
     return list;
 }
 
 void
-destroy_list(List *list, void (*destroy_item_func)(Item *item))
+destroy_list(List *list, void (*destroy_item)(Item *item))
 {
     while (has_next(list))
     {
         Item *item = next_item(list);
-        destroy_item_func(item);
+        destroy_item(item);
         item = NULL;
     }
     free(list);
-    list = NULL;
+}
+
+
+Item *
+init_item(void *data)
+{
+    Item *item = malloc(sizeof(Item));
+    assert(NULL != item);
+    item->next = NULL;
+    item->data = data;
+    return item;
 }
