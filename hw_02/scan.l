@@ -80,22 +80,22 @@ SEPARATOR       "{"|"}"|"["|"]"|"("|")"|";"|","|"."
 
 %%
 
-int main(int argc, char *argv[])
+int main (int argc, char *argv[])
 {
-    comments = init_list();
-    yylex();
-    printf("There are %d tokens /* comments are counted as tokens */\n",
-        num_tokens);
-    printf("There are %d lines\n", yylineno);
-    printf("There are %ld comments:\n", comments->size);
+    comments = init_list ();
+    yylex ();
+    printf ("There are %d tokens /* comments are counted as tokens */\n",
+            num_tokens);
+    printf ("There are %d lines\n", yylineno);
+    printf ("There are %ld comments:\n", comments->size);
 
-    display_comments();
-    printf("\n");
+    display_comments ();
+    printf ("\n");
 
     /* print out the frequency of identifiers here */
-    printf("Frequency of identifiers:\n");
+    printf ("Frequency of identifiers:\n");
 
-    destroy_list(comments, destroy_data);
+    destroy_list (comments, destroy_data);
 
     return EXIT_SUCCESS;
 }
@@ -105,11 +105,11 @@ int main(int argc, char *argv[])
  * scanner will already have read past the / and the *, so we have to account
  * for the difference.
  */
-void start_comment()
+void start_comment ()
 {
-    latest_comment_positions = malloc(sizeof(CommentPos));
-    latest_comment = init_item(latest_comment_positions);
-    assert(NULL != latest_comment);
+    latest_comment_positions = malloc (sizeof (CommentPos));
+    latest_comment = init_item (latest_comment_positions);
+    assert (NULL != latest_comment);
     latest_comment_positions->start = num_chars - 2;
 }
 
@@ -117,27 +117,29 @@ void start_comment()
  * End of comment is exactly num_chars when this function is called. This
  * includes the * and the /.
  */
-void end_comment()
+void end_comment ()
 {
     latest_comment_positions->end = num_chars;
-    append(comments, latest_comment);
+    append (comments, latest_comment);
 }
 
-void display_comments()
+void display_comments ()
 {
-    while (has_next(comments))
+    while (has_next (comments))
     {
-        Item *next = next_item(comments);
+        Item *next = next_item (comments);
         CommentPos *comment_pos = (CommentPos *) next->data;
         long left = comment_pos->end - comment_pos->start;
         int current = EOF;
-        assert(0 == fseek(yyin, comment_pos->start, SEEK_SET));
-        do {
-            current = getc(yyin);
-            assert(EOF != current);
-            assert(EOF != putchar(current));
+        assert (0 == fseek (yyin, comment_pos->start, SEEK_SET));
+        do
+        {
+            current = getc (yyin);
+            assert (EOF != current);
+            assert (EOF != putchar (current));
             left -= 1;
-        } while (left > 0);
-        assert(EOF != putchar('\n'));
+        }
+        while (left > 0);
+        assert (EOF != putchar ('\n'));
     }
 }
