@@ -9,6 +9,7 @@
 
 %{
 #include <assert.h>
+#include <hash.h>
 #include <list.h>
 
 typedef struct comment_pos_t { long start; long end; } CommentPos;

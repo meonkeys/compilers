@@ -1,5 +1,6 @@
 src/scan
 src/*.o
+src/test_hash
 src/test_list
 src/tags
 src/cscope.out

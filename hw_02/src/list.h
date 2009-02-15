@@ -46,4 +46,4 @@ ListItem *init_item (void *data);
  */
 void destroy_list (List * list, void (*destroy_data) (void *data));
 
-#endif /* ifndef GLOBAL_H */
+#endif
