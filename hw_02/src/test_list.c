@@ -39,9 +39,9 @@ main (void)
     /* declarations */
     MyData *mydata1 = init_MyData (1, "Joe Smith", strlen ("Joe Smith"));
     MyData *mydata2 = init_MyData (2, "Jim Smythe", strlen ("Joe Smythe"));
-    Item *item1 = init_item (mydata1);
-    Item *item2 = init_item (mydata2);
-    Item *tmp_item = NULL;
+    ListItem *item1 = init_item (mydata1);
+    ListItem *item2 = init_item (mydata2);
+    ListItem *tmp_item = NULL;
     List *list = init_list ();
 
     /* tests */

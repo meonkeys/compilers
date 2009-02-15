@@ -19,7 +19,7 @@ int num_tokens = 0;
 long num_chars = 0;
 List *comments = NULL;
 CommentPos *latest_comment_positions = NULL;
-Item *latest_comment = NULL;
+ListItem *latest_comment = NULL;
 
 void start_comment();
 void end_comment();
@@ -127,7 +127,7 @@ void display_comments ()
 {
     while (has_next (comments))
     {
-        Item *next = next_item (comments);
+        ListItem *next = next_item (comments);
         CommentPos *comment_pos = (CommentPos *) next->data;
         long left = comment_pos->end - comment_pos->start;
         int current = EOF;

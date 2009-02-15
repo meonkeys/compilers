@@ -8,13 +8,13 @@ typedef struct item_s
     struct item_s *next;
     void *data;
 }
-Item;
+ListItem;
 
 typedef struct list_s
 {
-    Item *first;
-    Item *last;                 /* guarantees O(1) inserts */
-    Item *current;              /* iterator-like functionality */
+    ListItem *first;
+    ListItem *last;             /* guarantees O(1) inserts */
+    ListItem *current;          /* iterator-like functionality */
     long size;
 }
 List;
@@ -22,12 +22,12 @@ List;
 /**
  * Append a new item to the end of the list.
  */
-void append (List * list, Item * item);
+void append (List * list, ListItem * item);
 
 /**
  * Return the next node in the list.
  */
-Item *next_item (List * list);
+ListItem *next_item (List * list);
 
 Bool has_next (List * list);
 
@@ -39,7 +39,7 @@ List *init_list (void);
 /**
  * Must call this on an item before usage.
  */
-Item *init_item (void *data);
+ListItem *init_item (void *data);
 
 /**
  * Must call this on a list when done using list.

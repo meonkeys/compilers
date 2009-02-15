@@ -2,3 +2,5 @@ src/scan
 src/*.o
 src/test_list
 src/tags
+src/cscope.out
+src/*~

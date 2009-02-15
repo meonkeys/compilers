@@ -17,7 +17,11 @@ valgrind: scan test_list
 # uses implicit rules to compile the scanner
 scan: list.o
 
-.PHONY: clean
+.PHONY: distclean clean
 
 clean:
-	$(RM) *.o scan test_list
+	$(RM) *.o scan test_list *~
+
+# "clean enough for source distribution"
+distclean: clean
+	$(RM) tags cscope.out

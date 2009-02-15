@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 void
-append (List * list, Item * item)
+append (List * list, ListItem * item)
 {
     assert (NULL != list);
     assert (NULL != item);
@@ -22,10 +22,10 @@ append (List * list, Item * item)
     list->size++;
 }
 
-Item *
+ListItem *
 next_item (List * list)
 {
-    Item *this;
+    ListItem *this;
     assert (NULL != list->current);
     this = list->current;
     list->current = list->current->next;
@@ -66,7 +66,7 @@ destroy_list (List * list, void (*destroy_data) (void *data))
     reset (list);
     while (has_next (list))
     {
-        Item *item = next_item (list);
+        ListItem *item = next_item (list);
         destroy_data (item->data);
         free (item);
     }
@@ -74,10 +74,10 @@ destroy_list (List * list, void (*destroy_data) (void *data))
 }
 
 
-Item *
+ListItem *
 init_item (void *data)
 {
-    Item *item = malloc (sizeof (Item));
+    ListItem *item = malloc (sizeof (ListItem));
     assert (NULL != item);
     item->next = NULL;
     item->data = data;
