@@ -15,9 +15,9 @@ typedef struct mydata_s
 } MyData;
 
 void
-destroy_item(Item *item)
+destroy_data(void *data)
 {
-    free((MyData *)item->data);
+    free(data);
 }
 
 MyData *
@@ -65,7 +65,7 @@ main (void)
     assert(2 == list->size);
 
     /* cleanup */
-    destroy_list(list, destroy_item);
+    destroy_list(list, destroy_data);
     list = NULL;
 
     return EXIT_SUCCESS;

@@ -1,4 +1,4 @@
-[_] recognize tokens
+[X] recognize tokens
 	[X] operators
 		+ | - | * | /
 	[X] separators
@@ -10,7 +10,7 @@
 	[X] constants
 		examples: 1, "Enter a number"
 	[X] whitespace
-[_] deal with parens, commas, semicolons, curly braces
+[X] deal with parens, commas, semicolons, curly braces
 [_] count
 	[X] total number of tokens
 	[X] total number of lines
@@ -20,7 +20,7 @@
 	[X] total number of tokens
 	[X] total number of lines
 	[X] total number of comments
-	[_] comments themselves
+	[X] comments themselves
 		store comment offsets in input stream using (start|end)comment
 		"replay" comments in main()
 			can fseek(), fread() into buffer and fwrite() to stdout
@@ -28,3 +28,4 @@
 [_] sort identifiers alphabetically
 [_] symbol table supports efficient insertion, lookup, deletion
 [_] all unit tests pass
+[_] exclude valgrind memory checks from default build

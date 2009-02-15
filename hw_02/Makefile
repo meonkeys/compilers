@@ -16,7 +16,7 @@ valgrind: scan test_list
 	$@ --quiet ./test_list
 
 # uses implicit rules to compile the scanner
-scan:
+scan: list.o
 
 .PHONY: clean
 

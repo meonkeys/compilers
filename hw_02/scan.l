@@ -9,12 +9,17 @@
 
 %{
 #include <assert.h>
+#include <list.h>
+
+typedef struct comment_pos_t { long start; long end; } CommentPos;
+void destroy_data(void *data) { free(data); }
 
 /* could use %option yylineno in __FILE__ instead of num_lines */
-int num_tokens = 0, num_comments = 0;
-/* FIXME, FIXME, FIXME: use growable structure(s)! */
-long comment_start_pos[] = {0,0,0}, comment_end_pos[] = {0,0,0};
+int num_tokens = 0;
 long num_chars = 0;
+List *comments = NULL;
+CommentPos *latest_comment_positions = NULL;
+Item *latest_comment = NULL;
 
 void start_comment();
 void end_comment();
@@ -63,7 +68,6 @@ SEPARATOR       "{"|"}"|"["|"]"|"("|")"|";"|","|"."
 <comment>\n             /* blank lines in comments are ok */
 <comment>"*"+"/"        {
                                 end_comment();
-                                num_comments++;
                                 num_tokens++;
                                 BEGIN(INITIAL);
                         }
@@ -78,16 +82,19 @@ SEPARATOR       "{"|"}"|"["|"]"|"("|")"|";"|","|"."
 
 int main(int argc, char *argv[])
 {
+    comments = init_list();
     yylex();
     printf("There are %d tokens /* comments are counted as tokens */\n", num_tokens);
     printf("There are %d lines\n", yylineno);
-    printf("There are %d comments:\n", num_comments);
+    printf("There are %ld comments:\n", comments->size);
 
     display_comments();
     printf("\n");
 
     /* print out the frequency of identifiers here */
     printf("Frequency of identifiers:\n");
+
+    destroy_list(comments, destroy_data);
 
     return EXIT_SUCCESS;
 }
@@ -99,7 +106,10 @@ int main(int argc, char *argv[])
  */
 void start_comment()
 {
-     comment_start_pos[num_comments] = num_chars - 2;
+    latest_comment_positions = malloc(sizeof(CommentPos));
+    latest_comment = init_item(latest_comment_positions);
+    assert(NULL != latest_comment);
+    latest_comment_positions->start = num_chars -2;
 }
 
 /*
@@ -108,17 +118,19 @@ void start_comment()
  */
 void end_comment()
 {
-     comment_end_pos[num_comments] = num_chars;
+    latest_comment_positions->end = num_chars;
+    append(comments, latest_comment);
 }
 
 void display_comments()
 {
-    int i = 0;
-    for (i = 0; i < num_comments; i++)
+    while (has_next(comments))
     {
-        long left = comment_end_pos[i] - comment_start_pos[i];
+        Item *next = next_item(comments);
+        CommentPos *comment_pos = (CommentPos *) next->data;
+        long left = comment_pos->end - comment_pos->start;
         int current;
-        assert(0 == fseek(yyin, comment_start_pos[i], SEEK_SET));
+        assert(0 == fseek(yyin, comment_pos->start, SEEK_SET));
         do {
             current = getc(yyin);
             assert(EOF != current);

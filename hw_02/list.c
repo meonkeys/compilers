@@ -17,6 +17,7 @@ append (List *list, Item *item)
     else
     {
         list->last->next = item;
+        list->last = list->last->next;
     }
     list->size++;
 }
@@ -54,13 +55,13 @@ init_list(void)
 }
 
 void
-destroy_list(List *list, void (*destroy_item)(Item *item))
+destroy_list(List *list, void (*destroy_data)(void *data))
 {
     while (has_next(list))
     {
         Item *item = next_item(list);
-        destroy_item(item);
-        item = NULL;
+        destroy_data(item->data);
+        free(item);
     }
     free(list);
 }

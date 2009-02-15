@@ -44,6 +44,6 @@ Item * init_item(void *data);
 /**
  * Must call this on a list when done using list.
  */
-void destroy_list(List *list, void (*destroy_item)(Item *item));
+void destroy_list(List *list, void (*destroy_data)(void *data));
 
 #endif /* ifndef GLOBAL_H */
