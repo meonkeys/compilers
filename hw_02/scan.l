@@ -62,7 +62,7 @@ SEPARATOR       "{"|"}"|"["|"]"|"("|")"|";"|","|"."
 {SEPARATOR}     num_tokens++;
 {ASSIGNOP}      num_tokens++;
 
-"/*"                    { BEGIN(comment); start_comment();}
+"/*"                    { BEGIN(comment); start_comment(); }
 <comment>[^*\n]*        /* eat anything that's not a '*' */
 <comment>"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
 <comment>\n             /* blank lines in comments are ok */
@@ -84,7 +84,8 @@ int main(int argc, char *argv[])
 {
     comments = init_list();
     yylex();
-    printf("There are %d tokens /* comments are counted as tokens */\n", num_tokens);
+    printf("There are %d tokens /* comments are counted as tokens */\n",
+        num_tokens);
     printf("There are %d lines\n", yylineno);
     printf("There are %ld comments:\n", comments->size);
 
@@ -109,7 +110,7 @@ void start_comment()
     latest_comment_positions = malloc(sizeof(CommentPos));
     latest_comment = init_item(latest_comment_positions);
     assert(NULL != latest_comment);
-    latest_comment_positions->start = num_chars -2;
+    latest_comment_positions->start = num_chars - 2;
 }
 
 /*
@@ -129,7 +130,7 @@ void display_comments()
         Item *next = next_item(comments);
         CommentPos *comment_pos = (CommentPos *) next->data;
         long left = comment_pos->end - comment_pos->start;
-        int current;
+        int current = EOF;
         assert(0 == fseek(yyin, comment_pos->start, SEEK_SET));
         do {
             current = getc(yyin);
