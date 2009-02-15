@@ -54,9 +54,16 @@ init_list(void)
     return list;
 }
 
+static void
+reset(List *list)
+{
+    list->current = list->first;
+}
+
 void
 destroy_list(List *list, void (*destroy_data)(void *data))
 {
+    reset(list);
     while (has_next(list))
     {
         Item *item = next_item(list);

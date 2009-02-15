@@ -37,22 +37,19 @@ int
 main (void)
 {
     /* declarations */
-    MyData *mydata1;
-    MyData *mydata2;
-    Item *item1 = NULL, *item2 = NULL, *tmp_item = NULL;
+    MyData *mydata1 = init_MyData(1, "Joe Smith", strlen("Joe Smith"));
+    MyData *mydata2 = init_MyData(2, "Jim Smythe", strlen("Joe Smythe"));
+    Item *item1 = init_item(mydata1);
+    Item *item2 = init_item(mydata2);
+    Item *tmp_item = NULL;
     List *list = init_list();
 
     /* tests */
     assert(NULL != list);
-    mydata1 = init_MyData(1, "Joe Smith", strlen("Joe Smith"));
-    item1 = init_item(mydata1);
     assert(NULL != item1);
     assert(mydata1 == item1->data);
     assert(1 == ((MyData *)item1->data)->id);
     assert(strcmp(((MyData *)item1->data)->name, "Joe Smith") == 0);
-    item1 = init_item(mydata1);
-    mydata2 = init_MyData(2, "Jim Smythe", strlen("Joe Smythe"));
-    item2 = init_item(&mydata2);
     assert(FALSE == has_next(list));
     append(list, item1);
     assert(TRUE == has_next(list));
@@ -66,7 +63,6 @@ main (void)
 
     /* cleanup */
     destroy_list(list, destroy_data);
-    list = NULL;
 
     return EXIT_SUCCESS;
 }
