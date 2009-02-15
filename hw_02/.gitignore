@@ -1,4 +1,4 @@
-scan
-*.o
-test_list
-tags
+src/scan
+src/*.o
+src/test_list
+src/tags
