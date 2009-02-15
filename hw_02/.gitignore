@@ -1,2 +1,4 @@
 scan
-scan.o
+*.o
+test_list
+tags
