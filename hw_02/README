@@ -9,6 +9,7 @@ AUTHORS
 
 SYNOPSIS
 
+    cd src
     make
 
 PREREQUISITES
