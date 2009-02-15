@@ -29,3 +29,5 @@
 [_] symbol table supports efficient insertion, lookup, deletion
 [_] all unit tests pass
 [_] exclude valgrind memory checks from default build
+[_] fix memory leak caused by lex stack or something
+	valgrind --leak-check=full --show-reachable=yes ./scan < tests/simple.in > /dev/null
