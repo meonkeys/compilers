@@ -9,13 +9,56 @@
 
 %{
 #include <assert.h>
-#include <hash.h>
+#include "hashtable.h"
+#include "hashtable_itr.h"
+#include "hashtable_utility.h"
 #include <list.h>
+#include <string.h> /* for memcmp() */
+
+/******************************************************************/
+
+static unsigned int ELFHash(void* val)
+{
+   char* str = (char*)val;
+   unsigned int hash = 0;
+   unsigned int x    = 0;
+   unsigned int i    = 0;
+   unsigned int len  = strlen(str);
+
+   for(i = 0; i < len; str++, i++)
+   {
+      hash = (hash << 4) + (*str);
+      if((x = hash & 0xF0000000L) != 0)
+      {
+         hash ^= (x >> 24);
+      }
+      hash &= ~x;
+   }
+
+   return hash;
+}
+
+static int equalkeys(void *k1, void *k2)
+{
+    return (0 == memcmp(k1,k2,sizeof(HashKey)));
+}
+
+int valcomp(const void* hv1, const void* hv2){
+	HashValue* val1 = (HashValue*)hv1;
+	HashValue* val2 = (HashValue*)hv2;
+
+	int result = strcmp(val1->id, val2->id);
+	if(result == 0){
+		return val1->count - val2->count;
+	}
+	return result;
+}
+
+/******************************************************************/
 
 typedef struct comment_pos_t { long start; long end; } CommentPos;
 void destroy_data(void *data) { free(data); }
 
-/* could use %option yylineno in __FILE__ instead of num_lines */
 int num_tokens = 0;
 long num_chars = 0;
 List *comments = NULL;
@@ -25,6 +68,14 @@ ListItem *latest_comment = NULL;
 void start_comment();
 void end_comment();
 void display_comments();
+void handle_id(char* id);
+void display_hashtable(struct hashtable* ht);
+
+HashKey *k = NULL;
+HashValue *v = NULL;
+HashValue *found = NULL;
+struct hashtable* ht = NULL;
+struct hashtable_itr* itr = NULL;
 
 /*
  * from
@@ -53,7 +104,7 @@ SEPARATOR       "{"|"}"|"["|"]"|"("|")"|";"|","|"."
 %%
 
 {RESERVED}      num_tokens++;
-{ID}            num_tokens++;
+{ID}            {num_tokens++; handle_id(yytext);}
 {INT}           num_tokens++;
 {FLOAT}         num_tokens++;
 {STRING}        num_tokens++;
@@ -84,19 +135,26 @@ SEPARATOR       "{"|"}"|"["|"]"|"("|")"|";"|","|"."
 int main (int argc, char *argv[])
 {
     comments = init_list ();
+	ht = create_hashtable(16, ELFHash, equalkeys);
+	assert(NULL != ht);
+	k = (HashKey*)malloc(sizeof(HashKey));
+	v = (HashValue*)malloc(sizeof(HashValue));
+
     yylex ();
     printf ("There are %d tokens /* comments are counted as tokens */\n",
             num_tokens);
     printf ("There are %d lines\n", yylineno);
     printf ("There are %ld comments:\n", comments->size);
 
-    display_comments ();
+    display_comments();
     printf ("\n");
 
     /* print out the frequency of identifiers here */
-    printf ("Frequency of identifiers:\n");
+    printf("Frequency of identifiers:\n");
+	display_hashtable(ht);
 
     destroy_list (comments, destroy_data);
+	hashtable_destroy(ht, 1);
 
     return EXIT_SUCCESS;
 }
@@ -109,9 +167,8 @@ int main (int argc, char *argv[])
 void start_comment ()
 {
     latest_comment_positions = malloc (sizeof (CommentPos));
-    latest_comment = init_item (latest_comment_positions);
-    assert (NULL != latest_comment);
-    latest_comment_positions->start = num_chars - 2;
+    assert(NULL != latest_comment_positions);
+	latest_comment_positions->start = num_chars - 2;
 }
 
 /*
@@ -121,6 +178,8 @@ void start_comment ()
 void end_comment ()
 {
     latest_comment_positions->end = num_chars;
+	latest_comment = init_item (latest_comment_positions);
+	assert(NULL != latest_comment);
     append (comments, latest_comment);
 }
 
@@ -144,3 +203,57 @@ void display_comments ()
         assert (EOF != putchar ('\n'));
     }
 }
+
+void handle_id(char* id){
+	/* search table
+     * if exists -> increment count 
+     * if not    -> add with a count of 1
+     */
+	k->key = ELFHash(id);
+	v->id = strdup(id);
+	if(NULL == (found = hashtable_search(ht, k))){
+		/* Not found */
+		v->count = 1;
+		hashtable_insert(ht, k, v);
+	}
+	else{
+		/* Found */
+		v->count = found->count + 1;
+		hashtable_change(ht, k, v);
+	}
+	k = (HashKey*)malloc(sizeof(HashKey));
+	v = (HashValue*)malloc(sizeof(HashValue));
+}
+
+void display_hashtable(struct hashtable* ht){
+	unsigned int size = hashtable_count(ht);
+	
+	HashValue* values = malloc(size * sizeof(HashValue));
+
+	int i = 0;
+	if(size > 0)
+    {
+        itr = hashtable_iterator(ht);
+        do {
+            v = hashtable_iterator_value(itr);
+
+			values[i].id = v->id;
+			values[i].count = v->count;
+			i++;
+        } while (hashtable_iterator_advance(itr));
+    }
+    free(itr);
+
+	 qsort(values, size, sizeof(HashValue), valcomp);
+
+	for(i = 0; i < size; i++){
+		printf("%s %d\n", values[i].id, values[i].count);
+	}
+
+	free(values);
+}
+
+/*
+ * Add reserved words to the hashtable eventually
+ */
+

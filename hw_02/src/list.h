@@ -29,6 +29,9 @@ void append (List * list, ListItem * item);
  */
 ListItem *next_item (List * list);
 
+/**
+ * Return true if list->current is NULL
+ */
 Bool has_next (List * list);
 
 /**
