@@ -5,15 +5,16 @@ LDFLAGS=-lm
 # Add -d to the next line to generate a debugging scanner
 # (or uncomment %option debug in the .l file).
 LEX=flex
+TEST_DATA_DIR=test_data
 
 test: scan test_list valgrind
-	bash unit_test.sh
+	bash unit_test.sh $(TEST_DATA_DIR)
 	./test_list
 
 test_list: list.o
 
 valgrind: scan test_list
-	$@ $(VALGRIND_OPTS) ./$< < tests/simple.in > /dev/null
+	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/simple.in > /dev/null
 	$@ $(VALGRIND_OPTS) ./test_list
 
 # uses implicit rules to compile the scanner
