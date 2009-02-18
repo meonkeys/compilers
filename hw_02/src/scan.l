@@ -147,33 +147,31 @@ static void destroy_data (void *data)
 
 static void handle_id (char *id)
 {
-    HashKey *k = NULL;
+    HashKey search_key;
     HashValue *found = NULL;
-    HashValue *v = NULL;
-
-    k = malloc(sizeof(HashKey));
-    assert(NULL != k);
-    v = malloc(sizeof(HashValue));
-    assert(NULL != v);
 
     /* search table
      * if exists -> increment count
      * if not    -> add with a count of 1
      */
-    k->key = ELFHash (id);
-    if (NULL == (found = hashtable_search (ht, k)))
+    search_key.key = ELFHash (id);
+    if (NULL == (found = hashtable_search (ht, &search_key)))
     {
         /* Not found */
+        HashKey *k = malloc(sizeof(HashKey));
+        HashValue *v = malloc(sizeof(HashValue));
+        assert(NULL != k);
+        assert(NULL != v);
+        k->key = search_key.key;
         v->count = 1;
+        /* FIXME: unbounded strdup() is probably a bad idea */
         v->id = strdup (id);
         assert (-1 == hashtable_insert (ht, k, v));
     }
     else
     {
         /* Found */
-        v->count = found->count + 1;
-        v->id = found->id;
-        assert (-1 == hashtable_change (ht, k, v));
+        found->count = found->count + 1;
     }
 }
 
