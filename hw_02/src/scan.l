@@ -161,17 +161,18 @@ static void handle_id (char *id)
      * if not    -> add with a count of 1
      */
     k->key = ELFHash (id);
-    v->id = strdup (id);
     if (NULL == (found = hashtable_search (ht, k)))
     {
         /* Not found */
         v->count = 1;
+        v->id = strdup (id);
         assert (-1 == hashtable_insert (ht, k, v));
     }
     else
     {
         /* Found */
         v->count = found->count + 1;
+        v->id = found->id;
         assert (-1 == hashtable_change (ht, k, v));
     }
 }
