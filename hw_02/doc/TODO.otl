@@ -29,5 +29,9 @@
 [_] symbol table supports efficient insertion, lookup, deletion
 [_] all unit tests pass
 [_] exclude valgrind memory checks from default build
-[_] fix memory leak caused by lex stack or something
+[X] fix memory leak caused by lex stack or something
 	valgrind --leak-check=full --show-reachable=yes ./scan < tests/simple.in > /dev/null
+	DONE! References:
+		http://flex.sf.net/manual/Init-and-Destroy-Functions.html
+		http://flex.sf.net/manual/The-Default-Memory-Management.html
+		http://flex.sf.net/manual/Memory-leak-_002d-16386-bytes-allocated-by-malloc_002e.html
