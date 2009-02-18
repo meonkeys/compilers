@@ -72,12 +72,11 @@ valcomp (const void *hv1, const void *hv2)
     return result;
 }
 
-extern HashValue *v; /* FIXME: why is this global? */
-
 void
 display_hashtable (struct hashtable *ht)
 {
     struct hashtable_itr *itr = NULL;
+    HashValue *v = NULL;
     unsigned int size = hashtable_count (ht);
 
     HashValue *values = malloc (size * sizeof (HashValue));
