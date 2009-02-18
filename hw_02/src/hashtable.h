@@ -163,6 +163,8 @@ hashtable_count(struct hashtable *h);
 
 void
 hashtable_destroy(struct hashtable *h, int free_values);
+unsigned int
+indexFor(unsigned int tablelength, unsigned int hashvalue);
 
 #endif /* __HASHTABLE_CWC22_H__ */
 

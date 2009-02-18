@@ -25,6 +25,7 @@
 		"replay" comments in main()
 			can fseek(), fread() into buffer and fwrite() to stdout
 	[_] frequencies of each identifier
+[_] add reserved words to symbol table
 [_] sort identifiers alphabetically
 [_] symbol table supports efficient insertion, lookup, deletion
 [_] all unit tests pass

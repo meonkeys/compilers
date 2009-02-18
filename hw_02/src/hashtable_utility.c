@@ -37,6 +37,14 @@ hashtable_change(struct hashtable *h, void *k, void *v)
     return 0;
 }
 
+/*****************************************************************************/
+/* indexFor */
+unsigned int
+indexFor(unsigned int tablelength, unsigned int hashvalue) {
+    return (hashvalue % tablelength);
+}
+
+
 /*
  * Copyright (c) 2002, Christopher Clark
  * All rights reserved.

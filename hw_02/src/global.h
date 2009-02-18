@@ -2,6 +2,9 @@
 #define GLOBAL_H
 
 typedef enum bool_e
-{ FALSE, TRUE } Bool;
+{
+    FALSE, TRUE
+}
+Bool;
 
 #endif

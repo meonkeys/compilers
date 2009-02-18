@@ -6,14 +6,14 @@
 
 typedef struct hash_key_s
 {
-	unsigned int key;	
+    unsigned int key;
 }
 HashKey;
 
 typedef struct hash_value_s
 {
-	char* id;
-	int count;
+    char* id;
+    int count;
 }
 HashValue;
 
