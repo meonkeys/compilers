@@ -6,13 +6,13 @@ LDFLAGS=-lm
 # (or uncomment %option debug in the .l file).
 LEX=flex
 
-test: scan test_list test_hash valgrind
+test: scan test_list valgrind
 	bash unit_test.sh
 	./test_list
 
 test_list: list.o
 
-valgrind: scan test_list #test_hash
+valgrind: scan test_list
 	$@ $(VALGRIND_OPTS) ./$< < tests/simple.in > /dev/null
 	$@ $(VALGRIND_OPTS) ./test_list
 
