@@ -58,55 +58,50 @@ equalkeys (void *k1, void *k2)
     return (0 == memcmp (k1, k2, sizeof (HashKey)));
 }
 
-int
-valcomp (const void *hv1, const void *hv2)
+static int
+compare (const void *hk1, const void *hk2)
 {
-    HashValue *val1 = (HashValue *) hv1;
-    HashValue *val2 = (HashValue *) hv2;
+    char *id1 = (char *) ((HashKey *)hk1)->id;
+    char *id2 = (char *) ((HashKey *)hk2)->id;
 
-    int result = strcmp (val1->id, val2->id);
-    if (result == 0)
-    {
-        return val1->count - val2->count;
-    }
-    return result;
+    return strcmp (id1, id2);
 }
 
 void
 display_hashtable (struct hashtable *ht)
 {
+    int i = 0;
     struct hashtable_itr *itr = NULL;
-    HashValue *v = NULL;
+    HashKey *keys;
     unsigned int size = hashtable_count (ht);
 
-    HashValue *values = malloc (size * sizeof (HashValue));
+    if (size <= 0)
+        return;
 
-    int i = 0;
-    if (size > 0)
+    keys = malloc (size * sizeof (HashKey));
+    assert (NULL != keys);
+
+    itr = hashtable_iterator (ht);
+    do
     {
-        itr = hashtable_iterator (ht);
-        do
-        {
-            v = hashtable_iterator_value (itr);
+        HashKey *k = hashtable_iterator_key (itr);
 
-            values[i].id = v->id;
-            values[i].count = v->count;
-            i++;
-        }
-        while (hashtable_iterator_advance (itr));
+        memset (keys[i].id, '\0', MAX_ID_LENGTH + 1);
+        strncpy(keys[i].id, k->id, MAX_ID_LENGTH);
+        i++;
     }
+    while (hashtable_iterator_advance (itr));
+
     free (itr);
 
-    qsort (values, size, sizeof (HashValue), valcomp);
+    qsort (keys, size, sizeof (HashKey), compare);
 
     for (i = 0; i < size; i++)
     {
-        printf ("%s %d\n", values[i].id, values[i].count);
+        HashValue *v = hashtable_search(ht, &keys[i]);
+        assert (NULL != v);
+        printf ("%s %d\n", keys[i].id, v->count);
     }
 
-    free (values);
+    free (keys);
 }
-
-/*
- * Add reserved words to the hashtable eventually
- */

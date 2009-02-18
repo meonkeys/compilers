@@ -150,11 +150,16 @@ static void handle_id (char *id)
     HashKey search_key;
     HashValue *found = NULL;
 
+    assert (NULL != id);
+    assert (strlen(id) <= MAX_ID_LENGTH);
+
+    memset (search_key.id, '\0', MAX_ID_LENGTH + 1);
+    strncpy(search_key.id, id, MAX_ID_LENGTH);
+
     /* search table
      * if exists -> increment count
      * if not    -> add with a count of 1
      */
-    search_key.key = ELFHash (id);
     if (NULL == (found = hashtable_search (ht, &search_key)))
     {
         /* Not found */
@@ -162,10 +167,9 @@ static void handle_id (char *id)
         HashValue *v = malloc(sizeof(HashValue));
         assert(NULL != k);
         assert(NULL != v);
-        k->key = search_key.key;
+        memset (k->id, '\0', MAX_ID_LENGTH + 1);
+        strncpy(k->id, id, MAX_ID_LENGTH);
         v->count = 1;
-        /* FIXME: unbounded strdup() is probably a bad idea */
-        v->id = strdup (id);
         assert (-1 == hashtable_insert (ht, k, v));
     }
     else

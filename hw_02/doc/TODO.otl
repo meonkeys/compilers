@@ -1,3 +1,10 @@
+[_] add reserved words to symbol table?
+[_] exclude valgrind memory checks from default build
+[_] document limitations in top-level README (BUGS section)
+	fixed-length keys/values in symbol table
+	display_hashtable is expensive
+	not storing reserved words in symbol table??
+
 [X] recognize tokens
 	[X] operators
 		+ | - | * | /
@@ -11,12 +18,12 @@
 		examples: 1, "Enter a number"
 	[X] whitespace
 [X] deal with parens, commas, semicolons, curly braces
-[_] count
+[X] count
 	[X] total number of tokens
 	[X] total number of lines
 	[X] total number of comments
-	[_] frequencies of each identifier
-[_] report
+	[X] frequencies of each identifier
+[X] report
 	[X] total number of tokens
 	[X] total number of lines
 	[X] total number of comments
@@ -24,12 +31,10 @@
 		store comment offsets in input stream using (start|end)comment
 		"replay" comments in main()
 			can fseek(), fread() into buffer and fwrite() to stdout
-	[_] frequencies of each identifier
-[_] add reserved words to symbol table
-[_] sort identifiers alphabetically
-[_] symbol table supports efficient insertion, lookup, deletion
-[_] all unit tests pass
-[_] exclude valgrind memory checks from default build
+	[X] frequencies of each identifier
+[X] sort identifiers alphabetically
+[X] symbol table supports efficient insertion, lookup, deletion
+[X] all unit tests pass
 [X] fix memory leak caused by lex stack or something
 	valgrind --leak-check=full --show-reachable=yes ./scan < tests/simple.in > /dev/null
 	DONE! References:
