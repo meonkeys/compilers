@@ -7,6 +7,29 @@
 /* Custom headers */
 #include <util.h>
 
+void
+display_comments (List *comments, FILE *inputStream)
+{
+    while (has_next (comments))
+    {
+        ListItem *next = next_item (comments);
+        CommentPos *comment_pos = (CommentPos *) next->data;
+        long left = comment_pos->end - comment_pos->start;
+        int current = EOF;
+        assert (0 == fseek (inputStream, comment_pos->start, SEEK_SET));
+        do
+        {
+            current = getc (inputStream);
+            assert (EOF != current);
+            assert (EOF != putchar (current));
+            left -= 1;
+        }
+        while (left > 0);
+        assert (EOF != putchar ('\n'));
+    }
+}
+
+
 unsigned int
 ELFHash (void *val)
 {

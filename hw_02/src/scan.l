@@ -27,7 +27,6 @@ struct hashtable *ht = NULL;
 
 static void start_comment ();
 static void end_comment ();
-static void display_comments ();
 static void destroy_data (void *data);
 static void handle_id (char *id);
 
@@ -100,7 +99,7 @@ int main (int argc, char *argv[])
     printf ("There are %d lines\n", yylineno);
     printf ("There are %ld comments:\n", comments->size);
 
-    display_comments();
+    display_comments(comments, yyin);
     printf ("\n");
 
     /* print out the frequency of identifiers here */
@@ -141,27 +140,6 @@ static void end_comment ()
     latest_comment = init_item (latest_comment_positions);
     assert (NULL != latest_comment);
     append (comments, latest_comment);
-}
-
-static void display_comments ()
-{
-    while (has_next (comments))
-    {
-        ListItem *next = next_item (comments);
-        CommentPos *comment_pos = (CommentPos *) next->data;
-        long left = comment_pos->end - comment_pos->start;
-        int current = EOF;
-        assert (0 == fseek (yyin, comment_pos->start, SEEK_SET));
-        do
-        {
-            current = getc (yyin);
-            assert (EOF != current);
-            assert (EOF != putchar (current));
-            left -= 1;
-        }
-        while (left > 0);
-        assert (EOF != putchar ('\n'));
-    }
 }
 
 static void destroy_data (void *data)
