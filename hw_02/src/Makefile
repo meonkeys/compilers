@@ -19,10 +19,14 @@ valgrind: scan test_list
 # uses implicit rules to compile the scanner
 scan: list.o util.o hashtable.o hashtable_itr.o hashtable_utility.o
 
-.PHONY: distclean clean
+.PHONY: distclean clean tools
 
 clean:
 	$(RM) *.o scan test_list *~
+
+tools:
+	cscope -bR
+	ctags -R
 
 # "clean enough for source distribution"
 distclean: clean
