@@ -90,8 +90,6 @@ int main (int argc, char *argv[])
     comments = init_list ();
     ht = create_hashtable(16, ELFHash, equalkeys);
     assert(NULL != ht);
-    k = (HashKey*)malloc(sizeof(HashKey));
-    v = (HashValue*)malloc(sizeof(HashValue));
 
     yylex ();
     printf ("There are %d tokens /* comments are counted as tokens */\n",
@@ -149,6 +147,9 @@ static void destroy_data (void *data)
 
 static void handle_id (char *id)
 {
+    k = (HashKey*)malloc(sizeof(HashKey));
+    v = (HashValue*)malloc(sizeof(HashValue));
+
     /* search table
      * if exists -> increment count
      * if not    -> add with a count of 1
@@ -167,7 +168,5 @@ static void handle_id (char *id)
         v->count = found->count + 1;
         hashtable_change (ht, k, v);
     }
-    k = (HashKey *) malloc (sizeof (HashKey));
-    v = (HashValue *) malloc (sizeof (HashValue));
 }
 
