@@ -8,7 +8,7 @@
 #include <util.h>
 
 void
-display_comments (List *comments, FILE *inputStream)
+display_comments (List * comments, FILE * inputStream)
 {
     while (has_next (comments))
     {
@@ -61,8 +61,8 @@ equalkeys (void *k1, void *k2)
 static int
 compare (const void *hk1, const void *hk2)
 {
-    char *id1 = (char *) ((HashKey *)hk1)->id;
-    char *id2 = (char *) ((HashKey *)hk2)->id;
+    char *id1 = (char *) ((HashKey *) hk1)->id;
+    char *id2 = (char *) ((HashKey *) hk2)->id;
 
     return strcmp (id1, id2);
 }
@@ -87,7 +87,7 @@ display_hashtable (struct hashtable *ht)
         HashKey *k = hashtable_iterator_key (itr);
 
         memset (keys[i].id, '\0', MAX_ID_LENGTH + 1);
-        strncpy(keys[i].id, k->id, MAX_ID_LENGTH);
+        strncpy (keys[i].id, k->id, MAX_ID_LENGTH);
         i++;
     }
     while (hashtable_iterator_advance (itr));
@@ -98,7 +98,7 @@ display_hashtable (struct hashtable *ht)
 
     for (i = 0; i < size; i++)
     {
-        HashValue *v = hashtable_search(ht, &keys[i]);
+        HashValue *v = hashtable_search (ht, &keys[i]);
         assert (NULL != v);
         printf ("%s %d\n", keys[i].id, v->count);
     }

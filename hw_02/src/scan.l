@@ -92,6 +92,7 @@ int main (int argc, char *argv[])
     assert (NULL != ht);
 
     yylex ();
+
     printf ("There are %d tokens /* comments are counted as tokens */\n",
             num_tokens);
     printf ("There are %d lines\n", yylineno);
@@ -151,10 +152,10 @@ static void handle_id (char *id)
     HashValue *found = NULL;
 
     assert (NULL != id);
-    assert (strlen(id) <= MAX_ID_LENGTH);
+    assert (strlen (id) <= MAX_ID_LENGTH);
 
     memset (search_key.id, '\0', MAX_ID_LENGTH + 1);
-    strncpy(search_key.id, id, MAX_ID_LENGTH);
+    strncpy (search_key.id, id, MAX_ID_LENGTH);
 
     /* search table
      * if exists -> increment count
@@ -163,12 +164,12 @@ static void handle_id (char *id)
     if (NULL == (found = hashtable_search (ht, &search_key)))
     {
         /* Not found */
-        HashKey *k = malloc(sizeof(HashKey));
-        HashValue *v = malloc(sizeof(HashValue));
-        assert(NULL != k);
-        assert(NULL != v);
+        HashKey *k = malloc (sizeof (HashKey));
+        HashValue *v = malloc (sizeof (HashValue));
+        assert (NULL != k);
+        assert (NULL != v);
         memset (k->id, '\0', MAX_ID_LENGTH + 1);
-        strncpy(k->id, id, MAX_ID_LENGTH);
+        strncpy (k->id, id, MAX_ID_LENGTH);
         v->count = 1;
         assert (-1 == hashtable_insert (ht, k, v));
     }
@@ -178,4 +179,3 @@ static void handle_id (char *id)
         found->count = found->count + 1;
     }
 }
-

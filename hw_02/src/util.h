@@ -18,7 +18,7 @@ typedef struct comment_pos_t
 }
 CommentPos;
 
-void display_comments (List *comments, FILE *inputStream);
+void display_comments (List * comments, FILE * inputStream);
 void display_hashtable (struct hashtable *ht);
 unsigned int ELFHash (void *val);
 int equalkeys (void *k1, void *k2);
