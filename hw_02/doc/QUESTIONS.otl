@@ -1,7 +1,9 @@
 Q. What are all the valid symbols in a C-- program?
+	A. See "C-- description" document posted at  http://www-users.itlabs.umn.edu/classes/Spring-2009/csci5161/?page=assignment
 Q. Is consecutive whitespace considered part of the same token?
-	(it appears that way based on the given output)
+	A. whitespace is not tokenized.
 Q. Is a separate symbol table needed for struct new?
+	A. no.
 Q. Does the scanner have to recognize floating point numbers?
 Q. Ok if pluralization is wrong (ie: "There are 1 tokens")?
 Q. Can we assume only one input file will be read?

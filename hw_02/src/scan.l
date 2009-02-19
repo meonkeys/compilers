@@ -47,7 +47,6 @@ LOGOP           "||"|"&&"|"!"
 ASSIGNOP        "="
 WHITESPACE      [ \t]+
 SEPARATOR       "{"|"}"|"["|"]"|"("|")"|";"|","|"."
-/* we still need to define string literals */
 
 %x comment
 

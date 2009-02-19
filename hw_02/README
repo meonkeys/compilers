@@ -16,12 +16,12 @@ PREREQUISITES
     * POSIX-compatible Make
     * GCC
     * Flex
-    * Valgrind (optional)
 
 EXECUTION DETAILS
 
-    Typing "make" in the source directory should compile and run all unit
-    tests except memory leak checks.
+    Typing "make" in the top-level or src directory should compile and run all
+    unit tests except memory leak checks. A successful return code and the
+    appearance of "ALL TESTS PASSED" should print out in the console.
 
     * flex and gcc assumed present in PATH
 
@@ -35,4 +35,21 @@ CODE DETAILS
     Assignment description:
     http://www-users.itlabs.umn.edu/classes/Spring-2009/csci5161/?page=./handouts/assign2
 
+    The hashtable used was derived from Christopher Clark's "C Hash Table",
+    freely available under the new BSD license at
+    http://www.cl.cam.ac.uk/~cwc22/hashtable/ . Changes were made to accomodate
+    the strictest possible GCC compilation options.
+
 BUGS
+
+    Due to a limitation in the hashtable implementation, the symbol table 
+    uses only fixed-length records for keys and values.
+
+COPYRIGHT
+
+    (C)2009 Adam Monsen <haircut@gmail.com> and Joe Myre <myrex013@umn.edu>
+
+LICENSE
+
+    This software is available under the GNU General Public License
+    version 3 or any later version.

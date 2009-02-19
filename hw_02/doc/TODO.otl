@@ -1,10 +1,13 @@
 [_] add reserved words to symbol table?
-[_] exclude valgrind memory checks from default build
-[_] document limitations in top-level README (BUGS section)
+	Having reserved words in the rules is fine for now.
+[X] document limitations in top-level README (BUGS section)
 	fixed-length keys/values in symbol table
 	display_hashtable is expensive
+		Prof: unimportant--no performance requirement for this assignment
 	not storing reserved words in symbol table??
+		don't need to do this
 
+[X] exclude valgrind memory checks from default build
 [X] recognize tokens
 	[X] operators
 		+ | - | * | /
