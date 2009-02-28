@@ -1,0 +1,50 @@
+CSCI 5161 -- Spring 2009
+Assignment 3
+Due XXX
+
+AUTHORS
+
+    Joe Myre <myrex013@umn.edu>
+    Adam Monsen <mons0166@umn.edu>
+
+SYNOPSIS
+
+    make
+
+PREREQUISITES
+
+    * POSIX-compatible Make
+    * GCC
+    * Flex
+    * Bison
+
+EXECUTION DETAILS
+
+    Typing "make" in the top-level or src directory should compile and run all
+    unit tests except memory leak checks. A successful return code and the
+    appearance of "ALL TESTS PASSED" should print out in the console.
+
+    * flex, gcc, and bison assumed present in PATH
+
+    If these paths are incorrect, edit Makefile before compiling and running
+    unit tests.
+
+    The code is known to work on Ubuntu 8.10.
+
+CODE DETAILS
+
+    Assignment description:
+    XXX
+
+BUGS
+
+    XXX
+
+COPYRIGHT
+
+    (C)2009 Adam Monsen <haircut@gmail.com> and Joe Myre <myrex013@umn.edu>
+
+LICENSE
+
+    This software is available under the GNU General Public License
+    version 3 or any later version.
