@@ -109,7 +109,9 @@ var_decl	: type init_id_list MK_SEMICOLON
 		| ID id_list MK_SEMICOLON
 		;
 
-type		: /* What types do we support? */
+type		: INT
+		| FLOAT
+		| VOID
 		;
 
 struct_type	: STRUCT tag
@@ -188,7 +190,12 @@ relop_factor	: expr
 		| expr rel_op expr
 		;
 
-rel_op		: /* what relation operators do we support ? */
+rel_op		: OP_LT
+		| OP_GT
+		| OP_GE
+		| OP_LE
+		| OP_NE
+		| OP_EQ
 		;
 
 relop_expr_list	: nonempty_relop_expr_list
