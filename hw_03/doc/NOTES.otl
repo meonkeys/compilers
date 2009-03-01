@@ -1,0 +1,6 @@
+Error recovery:
+	http://www.gnu.org/software/bison/manual/html_mono/bison.html.gz#Simple-Error-Recovery
+	http://www.gnu.org/software/bison/manual/html_mono/bison.html.gz#Error-Recovery
+Errors to consider handling
+	non-ASCII input
+	divide by zero

@@ -1,0 +1,4 @@
+Reverse polish notation calculator from the Bison manual.
+
+Usage:
+http://www.gnu.org/software/bison/manual/html_mono/bison.html.gz#Rpcalc-Compile
