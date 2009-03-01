@@ -73,14 +73,14 @@ param		: type ID
 		| struct_type ID dim_fn
 		;
 
-dim_fn		:MK_LB expr_null MK_RB dimfn1
+dim_fn		: MK_LB expr_null MK_RB dimfn1
 		;
 
-dimfn1		:MK_LB expr MK_RB dimfn1
+dimfn1		: MK_LB expr MK_RB dimfn1
 		|
 		;
 
-expr_null	:expr
+expr_null	: expr
 		|
 		;
 
@@ -138,7 +138,7 @@ mcexpr		: mcexpr mul_op cfactor
 		| cfactor
 		;
 
-cfactor:	CONST
+cfactor         : CONST
 		| MK_LPAREN cexpr MK_RPAREN
 		;
 
@@ -167,11 +167,11 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| RETURN relop_expr MK_SEMICOLON
 		;
 
-assign_expr_list : nonempty_assign_expr_list
+assign_expr_list: nonempty_assign_expr_list
                 |
                 ;
 
-nonempty_assign_expr_list        : nonempty_assign_expr_list MK_COMMA assign_expr
+nonempty_assign_expr_list: nonempty_assign_expr_list MK_COMMA assign_expr
                 | assign_expr
 
 assign_expr     : ID OP_ASSIGN relop_expr
