@@ -3,7 +3,7 @@ CC=gcc
 CFLAGS=-g -Wall -Werror -pedantic-errors -ansi -I.
 VALGRIND_OPTS=--quiet --leak-check=full --show-reachable=yes --error-exitcode=2
 LEX=flex
-YACC=bison --yacc
+YACC=bison --verbose --yacc
 TEST_DATA_DIR=test_data
 
 test: main valgrind
