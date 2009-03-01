@@ -1,6 +1,11 @@
 [_] all unit tests pass
-[_] use "simple.in" instead of "empty.in" during valgrind check
-	more complete memory check
 [_] exclude valgrind memory checks from default build
+[_] extra credit
+	[_] contribute test program(s) that fail solution parser
+	[_] implement error recovery
+		[_] handle parse errors and continue parsing
+		[_] demonstrate usage with test case
 
+[X] use "simple.in" instead of "empty.in" during valgrind check
+	more complete memory check
 [X] create test harness

@@ -11,7 +11,7 @@ test: main valgrind
 
 # check for memory leaks
 valgrind: main
-	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/empty.in > /dev/null
+	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/simple.in > /dev/null
 
 main: main.c parser.o lexer3.o
 

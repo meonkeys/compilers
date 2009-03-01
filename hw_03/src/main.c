@@ -17,6 +17,7 @@ main (int argc, char *argv[])
 
     if (argc > 1) {
         yyin = fopen (argv[1], "r");
+        assert (NULL != yyin);
     }
 
     parse_rv = yyparse ();
@@ -36,10 +37,11 @@ main (int argc, char *argv[])
      */
     yylex_destroy ();
 
-    if (0 == parse_rv)
-        exit(EXIT_SUCCESS);
-    else
-        exit(EXIT_FAILURE);
+    /*
+     * Successful exit code even if parsing failed. Unit test script depends
+     * on this behavior.
+     */
+    exit(EXIT_SUCCESS);
 }
 
 
