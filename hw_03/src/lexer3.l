@@ -1,7 +1,21 @@
+%option warn nodefault
+%option noinput nounput noyywrap yylineno
+%option header-file="lexer3.h"
+/* %option debug */
+
+%top{
+/* For fileno(3). See feature_test_macros(7) manpage. */
+#define _GNU_SOURCE
+}
+
 %{
+/* System headers */
 #include <stdio.h>
 
+/* Custom headers */
+#include <y.tab.h>
 %}
+
 letter   [A-Za-z]
 digit    [0-9]
 kwInt    "int"
@@ -76,8 +90,8 @@ error    .
 {op_minus}      return OP_MINUS;
 {op_times}      return OP_TIMES;
 {op_divide}     return OP_DIVIDE;
-{constant}      {  return CONST;}
-{s-const}       {  return CONST;}
+{constant}      { return CONST; }
+{s-const}       { return CONST; }
 {mk_lparen}     return MK_LPAREN;
 {mk_rparen}     return MK_RPAREN;
 {mk_lbrace}     return MK_LBRACE;
@@ -87,7 +101,7 @@ error    .
 {mk_comma}      return MK_COMMA;
 {mk_semicolon}  return MK_SEMICOLON;
 {mk_dot}	return MK_DOT;
-{newline}       linenumber += 1;
+{newline}       ; /* we use the yylineno feature */
 {error}         return ERROR;
 
 %%

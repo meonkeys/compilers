@@ -1,12 +1,11 @@
-/* ===== Definition Section ===== */
-
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-static int linenumber = 1;
+#include <y.tab.h>
+
+int yylex(void);
+void yyerror (char const *mesg);
 %}
 
+%defines
 
 %token ID
 %token CONST
@@ -45,14 +44,10 @@ static int linenumber = 1;
 %token ERROR
 %token RETURN
 
-
 %start program
 
 %%
 
-/* ==== Grammar Section ==== */
-
-/* Productions */               /* Semantic actions */
 program		: global_decl_list
 		;
 
@@ -77,11 +72,14 @@ param		: type ID
 		| type ID dim_fn
 		| struct_type ID dim_fn
 		;
+
 dim_fn		:MK_LB expr_null MK_RB dimfn1
 		;
+
 dimfn1		:MK_LB expr MK_RB dimfn1
 		|
 		;
+
 expr_null	:expr
 		|
 		;
@@ -125,15 +123,19 @@ id_list		: ID
 		| id_list MK_COMMA ID dim_decl
 		| ID dim_decl
 		;
+
 dim_decl	: MK_LB cexpr MK_RB
 		| dim_decl MK_LB cexpr MK_RB
 		;
+
 cexpr		: cexpr add_op mcexpr
 		| mcexpr
 		;
+
 mcexpr		: mcexpr mul_op cfactor
 		| cfactor
 		;
+
 cfactor:	CONST
 		| MK_LPAREN cexpr MK_RPAREN
 		;
@@ -226,6 +228,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		/* | - var-reference */
 		| OP_NOT var_ref
 		;
+
 var_ref		: ID
 		| var_ref dim
 		| var_ref struct_tail
@@ -240,20 +243,3 @@ struct_tail	: MK_DOT ID
 
 %%
 
-#include "lex.yy.c"
-main (argc, argv)
-int argc;
-char *argv[];
-  {
-     yyin = fopen(argv[1],"r");
-     yyparse();
-     printf("%s\n", "Parsing completed. No errors found.");
-  } /* main */
-
-
-int yyerror (mesg)
-char *mesg;
-  {
-  printf("%s\t%d\t%s\t%s\n", "Error found in Line ", linenumber, "next token: ", yytext );
-  exit(1);
-  }

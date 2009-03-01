@@ -1,0 +1,6 @@
+[_] all unit tests pass
+[_] use "simple.in" instead of "empty.in" during valgrind check
+	more complete memory check
+[_] exclude valgrind memory checks from default build
+
+[X] create test harness

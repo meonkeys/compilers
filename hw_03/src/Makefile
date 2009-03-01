@@ -1,17 +1,29 @@
+SHELL=/bin/bash
 CC=gcc
 CFLAGS=-g -Wall -Werror -pedantic-errors -ansi -I.
-LDFLAGS=-lfl
+VALGRIND_OPTS=--quiet --leak-check=full --show-reachable=yes --error-exitcode=2
 LEX=flex
-#LFLAGS=--outfile=lex.yy.c
-YACC=bison
-YFLAGS=--file-prefix=y
+YACC=bison --yacc
+TEST_DATA_DIR=test_data
 
-parser: parser.o lexer3.o
+test: main valgrind
+	bash unit_test.sh $(TEST_DATA_DIR)
 
-lexer3.o: lexer3.l
-	$(LEX) $(LFLAGS) $< > $@
+# check for memory leaks
+valgrind: main
+	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/empty.in > /dev/null
 
-.PHONY: clean
+main: main.c parser.o lexer3.o
+
+.PHONY: distclean clean tools valgrind
 
 clean:
-	$(RM) parser
+	$(RM) main *.tab.{c,h} lexer3.{c,h} *.o
+
+tools:
+	cscope -bR
+	ctags -R
+
+# "clean enough for source distribution"
+distclean: clean
+	$(RM) tags cscope.out
