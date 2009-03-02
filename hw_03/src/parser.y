@@ -102,6 +102,7 @@ decl		: type_decl
 
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
 		| TYPEDEF struct_type id_list MK_SEMICOLON
+		| struct_type MK_LBRACE decl_list MK_RBRACE ID MK_SEMICOLON
 		| struct_type MK_SEMICOLON
 		;
 
@@ -115,11 +116,8 @@ type		: INT
 		| VOID
 		;
 
-struct_type	: STRUCT tag
+struct_type	: STRUCT ID
 		;
-
-tag		: ID
-
 
 id_list		: ID
 		| id_list MK_COMMA ID
@@ -157,7 +155,8 @@ stmt_list	: stmt_list stmt
 		;
 
 stmt		: MK_LBRACE block MK_RBRACE
-		/* | While Statement here */
+		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
+		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 		/* | If statement here */
@@ -169,7 +168,7 @@ stmt		: MK_LBRACE block MK_RBRACE
 		;
 
 assign_expr_list: nonempty_assign_expr_list
-		|
+		| /* empty */
 		;
 
 nonempty_assign_expr_list: nonempty_assign_expr_list MK_COMMA assign_expr
@@ -203,7 +202,7 @@ relop_expr_list	: nonempty_relop_expr_list
 		| /* empty */
 		;
 
-nonempty_relop_expr_list	: nonempty_relop_expr_list MK_COMMA relop_expr
+nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
 		| relop_expr
 		;
 
@@ -224,16 +223,12 @@ mul_op		: OP_TIMES
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN
-		/* | -(<relop_expr>) */
 		| OP_NOT MK_LPAREN relop_expr MK_RPAREN
 		| CONST
-		/* | - constant, here - is an Unary operator */
 		| OP_NOT CONST
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
-		/* | - func ( <relop_expr_list> ) */
 		| OP_NOT ID MK_LPAREN relop_expr_list MK_RPAREN
 		| var_ref
-		/* | - var-reference */
 		| OP_NOT var_ref
 		;
 

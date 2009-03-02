@@ -1,0 +1,7 @@
+int main()
+{
+    int a = 0;
+    write("foo");
+    while(a < 10)
+        a = a + 1;
+}
