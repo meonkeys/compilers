@@ -1,6 +1,5 @@
 To create a new unit test that will automatically be found and run by
-"unit_test.sh"
-1. create a file ending with ".in" in this directory containing C-- source
-   code
-2. create a corresponding ".out" file containing the same as the other
-   ".out" files
+"unit_test.sh":
+1. Create a file ending with ".in" in this directory with C-- source.
+   Failing tests start with "bad_" by convention.
+2. Create a corresponding ".out" file containing the expected parser output.

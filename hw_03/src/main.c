@@ -28,7 +28,7 @@ main (int argc, char *argv[])
 
     parse_rv = yyparse ();
 
-    if (0 == yyparse ())
+    if (0 == parse_rv)
         printf ("Parsing completed. No errors found.\n");
     else
         printf ("Parsing completed with errors.\n");

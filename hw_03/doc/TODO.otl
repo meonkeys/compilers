@@ -1,15 +1,29 @@
+[_] create unit tests
+	[_] arrays
+		[_] multidimensional array declaration and usage
+		[_] multidimensional array usage
+	[_] failing unit tests
+		[_] unmatched parens
+		[_] arrays
+			[_] multidimensional array declaration and usage
+			[_] multidimensional array usage
+		[_] no main method defined
+			Is it the job of the parser to fail is main() is not defined?
+[_] main() method must exist
 [_] if
 [_] if then else
 [_] anything special required for library calls like read(), write()?
 [_] "Other function_decl productions"?
-[_] all unit tests pass
-[_] exclude valgrind memory checks from default build
-[_] main() method must exist
 [_] extra credit
 	[_] contribute test program(s) that fail solution parser
 	[_] implement error recovery
 		[_] handle parse errors and continue parsing
 		[_] demonstrate usage with test case
+
+[_] final TODOs (prior to homework submission)
+	[_] all unit tests pass
+	[_] exclude valgrind memory checks from default build
+	[_] try on different machines
 
 [X] use "simple.in" instead of "empty.in" during valgrind check
 	more complete memory check
