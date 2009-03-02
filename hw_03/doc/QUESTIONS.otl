@@ -7,3 +7,6 @@ Q. Which are valid structure declarations? All? Or different than ANSI C?
 Q. Why is anything special required for read() and write() library calls?
 Q. What does "Other function_decl productions" mean?
 Q. Is it the job of the parser to fail is main() is not defined?
+Q. Do if/else productions have to be unambiguous, or is it ok to default
+   to bison's "shift on shift/reduce conflict", since that handles if/else
+   in the expected manner?

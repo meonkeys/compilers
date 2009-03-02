@@ -10,11 +10,15 @@
 		[_] no main method defined
 			Is it the job of the parser to fail is main() is not defined?
 [_] main() method must exist
+	Is it the job of the parser to fail is main() is not defined?
+[_] disambiguate if/else parsing(?)
+	dragon book example 4.16 p.211-212
 [_] anything special required for library calls like read(), write()?
 [_] "Other function_decl productions"?
 [_] extra credit
 	[_] contribute test program(s) that fail solution parser
 	[_] implement error recovery
+		class 8 slides, p.9,10
 		[_] handle parse errors and continue parsing
 		[_] demonstrate usage with test case
 
