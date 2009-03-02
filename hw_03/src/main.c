@@ -9,11 +9,17 @@
 #include <lexer3.h>
 
 int yyparse (void);
+#ifdef YYDEBUG
+extern int yydebug;
+#endif
 
 int
 main (int argc, char *argv[])
 {
     int parse_rv;
+#ifdef YYDEBUG
+    yydebug = 1;
+#endif
 
     if (argc > 1) {
         yyin = fopen (argv[1], "r");

@@ -1,5 +1,6 @@
 [_] all unit tests pass
 [_] exclude valgrind memory checks from default build
+[_] main() method must exist
 [_] extra credit
 	[_] contribute test program(s) that fail solution parser
 	[_] implement error recovery

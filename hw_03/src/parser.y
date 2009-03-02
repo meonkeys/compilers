@@ -6,6 +6,7 @@ void yyerror (char const *mesg);
 %}
 
 %defines
+%output="y.tab.c"
 
 %token ID
 %token CONST
@@ -52,7 +53,7 @@ program		: global_decl_list
 		;
 
 global_decl_list: global_decl_list global_decl
-                |
+		| /* empty */
 		;
 
 global_decl	: decl_list function_decl
@@ -65,6 +66,7 @@ function_decl	: type ID MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
 
 param_list	: param_list MK_COMMA  param
 		| param
+		| /* empty */
 		;
 
 param		: type ID
@@ -77,18 +79,18 @@ dim_fn		: MK_LB expr_null MK_RB dimfn1
 		;
 
 dimfn1		: MK_LB expr MK_RB dimfn1
-		|
+		| /* empty */
 		;
 
 expr_null	: expr
 		|
 		;
 
-block           : decl_list stmt_list
-                | stmt_list
-                | decl_list
-                |
-                ;
+block		: decl_list stmt_list
+		| stmt_list
+		| decl_list
+		| /* empty */
+		;
 
 decl_list	: decl_list decl
 		| decl
@@ -98,7 +100,7 @@ decl		: type_decl
 		| var_decl
 		;
 
-type_decl 	: TYPEDEF type id_list MK_SEMICOLON
+type_decl	: TYPEDEF type id_list MK_SEMICOLON
 		| TYPEDEF struct_type id_list MK_SEMICOLON
 		| struct_type MK_SEMICOLON
 		;
@@ -137,7 +139,7 @@ mcexpr		: mcexpr mul_op cfactor
 		| cfactor
 		;
 
-cfactor         : CONST
+cfactor		: CONST
 		| MK_LPAREN cexpr MK_RPAREN
 		;
 
@@ -156,7 +158,7 @@ stmt_list	: stmt_list stmt
 
 stmt		: MK_LBRACE block MK_RBRACE
 		/* | While Statement here */
-	        | FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
+		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 		/* | If statement here */
 		/* | If then else here */
@@ -167,14 +169,14 @@ stmt		: MK_LBRACE block MK_RBRACE
 		;
 
 assign_expr_list: nonempty_assign_expr_list
-                |
-                ;
+		|
+		;
 
 nonempty_assign_expr_list: nonempty_assign_expr_list MK_COMMA assign_expr
-                | assign_expr
+		| assign_expr
 
-assign_expr     : ID OP_ASSIGN relop_expr
-                | relop_expr
+assign_expr	: ID OP_ASSIGN relop_expr
+		| relop_expr
 
 
 relop_expr	: relop_term
@@ -198,7 +200,7 @@ rel_op		: OP_LT
 		;
 
 relop_expr_list	: nonempty_relop_expr_list
-		|
+		| /* empty */
 		;
 
 nonempty_relop_expr_list	: nonempty_relop_expr_list MK_COMMA relop_expr
