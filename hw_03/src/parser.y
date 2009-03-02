@@ -161,12 +161,15 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
-		/* | If statement here */
-		/* | If then else here */
+                | IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
 		/* | read and write library calls -- note that read/write are not keywords */
 		| MK_SEMICOLON
 		| RETURN MK_SEMICOLON
 		| RETURN relop_expr MK_SEMICOLON
+		;
+
+if_stmt_tail	: ELSE stmt
+		| /* empty */
 		;
 
 assign_expr_list: nonempty_assign_expr_list

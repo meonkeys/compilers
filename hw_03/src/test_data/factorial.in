@@ -15,7 +15,7 @@ int fact (int n)
 int main()
 {
  int n, result;
- write(“Enter a number”);
+ write("Enter a number");
  n = read();
 
  if (n > 1)
@@ -27,6 +27,6 @@ int main()
   result = 1;
  }
 
- write(“The factorial is”);
+ write("The factorial is");
  write(result);
 }
