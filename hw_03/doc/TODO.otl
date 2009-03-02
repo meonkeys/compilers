@@ -19,6 +19,8 @@
 		[_] demonstrate usage with test case
 
 [_] final TODOs (prior to homework submission)
+	[_] no bison warnings/conflicts
+		these do not cause bison to return a nonzero exit code!
 	[_] all unit tests pass
 	[_] exclude valgrind memory checks from default build
 	[_] try on different machines

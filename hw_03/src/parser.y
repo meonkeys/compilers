@@ -8,6 +8,13 @@ void yyerror (char const *mesg);
 %defines
 %output="y.tab.c"
 
+/*
+ * Expect 1 shift/reduce conflict. Bison automatically handles the "dangling
+ * else" problem by choosing to shift when either shift or reduce is
+ * applicable.
+ */
+%expect 1
+
 %token ID
 %token CONST
 %token VOID
