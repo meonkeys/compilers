@@ -1,0 +1,8 @@
+Q. Must we support comma-separated values within parens in while(...)?
+Q. Must have semicolon at end of struct declaration?
+Q. Which are valid structure declarations? All? Or different than ANSI C?
+	struct a {int a; float b;};
+	struct {int a; float b;} b;
+	struct a c;
+Q. Why is anything special required for read() and write() library calls?
+Q. What does "Other function_decl productions" mean?

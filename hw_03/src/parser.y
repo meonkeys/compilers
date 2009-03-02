@@ -103,6 +103,8 @@ decl		: type_decl
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
 		| TYPEDEF struct_type id_list MK_SEMICOLON
 		| struct_type MK_LBRACE decl_list MK_RBRACE ID MK_SEMICOLON
+		| struct_type MK_LBRACE decl_list MK_RBRACE MK_SEMICOLON
+		| STRUCT MK_LBRACE decl_list MK_RBRACE ID MK_SEMICOLON
 		| struct_type MK_SEMICOLON
 		;
 

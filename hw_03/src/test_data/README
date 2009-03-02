@@ -1,0 +1,6 @@
+To create a new unit test that will automatically be found and run by
+"unit_test.sh"
+1. create a file ending with ".in" in this directory containing C-- source
+   code
+2. create a corresponding ".out" file containing the same as the other
+   ".out" files

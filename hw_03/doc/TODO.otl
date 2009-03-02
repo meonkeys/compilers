@@ -1,3 +1,7 @@
+[_] if
+[_] if then else
+[_] anything special required for library calls like read(), write()?
+[_] "Other function_decl productions"?
 [_] all unit tests pass
 [_] exclude valgrind memory checks from default build
 [_] main() method must exist
