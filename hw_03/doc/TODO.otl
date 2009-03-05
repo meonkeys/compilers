@@ -9,23 +9,16 @@
 		[X] arrays
 			[X] multidimensional array declaration and usage
 			[X] multidimensional array usage
-		[X?] no main method defined
+		[N] no main method defined
 			Is it the job of the parser to fail is main() is not defined?
-				- I feel like this falls under semantic analysis
-[O] main() method must exist
-	Is it the job of the parser to fail is main() is not defined?
-[X?] disambiguate if/else parsing(?)
-	- This looks like it's handled
+				falls under semantic analysis
 	dragon book example 4.16 p.211-212
-[_] anything special required for library calls like read(), write()?
-	- Doesn't appear to be, just recognize them during semantic 
-		analysis and handle appropriately.
 [_] "Other function_decl productions"?
 [_] extra credit
 	[_] contribute test program(s) that fail solution parser
-			- the supplied parser incorrectly accepts functions 
-				with arrays that do not have an empty first 
-				dimension, per the spec
+		; The supplied parser incorrectly accepts functions with arrays that
+		; do not have an empty first dimension, per the spec
+		; (told prof about this)
 	[_] implement error recovery
 		class 8 slides, p.9,10
 		[_] handle parse errors and continue parsing
@@ -38,6 +31,13 @@
 	[_] exclude valgrind memory checks from default build
 	[_] try on different machines
 
+[N] anything special required for library calls like read(), write()?
+	Doesn't appear to be, just recognize them during semantic analysis and handle appropriately.
+[N] main() method must exist
+	Is it the job of the parser to fail is main() is not defined?
+		No... will be done during syntax analysis
+[N] disambiguate if/else parsing(?)
+	Not necessary--Bison's default behavior is acceptable.
 [X] if statements
 [X] use "simple.in" instead of "empty.in" during valgrind check
 	more complete memory check

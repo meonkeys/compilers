@@ -4,6 +4,7 @@ int main()
     struct a {int a; float b;};
     struct {int a; float b;} b;
     struct a c;
+    struct d_s {float a; int b;} d;
     write("foo");
     while(a < 10)
         a = a + 1;

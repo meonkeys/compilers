@@ -1,13 +1,25 @@
 Q. Must we support comma-separated values within parens in while(...)?
+	A. No.
 Q. Must have semicolon at end of struct declaration?
+	A. Yes.
 Q. Which are valid structure declarations? All? Or different than ANSI C?
-	struct a {int a; float b;};
-	struct {int a; float b;} b;
-	struct a c;
+	struct a {int a; float b;}; <== error (create error production)
+	struct {int a; float b;} b; <== preceding typedef is optional
+	struct a c;                 <== preceding typedef is optional
 Q. Why is anything special required for read() and write() library calls?
+	A. Nothing special is required--save further checks for syntax analysis.
 Q. What does "Other function_decl productions" mean?
+	A. Other function_decl productions may be required.
+		ID ID ....
 Q. Is it the job of the parser to fail is main() is not defined?
+	A. No. This will be taken care of during syntax analysis.
 Q. Do if/else productions have to be unambiguous, or is it ok to default
    to bison's "shift on shift/reduce conflict", since that handles if/else
    in the expected manner?
+	A. Ok to use Bison's default behavior.
 Q. Is an empty file syntactically correct?
+	A. Yes, but don't worry about this yet.
+Q. Do we need to handle arrays of structs?
+	A. Yes.
+Q. Are void arrays allowed?
+	A. No.

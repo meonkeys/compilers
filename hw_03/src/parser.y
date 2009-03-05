@@ -67,6 +67,7 @@ global_decl	: decl_list function_decl
 		| function_decl
 		;
 
+/* TODO: handle ID ID */
 function_decl	: type ID MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
 		/* | Other function_decl productions */
 		;
@@ -82,6 +83,8 @@ param		: type ID
 		| struct_type ID dim_fn
 		;
 
+/* TODO: remove expr_null */
+/* TODO: use an error production here? */
 dim_fn		: MK_LB expr_null MK_RB dimfn1
 		;
 
@@ -89,7 +92,8 @@ dimfn1		: MK_LB expr MK_RB dimfn1
 		| /* empty */
 		;
 
-expr_null	: ;
+expr_null	: /* empty */
+		;
 
 block		: decl_list stmt_list
 		| stmt_list
@@ -119,13 +123,14 @@ var_decl	: type init_id_list MK_SEMICOLON
 		| ID id_list MK_SEMICOLON
 		;
 
+/* TODO: exclude VOID; handle it elsewhere */
 type		: INT
 		| FLOAT
 		| VOID
 		;
 
 array_decl	: type dim_decl id_list MK_SEMICOLON
-		   ;
+		;
 
 struct_type	: STRUCT ID
 		;
@@ -170,7 +175,7 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
-                | IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
+		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
 		/* | read and write library calls -- note that read/write are not keywords */
 		| MK_SEMICOLON
 		| RETURN MK_SEMICOLON
