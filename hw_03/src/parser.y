@@ -83,16 +83,12 @@ param		: type ID
 		| struct_type ID dim_fn
 		;
 
-/* TODO: remove expr_null */
-/* TODO: use an error production here? */
-dim_fn		: MK_LB expr_null MK_RB dimfn1
+/* TODO: use an error production here if something is specified? */
+dim_fn		: MK_LB MK_RB dimfn1
 		;
 
 dimfn1		: MK_LB expr MK_RB dimfn1
 		| /* empty */
-		;
-
-expr_null	: /* empty */
 		;
 
 block		: decl_list stmt_list
