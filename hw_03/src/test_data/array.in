@@ -1,0 +1,7 @@
+int main()
+{
+   int[1] i;
+   int[5][5] b;
+   float[4][3][2] c;
+   i[0] = 5;
+}

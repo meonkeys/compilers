@@ -2,6 +2,9 @@
 	[_] arrays
 		[_] multidimensional array declaration and usage
 		[_] multidimensional array usage
+		[_] first dim must be empty in a function
+		[_] declaration dims cannot be empty
+		[_] declaration dims must be a constant
 	[_] failing unit tests
 		[_] unmatched parens
 		[_] arrays

@@ -89,9 +89,7 @@ dimfn1		: MK_LB expr MK_RB dimfn1
 		| /* empty */
 		;
 
-expr_null	: expr
-		|
-		;
+expr_null	: ;
 
 block		: decl_list stmt_list
 		| stmt_list
@@ -105,6 +103,7 @@ decl_list	: decl_list decl
 
 decl		: type_decl
 		| var_decl
+		| array_decl
 		;
 
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
@@ -124,6 +123,9 @@ type		: INT
 		| FLOAT
 		| VOID
 		;
+
+array_decl	: type dim_decl id_list MK_SEMICOLON
+		   ;
 
 struct_type	: STRUCT ID
 		;
