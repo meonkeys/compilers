@@ -82,14 +82,12 @@ param		: type ID
 		| struct_type ID dim_fn
 		;
 
-dim_fn		: MK_LB expr_null MK_RB dimfn1
+dim_fn		: MK_LB MK_RB dimfn1
 		;
 
 dimfn1		: MK_LB expr MK_RB dimfn1
 		| /* empty */
 		;
-
-expr_null	: ;
 
 block		: decl_list stmt_list
 		| stmt_list
@@ -124,8 +122,7 @@ type		: INT
 		| VOID
 		;
 
-array_decl	: type dim_decl id_list MK_SEMICOLON
-		   ;
+array_decl	: type dim_decl id_list MK_SEMICOLON;
 
 struct_type	: STRUCT ID
 		;
