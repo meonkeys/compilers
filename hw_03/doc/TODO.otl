@@ -1,25 +1,31 @@
 [_] create unit tests
-	[_] arrays
-		[_] multidimensional array declaration and usage
-		[_] multidimensional array usage
-		[_] first dim must be empty in a function
-		[_] declaration dims cannot be empty
-		[_] declaration dims must be a constant
+	[X] arrays
+		[X] multidimensional array declaration and usage
+		[X] first dim must be empty in a function
+		[X] declaration dims cannot be empty
+		[X] declaration dims must be a constant
 	[_] failing unit tests
 		[_] unmatched parens
-		[_] arrays
-			[_] multidimensional array declaration and usage
-			[_] multidimensional array usage
-		[_] no main method defined
+		[X] arrays
+			[X] multidimensional array declaration and usage
+			[X] multidimensional array usage
+		[X?] no main method defined
 			Is it the job of the parser to fail is main() is not defined?
-[_] main() method must exist
+				- I feel like this falls under semantic analysis
+[O] main() method must exist
 	Is it the job of the parser to fail is main() is not defined?
-[_] disambiguate if/else parsing(?)
+[X?] disambiguate if/else parsing(?)
+	- This looks like it's handled
 	dragon book example 4.16 p.211-212
 [_] anything special required for library calls like read(), write()?
+	- Doesn't appear to be, just recognize them during semantic 
+		analysis and handle appropriately.
 [_] "Other function_decl productions"?
 [_] extra credit
 	[_] contribute test program(s) that fail solution parser
+			- the supplied parser incorrectly accepts functions 
+				with arrays that do not have an empty first 
+				dimension, per the spec
 	[_] implement error recovery
 		class 8 slides, p.9,10
 		[_] handle parse errors and continue parsing
