@@ -1,4 +1,5 @@
 typedef int special; 
+typedef special very_special; 
 
 special blah()
 {

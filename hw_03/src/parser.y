@@ -87,7 +87,6 @@ param		: type ID
 		| struct_type ID dim_fn
 		;
 
-/* TODO: use an error production here if something is specified? */
 dim_fn		: MK_LB expr_or_null MK_RB dimfn1
 		;
 
@@ -115,6 +114,7 @@ decl		: type_decl
 
 /* according to these rules, struct/union tag is _required_ */
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
+		| TYPEDEF ID id_list MK_SEMICOLON
 		| TYPEDEF VOID id_list MK_SEMICOLON
 		| TYPEDEF struct_type id_list MK_SEMICOLON
 		| TYPEDEF struct_decl id_list MK_SEMICOLON
