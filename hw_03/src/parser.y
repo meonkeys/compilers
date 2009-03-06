@@ -13,7 +13,7 @@ void yyerror (char const *mesg);
  * else" problem by choosing to shift when either shift or reduce is
  * applicable.
  */
-%expect 1
+//%expect 1
 
 %token ID
 %token CONST
@@ -117,18 +117,25 @@ decl		: type_decl
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
 		| TYPEDEF ID id_list MK_SEMICOLON
 		| TYPEDEF VOID id_list MK_SEMICOLON
-		| TYPEDEF struct_type id_list MK_SEMICOLON
-		| TYPEDEF struct_decl id_list MK_SEMICOLON
-		| struct_decl id_list MK_SEMICOLON
 		| struct_decl MK_SEMICOLON
-		/* FIXME: what is the point of this production? */
-		| struct_type MK_SEMICOLON
-		/* no tag or name: error */
-		| struct_type MK_LBRACE decl_list MK_RBRACE error MK_SEMICOLON
 		;
 
-struct_decl	: struct_type MK_LBRACE decl_list MK_RBRACE
+struct_decl	: struct_type struct_body
+			/*FIXME: whats the point of this produciton? */
+			| struct_type ID
+			| struct_type ID id_list 
+			| struct_type ID struct_body
+			| struct_type ID struct_body id_list
+			| struct_type struct_body id_list
+			| TYPEDEF struct_type ID struct_body ID
+			| TYPEDEF struct_type struct_body ID
+			| TYPEDEF struct_type id_list
+			/* no tag or name: error */
+			| struct_type MK_LBRACE decl_list MK_RBRACE error
 		;
+
+struct_body : MK_LBRACE decl_list MK_RBRACE
+			;
 
 var_decl	: type init_id_list MK_SEMICOLON
 		| struct_type id_list MK_SEMICOLON
@@ -139,8 +146,8 @@ type		: INT
 		| FLOAT
 		;
 
-struct_type	: STRUCT ID
-                | UNION ID
+struct_type	: STRUCT 
+            | UNION
 		;
 
 id_list		: ID
