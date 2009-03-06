@@ -84,10 +84,14 @@ param		: type ID
 		;
 
 /* TODO: use an error production here if something is specified? */
-dim_fn		: MK_LB MK_RB dimfn1
+dim_fn		: MK_LB expr_or_null MK_RB dimfn1
 		;
 
 dimfn1		: MK_LB expr MK_RB dimfn1
+		| /* empty */
+		;
+
+expr_or_null	: expr
 		| /* empty */
 		;
 
@@ -103,7 +107,6 @@ decl_list	: decl_list decl
 
 decl		: type_decl
 		| var_decl
-		| array_decl
 		;
 
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
@@ -123,9 +126,6 @@ var_decl	: type init_id_list MK_SEMICOLON
 type		: INT
 		| FLOAT
 		| VOID
-		;
-
-array_decl	: type dim_decl id_list MK_SEMICOLON
 		;
 
 struct_type	: STRUCT ID
