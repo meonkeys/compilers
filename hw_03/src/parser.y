@@ -120,14 +120,14 @@ type_decl	: TYPEDEF type id_list MK_SEMICOLON
 		| TYPEDEF struct_decl id_list MK_SEMICOLON
 		| struct_decl id_list MK_SEMICOLON
 		| struct_decl MK_SEMICOLON
-                /* no tag or name: error */
+		/* no tag or name: error */
 		| struct_type MK_LBRACE decl_list MK_RBRACE error MK_SEMICOLON
 		;
 
-struct_decl     : struct_type MK_LBRACE decl_list MK_RBRACE
-                /* FIXME: what is the point of this production? */
+struct_decl	: struct_type MK_LBRACE decl_list MK_RBRACE
+		/* FIXME: what is the point of this production? */
 		| struct_type MK_SEMICOLON
-                ;
+		;
 
 var_decl	: type init_id_list MK_SEMICOLON
 		| struct_type id_list MK_SEMICOLON
