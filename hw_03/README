@@ -33,9 +33,13 @@ EXECUTION DETAILS
 
     The code is known to work on Ubuntu 8.10.
 
-CODE DETAILS
+ERROR RECOVERY
 
-    Assignment description:
+    Simple error recovery was implemented: if a right parenthesis is missing
+    from a function declaration, the error is reported and parsing continues.
+
+ASSIGNMENT DESCRIPTION
+
     http://www-users.itlabs.umn.edu/classes/Spring-2009/csci5161/index.php?page=./handouts/assign3
 
 COPYRIGHT
