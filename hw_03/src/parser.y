@@ -69,6 +69,7 @@ global_decl	: decl_list function_decl
 		;
 
 function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
+		| func_start MK_LPAREN param_list error MK_LBRACE block MK_RBRACE
 		;
 
 func_start      : type ID
