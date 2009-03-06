@@ -7,4 +7,6 @@ union zoo {
     struct animal this;
 } TheZoo;
 
+struct mystery;
+
 int main() { }
