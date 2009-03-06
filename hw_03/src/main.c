@@ -29,9 +29,9 @@ main (int argc, char *argv[])
     parse_rv = yyparse ();
 
     if (0 == parse_rv)
-        printf ("Parsing completed. No errors found.\n");
+        printf ("Parsing complete.\n");
     else
-        printf ("Parsing completed with errors.\n");
+        printf ("Parsing aborted due to unrecoverable error(s).\n");
 
     if (argc > 1) {
         assert(0 == fclose (yyin));

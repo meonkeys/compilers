@@ -20,8 +20,10 @@ PREREQUISITES
 
 EXECUTION DETAILS
 
-    Typing "make" in the top-level or src directory should compile and run all
-    unit tests except memory leak checks. A successful return code and the
+    Executing "make main" will compile the standalone parser.
+
+    Executing "make" in the top-level or src directory should compile and run
+    all unit tests except memory leak checks. A successful return code and the
     appearance of "ALL TESTS PASSED" should print out in the console.
 
     * flex, gcc, and bison assumed present in PATH

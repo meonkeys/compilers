@@ -1,19 +1,3 @@
-[_] create unit tests
-	[X] arrays
-		[X] multidimensional array declaration and usage
-		[X] first dim must be empty in a function
-		[X] declaration dims cannot be empty
-		[X] declaration dims must be a constant
-	[_] failing unit tests
-		[_] unmatched parens
-		[X] arrays
-			[X] multidimensional array declaration and usage
-			[X] multidimensional array usage
-		[N] no main method defined
-			Is it the job of the parser to fail is main() is not defined?
-				falls under semantic analysis
-	dragon book example 4.16 p.211-212
-[_] "Other function_decl productions"?
 [_] extra credit
 	[_] contribute test program(s) that fail solution parser
 		; The supplied parser incorrectly accepts functions with arrays that
@@ -31,6 +15,22 @@
 	[_] exclude valgrind memory checks from default build
 	[_] try on different machines
 
+[X] "Other function_decl productions"?
+[X] create unit tests
+	[X] arrays
+		[X] multidimensional array declaration and usage
+		[X] first dim must be empty in a function
+		[X] declaration dims cannot be empty
+		[X] declaration dims must be a constant
+	[X] failing unit tests
+		[X] unmatched parens
+		[X] arrays
+			[X] multidimensional array declaration and usage
+			[X] multidimensional array usage
+		[N] no main method defined
+			Is it the job of the parser to fail is main() is not defined?
+				falls under semantic analysis
+	dragon book example 4.16 p.211-212
 [N] anything special required for library calls like read(), write()?
 	Doesn't appear to be, just recognize them during semantic analysis and handle appropriately.
 [N] main() method must exist

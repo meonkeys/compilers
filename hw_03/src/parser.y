@@ -25,6 +25,7 @@ void yyerror (char const *mesg);
 %token WHILE
 %token FOR
 %token STRUCT
+%token UNION
 %token TYPEDEF
 %token OP_ASSIGN
 %token OP_OR
@@ -67,12 +68,15 @@ global_decl	: decl_list function_decl
 		| function_decl
 		;
 
-/* TODO: handle ID ID */
-function_decl	: type ID MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
-		/* | Other function_decl productions */
+function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
 		;
 
-param_list	: param_list MK_COMMA  param
+func_start      : type ID
+		| VOID ID /* function returns void */
+		| ID ID   /* for a typedef'd return type */
+		;
+
+param_list	: param_list MK_COMMA param
 		| param
 		| /* empty */
 		;
@@ -109,26 +113,33 @@ decl		: type_decl
 		| var_decl
 		;
 
+/* according to these rules, struct/union tag is _required_ */
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
+		| TYPEDEF VOID id_list MK_SEMICOLON
 		| TYPEDEF struct_type id_list MK_SEMICOLON
-		| struct_type MK_LBRACE decl_list MK_RBRACE ID MK_SEMICOLON
-		| struct_type MK_LBRACE decl_list MK_RBRACE MK_SEMICOLON
-		| STRUCT MK_LBRACE decl_list MK_RBRACE ID MK_SEMICOLON
-		| struct_type MK_SEMICOLON
+		| TYPEDEF struct_decl id_list MK_SEMICOLON
+		| struct_decl id_list MK_SEMICOLON
+		| struct_decl MK_SEMICOLON
+                /* no tag or name: error */
+		| struct_type MK_LBRACE decl_list MK_RBRACE error MK_SEMICOLON
 		;
+
+struct_decl     : struct_type MK_LBRACE decl_list MK_RBRACE
+                /* FIXME: what is the point of this production? */
+		| struct_type MK_SEMICOLON
+                ;
 
 var_decl	: type init_id_list MK_SEMICOLON
 		| struct_type id_list MK_SEMICOLON
 		| ID id_list MK_SEMICOLON
 		;
 
-/* TODO: exclude VOID; handle it elsewhere */
 type		: INT
 		| FLOAT
-		| VOID
 		;
 
 struct_type	: STRUCT ID
+                | UNION ID
 		;
 
 id_list		: ID
@@ -172,7 +183,6 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
-		/* | read and write library calls -- note that read/write are not keywords */
 		| MK_SEMICOLON
 		| RETURN MK_SEMICOLON
 		| RETURN relop_expr MK_SEMICOLON

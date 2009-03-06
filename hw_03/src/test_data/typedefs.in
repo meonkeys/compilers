@@ -1,0 +1,15 @@
+typedef int special; 
+
+special blah()
+{
+}
+
+int main()
+{
+    special person;
+    struct sometag { int id; } other; 
+    other x;
+
+    person = 5;
+    x.id = 10;
+}

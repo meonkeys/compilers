@@ -1,0 +1,10 @@
+struct animal {
+    int place;
+};
+
+union zoo {
+    int id;
+    struct animal this;
+} TheZoo;
+
+int main() { }
