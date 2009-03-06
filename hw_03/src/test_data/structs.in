@@ -9,4 +9,6 @@ union zoo {
 
 struct mystery;
 
-int main() { }
+int main() {
+    struct animal dogs[5];
+}
