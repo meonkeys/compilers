@@ -31,7 +31,7 @@ EXECUTION DETAILS
     If these paths are incorrect, edit Makefile before compiling and running
     unit tests.
 
-    The code is known to work on Ubuntu 8.10.
+    The code has been tested and works on Ubuntu 8.04.2 and Ubuntu 8.10.
 
 ERROR RECOVERY
 

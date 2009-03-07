@@ -8,6 +8,17 @@
 #include <y.tab.h>
 #include <lexer3.h>
 
+/*
+ * We need yylex_destroy or valgrind complains of memory leaks. When testing on
+ * Ubuntu 8.04.2, Flex 2.5.34 was found to omit the yylex_destroy declaration
+ * in the generated header file. Try to handle this case gracefully.
+ */
+#if YY_FLEX_MAJOR_VERSION == 2 \
+    && YY_FLEX_MINOR_VERSION == 5 \
+    && YY_FLEX_SUBMINOR_VERSION < 35
+int yylex_destroy (void);
+#endif
+
 int yyparse (void);
 #ifdef YYDEBUG
 extern int yydebug;
