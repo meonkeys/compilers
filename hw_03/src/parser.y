@@ -72,7 +72,7 @@ function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBR
 		| func_start MK_LPAREN param_list error MK_LBRACE block MK_RBRACE
 		;
 
-func_start      : type ID
+func_start	: type ID
 		| VOID ID /* function returns void */
 		| ID ID   /* for a typedef'd return type */
 		;
@@ -121,21 +121,20 @@ type_decl	: TYPEDEF type id_list MK_SEMICOLON
 		;
 
 struct_decl	: struct_type struct_body
-			/*FIXME: whats the point of this produciton? */
-			| struct_type ID
-			| struct_type ID id_list 
-			| struct_type ID struct_body
-			| struct_type ID struct_body id_list
-			| struct_type struct_body id_list
-			| TYPEDEF struct_type ID struct_body ID
-			| TYPEDEF struct_type struct_body ID
-			| TYPEDEF struct_type id_list
-			/* no tag or name: error */
-			| struct_type MK_LBRACE decl_list MK_RBRACE error
+		| struct_type ID
+		| struct_type ID id_list
+		| struct_type ID struct_body
+		| struct_type ID struct_body id_list
+		| struct_type struct_body id_list
+		| TYPEDEF struct_type ID struct_body ID
+		| TYPEDEF struct_type struct_body ID
+		| TYPEDEF struct_type id_list
+		/* no tag or name: error */
+		| struct_type MK_LBRACE decl_list MK_RBRACE error
 		;
 
-struct_body : MK_LBRACE decl_list MK_RBRACE
-			;
+struct_body	: MK_LBRACE decl_list MK_RBRACE
+		;
 
 var_decl	: type init_id_list MK_SEMICOLON
 		| struct_type id_list MK_SEMICOLON
@@ -146,8 +145,8 @@ type		: INT
 		| FLOAT
 		;
 
-struct_type	: STRUCT 
-            | UNION
+struct_type	: STRUCT
+		| UNION
 		;
 
 id_list		: ID
