@@ -247,12 +247,17 @@ add_op		: OP_PLUS
 		| OP_MINUS
 		;
 
-term		: term mul_op factor
-		| factor
+term		: term mul_op unary
+		| unary
 		;
 
 mul_op		: OP_TIMES
 		| OP_DIVIDE
+		;
+
+unary		: OP_MINUS unary
+		| OP_NOT unary
+		| factor
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN
