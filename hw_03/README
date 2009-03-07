@@ -35,8 +35,10 @@ EXECUTION DETAILS
 
 ERROR RECOVERY
 
-    Simple error recovery was implemented: if a right parenthesis is missing
-    from a function declaration, the error is reported and parsing continues.
+    Simple error recovery was implemented. For instance, if a right parenthesis
+    is missing from a function declaration, the error is reported and parsing
+    continues. The special "error" nonterminal is used in "error productions"
+    for this purpose.
 
 ASSIGNMENT DESCRIPTION
 

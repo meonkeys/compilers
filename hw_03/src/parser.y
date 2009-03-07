@@ -13,7 +13,7 @@ void yyerror (char const *mesg);
  * else" problem by choosing to shift when either shift or reduce is
  * applicable.
  */
-//%expect 1
+%expect 1
 
 %token ID
 %token CONST
@@ -120,24 +120,22 @@ type_decl	: TYPEDEF type id_list MK_SEMICOLON
 		| struct_decl MK_SEMICOLON
 		;
 
-struct_decl	: struct_type struct_body
-		| struct_type ID
-		| struct_type ID id_list
-		| struct_type ID struct_body
+struct_decl	: struct_type id_list
+	    	| struct_type ID id_list
+	    	| struct_type ID struct_body
 		| struct_type ID struct_body id_list
 		| struct_type struct_body id_list
-		| TYPEDEF struct_type ID struct_body ID
-		| TYPEDEF struct_type struct_body ID
+		| TYPEDEF struct_type ID struct_body id_list
+		| TYPEDEF struct_type struct_body id_list
 		| TYPEDEF struct_type id_list
 		/* no tag or name: error */
-		| struct_type MK_LBRACE decl_list MK_RBRACE error
+		| struct_type struct_body error
 		;
 
 struct_body	: MK_LBRACE decl_list MK_RBRACE
 		;
 
 var_decl	: type init_id_list MK_SEMICOLON
-		| struct_type id_list MK_SEMICOLON
 		| ID id_list MK_SEMICOLON
 		;
 
@@ -168,6 +166,7 @@ mcexpr		: mcexpr mul_op cfactor
 		;
 
 cfactor		: CONST
+		| ID error
 		| MK_LPAREN cexpr MK_RPAREN
 		;
 
@@ -260,13 +259,9 @@ unary		: OP_MINUS unary
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN
-		| OP_NOT MK_LPAREN relop_expr MK_RPAREN
 		| CONST
-		| OP_NOT CONST
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
-		| OP_NOT ID MK_LPAREN relop_expr_list MK_RPAREN
 		| var_ref
-		| OP_NOT var_ref
 		;
 
 var_ref		: ID
