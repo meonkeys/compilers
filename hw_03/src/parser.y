@@ -186,6 +186,7 @@ stmt_list	: stmt_list stmt
 stmt		: MK_LBRACE block MK_RBRACE
 		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
+		| ELSE error stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
