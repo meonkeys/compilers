@@ -1,20 +1,20 @@
-[_] extra credit
-	[_] contribute test program(s) that fail solution parser
+[_] final TODOs (prior to homework submission)
+	[X] no bison warnings/conflicts
+		: "%expect 1" allows the "dangling else" conflict to exist and errors
+		: if any less or any more conflicts are discovered.
+	[X] all unit tests pass
+	[X] exclude valgrind memory checks from default build
+	[_] try on different machines
+
+[X] extra credit
+	[X] contribute test program(s) that fail solution parser
 		; The supplied parser incorrectly accepts functions with arrays that
 		; do not have an empty first dimension, per the spec
 		; (told prof about this)
-	[_] implement error recovery
+	[X] implement error recovery
 		class 8 slides, p.9,10
-		[_] handle parse errors and continue parsing
-		[_] demonstrate usage with test case
-
-[_] final TODOs (prior to homework submission)
-	[_] no bison warnings/conflicts
-		these do not cause bison to return a nonzero exit code!
-	[_] all unit tests pass
-	[_] exclude valgrind memory checks from default build
-	[_] try on different machines
-
+		[X] handle parse errors and continue parsing
+		[X] demonstrate usage with test case
 [X] "Other function_decl productions"?
 [X] create unit tests
 	[X] arrays
