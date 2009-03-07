@@ -7,7 +7,15 @@ union zoo {
     struct animal this;
 } TheZoo;
 
-struct mystery;
+struct predeclared;
+
+typedef struct {
+    float boat;
+} NoTag;
+
+struct {
+    float boat;
+} NoTag;
 
 int main() {
     struct animal dogs[5];
