@@ -6,7 +6,7 @@ LEX=flex
 YACC=bison
 TEST_DATA_DIR=test_data
 
-test: main
+test: main valgrind
 	bash unit_test.sh $(TEST_DATA_DIR)
 
 # build a parser that prints trace output to stderr
