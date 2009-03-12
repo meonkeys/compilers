@@ -53,6 +53,12 @@ void yyerror (char const *mesg);
 %token ERROR
 %token RETURN
 
+%left OP_OR OP_AND
+%left OP_LT OP_GT OP_GE OP_LE OP_NE OP_EQ
+%left OP_PLUS OP_MINUS
+%left OP_TIMES OP_DIVIDE
+%left MK_DOT
+
 %start program
 
 %%
@@ -157,11 +163,10 @@ dim_decl	: MK_LB cexpr MK_RB
 		| dim_decl MK_LB cexpr MK_RB
 		;
 
-cexpr		: cexpr add_op mcexpr
-		| mcexpr
-		;
-
-mcexpr		: mcexpr mul_op cfactor
+cexpr		: cexpr OP_PLUS cexpr
+		| cexpr OP_MINUS cexpr
+		| cexpr OP_TIMES cexpr
+		| cexpr OP_DIVIDE cexpr
 		| cfactor
 		;
 
@@ -210,16 +215,8 @@ assign_expr	: ID OP_ASSIGN relop_expr
 		| relop_expr
 
 
-relop_expr	: relop_term
-		| relop_expr OP_OR relop_term
-		;
-
-relop_term	: relop_factor
-		| relop_term OP_AND relop_factor
-		;
-
-relop_factor	: expr
-		| expr rel_op expr
+relop_expr	: expr
+		| relop_expr rel_op expr
 		;
 
 rel_op		: OP_LT
@@ -228,6 +225,8 @@ rel_op		: OP_LT
 		| OP_LE
 		| OP_NE
 		| OP_EQ
+		| OP_OR
+		| OP_AND
 		;
 
 relop_expr_list	: nonempty_relop_expr_list
@@ -238,20 +237,11 @@ nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
 		| relop_expr
 		;
 
-expr		: expr add_op term
-		| term
-		;
-
-add_op		: OP_PLUS
-		| OP_MINUS
-		;
-
-term		: term mul_op unary
+expr		: expr OP_PLUS expr
+		| expr OP_MINUS expr
+		| expr OP_TIMES expr
+		| expr OP_DIVIDE expr
 		| unary
-		;
-
-mul_op		: OP_TIMES
-		| OP_DIVIDE
 		;
 
 unary		: OP_MINUS unary
