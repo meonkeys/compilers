@@ -1,0 +1,18 @@
+typedef struct {
+	float boat;
+} Tag;
+
+struct {
+	float boat;
+} NoTag;
+
+struct blah{
+	int id;
+};
+
+int main()
+{
+	typedef blah blag;
+
+	blag x;
+}

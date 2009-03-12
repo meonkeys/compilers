@@ -1,0 +1,15 @@
+/* Demonstrate simple error recovery. Two parsing errors should be found, but
+ * parsing should not abort until the entire file is read.
+ */
+
+float func(int a, float b {
+    return a + b;
+}
+
+int func2(int a, int b {
+    return a + b;
+}
+
+int main() {
+    int a;
+}
