@@ -1,4 +1,5 @@
-Infix (standard) calculator from the Bison manual.
+Infix (standard) calculator from the Bison manual. Augmented to be useful as a
+sandbox for experimenting with semantic checking.
 
 Usage:
 http://www.gnu.org/software/bison/manual/html_mono/bison.html.gz#Infix-Calc

@@ -21,6 +21,5 @@ y.tab.c: parser.y
 	$(YACC) $(YFLAGS) --verbose $<
 
 # check for memory leaks
-# FIXME: this doesn't work yet
 valgrind: main
-	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/simple.in > /dev/null
+	$@ $(VALGRIND_OPTS) ./$< <<< "5 - 2 * 2" > /dev/null

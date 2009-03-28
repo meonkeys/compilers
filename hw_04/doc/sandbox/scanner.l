@@ -22,6 +22,7 @@ INT             {DIGIT}+
 FLOAT           \.{DIGIT}+|{DIGIT}+\.|{DIGIT}+\.{DIGIT}+
 ARITHOP         "+"|"-"|"*"|"/"|"^"
 ASSIGNOP        "="
+PAREN           "("|")"
 WHITESPACE      [ \t]+
 
 %%
@@ -29,8 +30,9 @@ WHITESPACE      [ \t]+
 {ID}            { return ID; }
 {INT}           { yylval.num = atoi(yytext); return INT; }
 {FLOAT}         { return FLOAT; }
-{ASSIGNOP}      { return yytext[0]; }
+{ASSIGNOP}      { return '='; }
 {ARITHOP}       { return yytext[0]; }
+{PAREN}         { return yytext[0]; }
 {WHITESPACE}    {}
 \n              { return END_OF_LINE; }
  .              { printf("Unrecognized character: %s on line: %d\n",
