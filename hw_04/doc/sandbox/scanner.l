@@ -28,6 +28,7 @@ WHITESPACE      [ \t]+
 
 {ID}            { return ID; }
 {INT}           { return NUM; }
+{FLOAT}         { return NUM; }
 {ASSIGNOP}      { return yytext[0]; }
 {ARITHOP}       { return yytext[0]; }
 {WHITESPACE}    {}

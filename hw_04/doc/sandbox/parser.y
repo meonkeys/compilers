@@ -1,6 +1,8 @@
 /* Infix notation calculator with variables.  */
 
 %{
+#define YYSTYPE double
+
 /* System headers */
 #include <math.h>
 #include <stdio.h>
@@ -32,7 +34,7 @@ input:    /* empty */
 ;
 
 line:     '\n'
-        | exp '\n'  { printf ("\t%d\n", $1); }
+        | exp '\n'  { printf ("\t%.10g\n", $1); }
 ;
 
 exp:      NUM                { $$ = $1;         }
