@@ -6,7 +6,7 @@ LEX=flex
 YACC=bison
 LDFLAGS=-lm
 
-main: main.c calc.o scan.o
+main: main.c parser.o scanner.o
 
 clean:
-	$(RM) calc *.o *.c
+	$(RM) y.tab.h *.o main scanner.h

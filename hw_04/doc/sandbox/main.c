@@ -5,7 +5,7 @@
 
 /* Custom headers */
 #include <y.tab.h>
-#include <scan.h>
+#include <scanner.h>
 
 /*
  * We need yylex_destroy or valgrind complains of memory leaks. When testing on

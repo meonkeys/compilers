@@ -7,8 +7,9 @@
 #include <y.tab.h>
 
 /* Custom headers */
-#include <scanner.h>
 
+/* Prototypes */
+int yylex(void);
 void yyerror (char const *);
 %}
 
@@ -31,11 +32,10 @@ input:    /* empty */
 ;
 
 line:     '\n'
-        | exp '\n'  { printf ("\t%.10g\n", $1); }
+        | exp '\n'  { printf ("\t%d\n", $1); }
 ;
 
 exp:      NUM                { $$ = $1;         }
-        | ID '=' exp
         | exp '+' exp        { $$ = $1 + $3;    }
         | exp '-' exp        { $$ = $1 - $3;    }
         | exp '*' exp        { $$ = $1 * $3;    }
