@@ -27,12 +27,12 @@ WHITESPACE      [ \t]+
 %%
 
 {ID}            { return ID; }
-{INT}           { return NUM; }
-{FLOAT}         { return NUM; }
+{INT}           { yylval.num = atoi(yytext); return INT; }
+{FLOAT}         { return FLOAT; }
 {ASSIGNOP}      { return yytext[0]; }
 {ARITHOP}       { return yytext[0]; }
 {WHITESPACE}    {}
-\n              {}
+\n              { return END_OF_LINE; }
  .              { printf("Unrecognized character: %s on line: %d\n",
                          yytext, yylineno); }
 

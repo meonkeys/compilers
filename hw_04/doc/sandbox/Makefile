@@ -8,5 +8,19 @@ LDFLAGS=-lm
 
 main: main.c parser.o scanner.o
 
+trace: main.c parser_debug.o scanner.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -DYYDEBUG=1 -o $@ $^
+
 clean:
-	$(RM) y.tab.h *.o main scanner.h
+	$(RM) *.o y.tab.h scanner.h y.output y.tab.c main trace
+
+parser_debug.o: y.tab.c
+	$(CC) $(CFLAGS) -DYYDEBUG=1 -c -o $@ $<
+
+y.tab.c: parser.y
+	$(YACC) $(YFLAGS) --verbose $<
+
+# check for memory leaks
+# FIXME: this doesn't work yet
+valgrind: main
+	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/simple.in > /dev/null
