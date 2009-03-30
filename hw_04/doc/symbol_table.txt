@@ -1,0 +1,25 @@
+Symbol table design ideas. For starters, here's a symbol table that supports
+only one scope. Description:
+
+    key: variable name (char *)
+    value: nested hashtable
+        type (int)
+        int_val (int)
+        float_val (double)
+        string_val (char *)
+
+Example:
+
+    "age" -> {
+        "type" -> INTEGER,
+        "int_val" -> "5",
+        "float_val" -> NULL,
+        "string_val" -> NULL
+    },
+    "name" -> {
+        "type" -> STRING,
+        "int_val" -> NULL,
+        "float_val" -> NULL,
+        "string_val" -> NULL
+        "string_val" -> "John Doe"
+    }
