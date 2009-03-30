@@ -12,7 +12,7 @@ trace: main.c parser_debug.o scanner.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -DYYDEBUG=1 -o $@ $^
 
 clean:
-	$(RM) *.o y.tab.h scanner.h y.output y.tab.c main trace
+	$(RM) *.o y.tab.h scanner.h y.output y.tab.c lex.yy.c main trace
 
 parser_debug.o: y.tab.c
 	$(CC) $(CFLAGS) -DYYDEBUG=1 -c -o $@ $<

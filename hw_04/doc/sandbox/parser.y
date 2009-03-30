@@ -7,15 +7,24 @@
 #include <y.tab.h>
 
 /* Custom headers */
+#include <ourtypes.h>
 
 /* Prototypes */
-int yylex(void);
+int yylex (void);
 void yyerror (char const *);
+
+const_val * arith_op(const_val *exp1, const_val *exp2, int op);
 %}
 
 %union {
-    int num;
-    float fnum;
+    struct {
+        int type;
+        union {
+            int int_val;
+            double float_val;
+            char *string_val;
+        } const_u;
+    } const_val;
 }
 
 %defines
@@ -26,6 +35,7 @@ void yyerror (char const *);
 %token <num> INT
 %token <fnum> FLOAT
 %token ID
+%token <const_ptr> CONST
 %right '='
 %left '-' '+'
 %left '*' '/'
@@ -41,8 +51,12 @@ input:  /* empty */
 line:   exp END_OF_LINE      { printf ("\t%d\n", $<num>1); }
 ;
 
-exp:      INT                { $<num>$ = $<num>1; }
-        | exp '+' exp        { $<num>$ = $<num>1 + $<num>3;    }
+exp:      CONST              { $<num>$ = $<num>1 }
+        | ID                 { }
+        | ID  '=' exp        { }
+        | exp '+' exp        {
+                               $<const_val>$ = arith_op(&$<const_val>1, &$<const_val>3, $2);
+                             }
         | exp '-' exp        { $<num>$ = $<num>1 - $<num>3;    }
         | exp '*' exp        { $<num>$ = $<num>1 * $<num>3;    }
         | exp '/' exp        { $<num>$ = $<num>1 / $<num>3;    }
@@ -53,3 +67,8 @@ exp:      INT                { $<num>$ = $<num>1; }
 
 %%
 
+const_val *
+arith_op(const_val *exp1, const_val *exp2, int op)
+{
+    return NULL;
+}
