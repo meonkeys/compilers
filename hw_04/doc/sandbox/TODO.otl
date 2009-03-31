@@ -1,2 +1,3 @@
-[_] add very simple unit test(s)
+[X] add very simple unit test(s)
 [_] add floating point arithmetic
+[_] use strtol() instead of atof()

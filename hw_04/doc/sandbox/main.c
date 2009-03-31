@@ -29,9 +29,7 @@ symrec_t *sym_table;
 void
 init_sym_table (void)
 {
-#if 0
-    putsym ("blah", ID);
-#endif
+    putsym ("blah", KEYWORD);
 }
 
 void
@@ -94,8 +92,12 @@ main (int argc, char *argv[])
 int
 yyerror (char const *mesg)
 {
-    printf ("%s\t%d\t%s\t%s\n", "Error found in Line ", yylineno,
-            "next token: ", yytext);
+    /* FIXME: handle nonprintables in a more generic and platform-neutral manner. */
+    if ('\n' == yytext[0])
+        printf ("Error on line [%d]: '%s'. Next token: '\\n'.\n", yylineno, mesg);
+    else
+        printf ("Error on line [%d]: '%s'. Next token: '%s'.\n", yylineno, mesg, yytext);
+
     return 1;
 }
 

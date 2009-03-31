@@ -25,7 +25,7 @@ void yyerror (char const *);
 /* Bison declarations.  */
 %token END_OF_LINE
 %token <val> NUM
-%token <tptr> ID
+%token <tptr> ID KEYWORD
 %type <val> exp
 %right '='
 %left '-' '+'
@@ -40,11 +40,17 @@ input:  /* empty */
 ;
 
 line:   exp END_OF_LINE      { printf ("\t%.10g\n", $1) }
+        | error END_OF_LINE  { yyerrok }
 ;
 
-exp:      NUM                { $$ = $1 }
+exp:    NUM                  { $$ = $1; }
         | ID                 { $$ = $1->value.var }
-        | ID  '=' exp        { $$ = $3; $1->value.var = $3 }
+        | ID  '=' exp        {
+                                if (KEYWORD == $1->type) {
+                                    yyerror("keyword in lvalue"); YYERROR;
+                                }
+                                $$ = $3; $1->value.var = $3
+                             }
         | exp '+' exp        { $$ = $1 + $3 }
         | exp '-' exp        { $$ = $1 - $3 }
         | exp '*' exp        { $$ = $1 * $3 }
