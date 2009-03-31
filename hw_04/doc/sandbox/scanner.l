@@ -15,6 +15,8 @@
 /* Custom headers */
 #include <y.tab.h>
 #include <ourtypes.h>
+/* Prototypes */
+#define MAX_ID_LENGTH 256
 %}
 
 ID              [a-z][a-z0-9_]*
@@ -28,21 +30,29 @@ WHITESPACE      [ \t]+
 
 %%
 
-{ID}            { return ID; }
+{ID}            {
+                    int len = strlen (yytext);
+                    symrec_t *tmp = NULL;
+                    assert (len < MAX_ID_LENGTH);
+                    tmp = getsym (yytext);
+                    if (NULL == tmp) {
+                        tmp = putsym (yytext, ID);
+                    }
+                    yylval.tptr = tmp;
+                    return ID;
+                }
 {INT}           {
-                    yylval.const_val.type = CONST_INT;
-                    yylval.const_val.int_val = atoi(yytext);
-                    return CONST;
+                    yylval.val = atof(yytext);
+                    return NUM;
                 }
 {FLOAT}         {
-                    yylval.const_val.type = CONST_FLOAT;
-                    yylval.const_val.float_val = atof(yytext);
-                    return CONST;
+                    yylval.val = atoi(yytext);
+                    return NUM;
                 }
 {ASSIGNOP}      { return '='; }
 {ARITHOP}       { return yytext[0]; }
 {PAREN}         { return yytext[0]; }
-{WHITESPACE}    {}
+{WHITESPACE}    /* strip whitespace */
 \n              { return END_OF_LINE; }
  .              { printf("Unrecognized character: %s on line: %d\n",
                          yytext, yylineno); }

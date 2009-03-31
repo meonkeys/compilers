@@ -6,6 +6,7 @@
 /* Custom headers */
 #include <y.tab.h>
 #include <scanner.h>
+#include <ourtypes.h>
 
 /*
  * We need yylex_destroy or valgrind complains of memory leaks. When testing on
@@ -23,6 +24,29 @@ int yyparse (void);
 extern int yydebug;
 #endif
 
+symrec_t *sym_table;
+
+void
+init_sym_table (void)
+{
+#if 0
+    putsym ("blah", ID);
+#endif
+}
+
+void
+destroy_sym_table (void)
+{
+    symrec_t *cur = sym_table;
+    symrec_t *next = NULL;
+    while (cur != (symrec_t *) 0) {
+        next = (symrec_t *) cur->next;
+        free(cur->name);
+        free(cur);
+        cur = next;
+    };
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -31,10 +55,13 @@ main (int argc, char *argv[])
     yydebug = 1;
 #endif
 
-    if (argc > 1) {
+    if (argc > 1)
+    {
         yyin = fopen (argv[1], "r");
         assert (NULL != yyin);
     }
+
+    init_sym_table ();
 
     parse_rv = yyparse ();
 
@@ -43,9 +70,12 @@ main (int argc, char *argv[])
     else
         printf ("Parsing aborted due to unrecoverable error(s).\n");
 
-    if (argc > 1) {
-        assert(0 == fclose (yyin));
+    if (argc > 1)
+    {
+        assert (0 == fclose (yyin));
     }
+
+    destroy_sym_table ();
 
     /*
      * Not precisely as indicated by the manual, but seems to be the right
@@ -57,7 +87,7 @@ main (int argc, char *argv[])
      * Successful exit code even if parsing failed. Unit test script depends
      * on this behavior.
      */
-    exit(EXIT_SUCCESS);
+    exit (EXIT_SUCCESS);
 }
 
 
@@ -67,4 +97,48 @@ yyerror (char const *mesg)
     printf ("%s\t%d\t%s\t%s\n", "Error found in Line ", yylineno,
             "next token: ", yytext);
     return 1;
+}
+
+symrec_t *
+putsym (char const *sym_name, int sym_type)
+{
+    symrec_t *ptr;
+    ptr = (symrec_t *) malloc (sizeof (symrec_t));
+    ptr->name = (char *) calloc (strlen (sym_name) + 1, 1);
+    strcpy (ptr->name, sym_name);
+    ptr->type = sym_type;
+    ptr->value.var = 0;         /* Set value to 0 even if fctn.  */
+    ptr->next = (symrec_t *) sym_table;
+    sym_table = ptr;
+    return ptr;
+}
+
+symrec_t *
+getsym (char const *sym_name)
+{
+    symrec_t *ptr;
+    for (ptr = sym_table; ptr != (symrec_t *) 0; ptr = (symrec_t *) ptr->next)
+    {
+        if (strcmp (ptr->name, sym_name) == 0)
+        {
+            return ptr;
+        }
+    }
+    return 0;
+}
+
+void
+dump_symtab (void)
+{
+    symrec_t *ptr;
+    printf("dumping symbol table\n");
+    for (ptr = sym_table; ptr != (symrec_t *) 0; ptr = (symrec_t *) ptr->next)
+    {
+        printf("\tname = %s\n", ptr->name);
+        printf("\t\ttype = %d\n", ptr->type);
+        if (ID == ptr->type) {
+            printf("\t\tvalue = %g\n", ptr->value.var);
+        }
+        printf("\t\tnext = %p\n", (void *) ptr->next);
+    }
 }

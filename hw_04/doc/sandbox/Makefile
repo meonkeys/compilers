@@ -5,6 +5,10 @@ VALGRIND_OPTS=--quiet --leak-check=full --show-reachable=yes --error-exitcode=2
 LEX=flex
 YACC=bison
 LDFLAGS=-lm
+TEST_DATA_DIR=test_data
+
+test: main valgrind
+	bash unit_test.sh $(TEST_DATA_DIR)
 
 main: main.c parser.o scanner.o
 
@@ -22,4 +26,4 @@ y.tab.c: parser.y
 
 # check for memory leaks
 valgrind: main
-	$@ $(VALGRIND_OPTS) ./$< <<< "5 - 2 * 2" > /dev/null
+	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/01simple.in > /dev/null
