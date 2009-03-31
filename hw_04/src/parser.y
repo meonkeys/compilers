@@ -1,9 +1,18 @@
 %{
-#include <y.tab.h>
+#include "y.tab.h"
+#include "ourtypes.h"
+#include "util.h"
 
 int yylex(void);
 void yyerror (char const *mesg);
+
 %}
+
+%union{
+	int num;
+	struct Const_type* con_ptr;
+	struct symrec* sym_ptr;
+}
 
 %defines
 %output="y.tab.c"
@@ -52,6 +61,11 @@ void yyerror (char const *mesg);
 %token MK_DOT
 %token ERROR
 %token RETURN
+
+%type <con_ptr> CONST
+%type <con_ptr> cexpr 
+%type <con_ptr> cfactor
+%type <con_ptr> factor /* FIXME: this is probably incorrect */
 
 %left OP_OR OP_AND
 %left OP_LT OP_GT OP_GE OP_LE OP_NE OP_EQ
@@ -170,9 +184,9 @@ cexpr		: cexpr OP_PLUS cexpr
 		| cfactor
 		;
 
-cfactor		: CONST
-		| ID error
-		| MK_LPAREN cexpr MK_RPAREN
+cfactor		: CONST		{$$ = $1; free_const($1);}
+		| ID error		/* Error Routine */
+		| MK_LPAREN cexpr MK_RPAREN {$$ = $2; free_const($2); }
 		;
 
 init_id_list	: init_id
@@ -250,7 +264,7 @@ unary		: OP_MINUS unary
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN
-		| CONST
+		| CONST		{$$ = $1; free_const($1);}
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 		| var_ref
 		;

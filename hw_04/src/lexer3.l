@@ -14,6 +14,7 @@
 
 /* Custom headers */
 #include <y.tab.h>
+#include "ourtypes.h"
 %}
 
 letter   [A-Za-z]
@@ -44,7 +45,8 @@ op_plus "+"
 op_minus "-"
 op_times "*"
 op_divide "/"
-constant {digit}+(("."){digit}+)?
+iconstant {digit}+
+fconstant {digit}+(("."){digit}+)?
 comment	"/*"(([^*])|([*]+[^/*]))*("*")+"/"
 s-const \"([^"\n])*\"
 ws       [ \t]+
@@ -90,8 +92,25 @@ error    .
 {op_minus}      return OP_MINUS;
 {op_times}      return OP_TIMES;
 {op_divide}     return OP_DIVIDE;
-{constant}      { return CONST; }
-{s-const}       { return CONST; }
+{iconstant}		{struct Const_type* p;
+					p= (struct Const_type*)malloc(sizeof(Const_type));
+					p->const_type=INTC;
+					p->const_u.intval=atoi(yytext);
+					yylval.con_ptr=p;
+					return CONST;}
+{fconstant}     {struct Const_type* p;
+					p= (struct Const_type*)malloc(sizeof(Const_type));
+					p->const_type=FC;
+					p->const_u.fval=atof(yytext);
+					yylval.con_ptr=p;
+					return CONST;}
+{s-const}       {struct Const_type* p;
+					p= (struct Const_type*)malloc(sizeof(Const_type));
+					p->const_type=SC;
+					p->const_u.sc = malloc(sizeof(char)*strlen(yytext)+1);
+					p->const_u.sc = strcpy(p->const_u.sc, yytext);
+					yylval.con_ptr=p;
+					return CONST;}
 {mk_lparen}     return MK_LPAREN;
 {mk_rparen}     return MK_RPAREN;
 {mk_lbrace}     return MK_LBRACE;
