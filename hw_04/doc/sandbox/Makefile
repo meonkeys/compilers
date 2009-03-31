@@ -8,7 +8,7 @@ LDFLAGS=-lm
 TEST_DATA_DIR=test_data
 
 test: main valgrind
-	bash unit_test.sh $(TEST_DATA_DIR)
+	@bash unit_test.sh $(TEST_DATA_DIR)
 
 main: main.c parser.o scanner.o
 
@@ -26,4 +26,6 @@ y.tab.c: parser.y
 
 # check for memory leaks
 valgrind: main
-	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/01simple.in > /dev/null
+	@# $@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/01simple.in > /dev/null
+	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/02variables.in > /dev/null
+	@# $@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/03keyword_lvalue.in > /dev/null

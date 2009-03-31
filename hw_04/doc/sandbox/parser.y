@@ -49,6 +49,9 @@ exp:    NUM                  { $$ = $1; }
                                 if (KEYWORD == $1->type) {
                                     yyerror("keyword in lvalue"); YYERROR;
                                 }
+                                if (FALSE == $1->virgin) {
+                                    yyerror("redeclared identifier"); YYERROR;
+                                }
                                 $$ = $3; $1->value.var = $3
                              }
         | exp '+' exp        { $$ = $1 + $3 }
