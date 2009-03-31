@@ -1,8 +1,10 @@
 #ifndef OURTYPES_H
 #define OURTYPES_H
 
-#define TRUE 1
-#define FALSE 0
+typedef enum TRUTH {
+    FALSE = 0,
+    TRUE = 1
+} truth;
 
 /* Function type.  */
 typedef double (*func_t) (double);
@@ -12,7 +14,7 @@ typedef struct symrec_s
 {
     char *name;                 /* name of symbol */
     int type;                   /* type of symbol: either ID, KEYWORD, or ? */
-    int is_declared;            /* has this ID been declared? */
+    truth is_declared;          /* has this ID been declared? */
     union
     {
         double var;             /* value of a VAR */
