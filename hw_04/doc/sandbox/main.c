@@ -110,6 +110,7 @@ putsym (char const *sym_name, int sym_type)
     strcpy (ptr->name, sym_name);
     ptr->type = sym_type;
     ptr->value.var = 0;         /* Set value to 0 even if fctn.  */
+    ptr->is_declared = FALSE;
     ptr->next = (symrec_t *) sym_table;
     sym_table = ptr;
     return ptr;

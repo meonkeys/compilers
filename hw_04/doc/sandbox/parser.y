@@ -44,14 +44,20 @@ line:   exp END_OF_LINE      { printf ("\t%.10g\n", $1) }
 ;
 
 exp:    NUM                  { $$ = $1; }
-        | ID                 { $$ = $1->value.var }
+        | ID                 {
+                                if (FALSE == $1->is_declared) {
+                                    yyerror("undeclared identifier"); YYERROR;
+                                }
+                                $$ = $1->value.var
+                             }
         | ID  '=' exp        {
                                 if (KEYWORD == $1->type) {
                                     yyerror("keyword in lvalue"); YYERROR;
                                 }
-                                if (FALSE == $1->virgin) {
+                                if (TRUE == $1->is_declared) {
                                     yyerror("redeclared identifier"); YYERROR;
                                 }
+                                $1->is_declared = TRUE;
                                 $$ = $3; $1->value.var = $3
                              }
         | exp '+' exp        { $$ = $1 + $3 }

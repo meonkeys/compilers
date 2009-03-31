@@ -37,9 +37,6 @@ WHITESPACE      [ \t]+
                     tmp = getsym (yytext);
                     if (NULL == tmp) {
                         tmp = putsym (yytext, ID);
-                        tmp->virgin = TRUE;
-                    } else {
-                        tmp->virgin = FALSE;
                     }
                     yylval.tptr = tmp;
                     return ID;

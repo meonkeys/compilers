@@ -11,8 +11,8 @@ typedef double (*func_t) (double);
 typedef struct symrec_s
 {
     char *name;                 /* name of symbol */
-    int type;                   /* type of symbol: either ID or ? */
-    int virgin;                 /* first time this symbol is seen? */
+    int type;                   /* type of symbol: either ID, KEYWORD, or ? */
+    int is_declared;            /* has this ID been declared? */
     union
     {
         double var;             /* value of a VAR */
