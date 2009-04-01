@@ -10,7 +10,7 @@ void yyerror (char const *mesg);
 
 %union{
     int num;
-    struct base_type* con_ptr;
+    struct base_type* base_t_ptr;
     struct symrec* sym_ptr;
 }
 
@@ -62,10 +62,12 @@ void yyerror (char const *mesg);
 %token ERROR
 %token RETURN
 
-%type <con_ptr> CONST
-%type <con_ptr> cexpr
-%type <con_ptr> cfactor
-%type <con_ptr> factor /* FIXME: this is probably incorrect */
+%type <base_t_ptr> CONST
+%type <base_t_ptr> cexpr
+%type <base_t_ptr> cfactor
+%type <base_t_ptr> expr
+%type <base_t_ptr> factor
+%type <base_t_ptr> unary
 
 %type <sym_ptr> param_list
 %type <sym_ptr> param
@@ -159,6 +161,9 @@ struct_decl	: struct_type id_list
 struct_body	: MK_LBRACE decl_list MK_RBRACE
 		;
 
+/* This production inserts sym_recs into the symbol table
+ * No real need to keep them on the value stack
+ */
 var_decl	: type init_id_list MK_SEMICOLON
 		| ID id_list MK_SEMICOLON
 		;
@@ -181,11 +186,20 @@ dim_decl	: MK_LB cexpr MK_RB
 		| dim_decl MK_LB cexpr MK_RB
 		;
 
-cexpr		: cexpr OP_PLUS cexpr
-		| cexpr OP_MINUS cexpr
-		| cexpr OP_TIMES cexpr
-		| cexpr OP_DIVIDE cexpr
-		| cfactor
+cexpr		: cexpr OP_PLUS cexpr 
+                    {$$ = arith_op_type_reduce($1, $3);
+                     free_const($1);
+                     free_const($3);}
+		| cexpr OP_MINUS cexpr {$$ = arith_op_type_reduce($1, $3);
+                     free_const($1);
+                     free_const($3);}
+		| cexpr OP_TIMES cexpr {$$ = arith_op_type_reduce($1, $3);
+                     free_const($1);
+                     free_const($3);}
+		| cexpr OP_DIVIDE cexpr {$$ = arith_op_type_reduce($1, $3);
+                     free_const($1);
+                     free_const($3);}
+		| cfactor {$$ = $1; free_const($1);}
 		;
 
 cfactor		: CONST		{$$ = $1; free_const($1);}
@@ -255,16 +269,24 @@ nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
 		| relop_expr
 		;
 
-expr		: expr OP_PLUS expr
-		| expr OP_MINUS expr
-		| expr OP_TIMES expr
-		| expr OP_DIVIDE expr
-		| unary
+expr		: expr OP_PLUS expr {$$ = arith_op_type_reduce($1, $3);
+                     free_const($1);
+                     free_const($3);}
+		| expr OP_MINUS expr {$$ = arith_op_type_reduce($1, $3);
+                     free_const($1);
+                     free_const($3);}
+		| expr OP_TIMES expr {$$ = arith_op_type_reduce($1, $3);
+                     free_const($1);
+                     free_const($3);}
+		| expr OP_DIVIDE expr {$$ = arith_op_type_reduce($1, $3);
+                     free_const($1);
+                     free_const($3);}
+		| unary {$$ = $1; free_const($1);}
 		;
 
-unary		: OP_MINUS unary
-		| OP_NOT unary
-		| factor
+unary		: OP_MINUS unary {$$ = $2; free_const($2);}
+		| OP_NOT unary {$$ = $2; free_const($2);}
+		| factor {$$ = $1; free_const($1)}
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN

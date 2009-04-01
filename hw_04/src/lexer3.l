@@ -113,7 +113,7 @@ error    .
                     p = (struct base_type *) malloc (sizeof (base_type));
                     p->type = TYPE_INT;
                     p->const_u.intval = atoi (yytext);
-                    yylval.con_ptr = p;
+                    yylval.base_t_ptr = p;
                     return CONST;
                 }
 {fconstant}     {
@@ -121,7 +121,7 @@ error    .
                     p = (struct base_type *) malloc (sizeof (base_type));
                     p->type = TYPE_FLOAT;
                     p->const_u.fval = atof (yytext);
-                    yylval.con_ptr = p;
+                    yylval.base_t_ptr = p;
                     return CONST;
                 }
 {s-const}       {
@@ -130,7 +130,7 @@ error    .
                     p->type = TYPE_STRING;
                     p->const_u.sc = malloc (sizeof (char) * strlen (yytext) + 1);
                     p->const_u.sc = strcpy (p->const_u.sc, yytext);
-                    yylval.con_ptr = p;
+                    yylval.base_t_ptr = p;
                     return CONST;
                 }
 {mk_lparen}     return MK_LPAREN;
