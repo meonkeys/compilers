@@ -186,7 +186,7 @@ dim_decl	: MK_LB cexpr MK_RB
 		| dim_decl MK_LB cexpr MK_RB
 		;
 
-cexpr		: cexpr OP_PLUS cexpr 
+cexpr		: cexpr OP_PLUS cexpr
                     {$$ = arith_op_type_reduce($1, $3);
                      free_const($1);
                      free_const($3);}
@@ -281,16 +281,16 @@ expr		: expr OP_PLUS expr {$$ = arith_op_type_reduce($1, $3);
 		| expr OP_DIVIDE expr {$$ = arith_op_type_reduce($1, $3);
                      free_const($1);
                      free_const($3);}
-		| unary {$$ = $1; free_const($1);}
+		| unary {$$ = $1}
 		;
 
-unary		: OP_MINUS unary {$$ = $2; free_const($2);}
-		| OP_NOT unary {$$ = $2; free_const($2);}
-		| factor {$$ = $1; free_const($1)}
+unary		: OP_MINUS unary {$$ = $2}
+		| OP_NOT unary {$$ = $2}
+		| factor {$$ = $1}
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN
-		| CONST		{$$ = $1; free_const($1);}
+		| CONST		{$$ = $1}
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 		| var_ref
 		;
