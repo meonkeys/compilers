@@ -23,6 +23,9 @@ y.tab.c: parser.y
 valgrind: main
 	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/simple.in > /dev/null
 
+pretty:
+	indent -bli0 -nut -i4 *.c
+
 main: main.c parser.o lexer3.o ourtypes.o symtab.o util.o
 
 .PHONY: distclean clean tools valgrind
