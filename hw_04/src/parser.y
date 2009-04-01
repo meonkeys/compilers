@@ -24,7 +24,7 @@ void yyerror (char const *mesg);
 %expect 1
 
 %token <sem_ptr> ID
-%token CONST
+%token <sem_ptr>CONST
 %token VOID
 %token INT
 %token FLOAT
@@ -61,7 +61,6 @@ void yyerror (char const *mesg);
 %token ERROR
 %token RETURN
 
-%type <sem_ptr> CONST
 %type <sem_ptr> cexpr
 %type <sem_ptr> cfactor
 %type <sem_ptr> expr
