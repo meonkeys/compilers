@@ -7,6 +7,7 @@
 /* Custom headers */
 #include <y.tab.h>
 #include <lexer3.h>
+#include <symtab.h>
 
 /*
  * We need yylex_destroy or valgrind complains of memory leaks. When testing on
@@ -32,10 +33,13 @@ main (int argc, char *argv[])
     yydebug = 1;
 #endif
 
-    if (argc > 1) {
+    if (argc > 1)
+    {
         yyin = fopen (argv[1], "r");
         assert (NULL != yyin);
     }
+
+    init_sym_table ();
 
     parse_rv = yyparse ();
 
@@ -44,9 +48,12 @@ main (int argc, char *argv[])
     else
         printf ("Parsing aborted due to unrecoverable error(s).\n");
 
-    if (argc > 1) {
-        assert(0 == fclose (yyin));
+    if (argc > 1)
+    {
+        assert (0 == fclose (yyin));
     }
+
+    destroy_sym_table ();
 
     /*
      * Not precisely as indicated by the manual, but seems to be the right
@@ -58,7 +65,7 @@ main (int argc, char *argv[])
      * Successful exit code even if parsing failed. Unit test script depends
      * on this behavior.
      */
-    exit(EXIT_SUCCESS);
+    exit (EXIT_SUCCESS);
 }
 
 

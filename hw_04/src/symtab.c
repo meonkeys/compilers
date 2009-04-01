@@ -1,24 +1,26 @@
-
-#include "symtab.h"
+#include <symtab.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "lexer3.h"
-#include "y.tab.h"
+#include <lexer3.h>
+#include <y.tab.h>
 
 symrec_t *sym_table;
 
 void
 init_sym_table (void)
 {
-    /*putsym ("blah", KEYWORD);*/
-	
-	/* 
-	 * FIXME: we need to add the keywords 
-	 * but I don't have that defined yet 
-	 */
+    /* these are library functions, not keywords... do we need another type? */
+    putsym ("read", STYPE_KEYWORD);
+    putsym ("write", STYPE_KEYWORD);
+    putsym ("fwrite", STYPE_KEYWORD);
+
+    /*
+     * FIXME: we need to add the real keywords
+     * but I don't have that defined yet
+     */
 }
 
 void
@@ -26,10 +28,11 @@ destroy_sym_table (void)
 {
     symrec_t *cur = sym_table;
     symrec_t *next = NULL;
-    while (cur != (symrec_t *) 0) {
+    while (cur != (symrec_t *) 0)
+    {
         next = (symrec_t *) cur->next;
-        free(cur->name);
-        free(cur);
+        free (cur->name);
+        free (cur);
         cur = next;
     };
 }
@@ -67,15 +70,15 @@ void
 dump_symtab (void)
 {
     symrec_t *ptr;
-    printf("dumping symbol table\n");
+    printf ("dumping symbol table\n");
     for (ptr = sym_table; ptr != (symrec_t *) 0; ptr = (symrec_t *) ptr->next)
     {
-        printf("\tname = %s\n", ptr->name);
-        printf("\t\ttype = %d\n", ptr->type);
-        if (ID == ptr->type) {
-            printf("\t\tvalue = %g\n", ptr->value.var);
+        printf ("\tname = %s\n", ptr->name);
+        printf ("\t\ttype = %d\n", ptr->type);
+        if (ID == ptr->type)
+        {
+            printf ("\t\tvalue = %g\n", ptr->value.var);
         }
-        printf("\t\tnext = %p\n", (void *) ptr->next);
+        printf ("\t\tnext = %p\n", (void *) ptr->next);
     }
 }
-

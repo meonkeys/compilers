@@ -7,7 +7,7 @@ YACC=bison
 TEST_DATA_DIR=test_data
 
 test: main valgrind
-	bash unit_test.sh $(TEST_DATA_DIR)
+	@bash unit_test.sh $(TEST_DATA_DIR)
 
 # build a parser that prints trace output to stderr
 trace: main.c parser_debug.o lexer3.o symtab.o ourtypes.o util.o

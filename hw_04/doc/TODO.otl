@@ -2,3 +2,4 @@
 [_] start adding semantic checking
 [_] design symbol table
 [_] use strtol() instead of atof()
+[_] move keywords to symbol table

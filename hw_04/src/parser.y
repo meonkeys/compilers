@@ -1,7 +1,7 @@
 %{
-#include "y.tab.h"
-#include "ourtypes.h"
-#include "util.h"
+#include <y.tab.h>
+#include <ourtypes.h>
+#include <util.h>
 
 int yylex(void);
 void yyerror (char const *mesg);
@@ -9,9 +9,9 @@ void yyerror (char const *mesg);
 %}
 
 %union{
-	int num;
-	struct base_type* con_ptr;
-	struct symrec* sym_ptr;
+    int num;
+    struct base_type* con_ptr;
+    struct symrec* sym_ptr;
 }
 
 %defines
@@ -24,7 +24,7 @@ void yyerror (char const *mesg);
  */
 %expect 1
 
-%token ID
+%token <sym_ptr> ID
 %token CONST
 %token VOID
 %token INT
@@ -63,7 +63,7 @@ void yyerror (char const *mesg);
 %token RETURN
 
 %type <con_ptr> CONST
-%type <con_ptr> cexpr 
+%type <con_ptr> cexpr
 %type <con_ptr> cfactor
 %type <con_ptr> factor /* FIXME: this is probably incorrect */
 
