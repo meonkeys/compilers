@@ -10,7 +10,7 @@ void yyerror (char const *mesg);
 
 %union{
 	int num;
-	struct Const_type* con_ptr;
+	struct base_type* con_ptr;
 	struct symrec* sym_ptr;
 }
 
@@ -66,6 +66,10 @@ void yyerror (char const *mesg);
 %type <con_ptr> cexpr 
 %type <con_ptr> cfactor
 %type <con_ptr> factor /* FIXME: this is probably incorrect */
+
+%type <sym_ptr> param_list
+%type <sym_ptr> param
+
 
 %left OP_OR OP_AND
 %left OP_LT OP_GT OP_GE OP_LE OP_NE OP_EQ

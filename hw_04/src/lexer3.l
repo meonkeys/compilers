@@ -92,21 +92,21 @@ error    .
 {op_minus}      return OP_MINUS;
 {op_times}      return OP_TIMES;
 {op_divide}     return OP_DIVIDE;
-{iconstant}		{struct Const_type* p;
-					p= (struct Const_type*)malloc(sizeof(Const_type));
-					p->const_type=INTC;
+{iconstant}		{struct base_type* p;
+					p= (struct base_type*)malloc(sizeof(base_type));
+					p->type=I;
 					p->const_u.intval=atoi(yytext);
 					yylval.con_ptr=p;
 					return CONST;}
-{fconstant}     {struct Const_type* p;
-					p= (struct Const_type*)malloc(sizeof(Const_type));
-					p->const_type=FC;
+{fconstant}     {struct base_type* p;
+					p= (struct base_type*)malloc(sizeof(base_type));
+					p->type=F;
 					p->const_u.fval=atof(yytext);
 					yylval.con_ptr=p;
 					return CONST;}
-{s-const}       {struct Const_type* p;
-					p= (struct Const_type*)malloc(sizeof(Const_type));
-					p->const_type=SC;
+{s-const}       {struct base_type* p;
+					p= (struct base_type*)malloc(sizeof(base_type));
+					p->type=S;
 					p->const_u.sc = malloc(sizeof(char)*strlen(yytext)+1);
 					p->const_u.sc = strcpy(p->const_u.sc, yytext);
 					yylval.con_ptr=p;

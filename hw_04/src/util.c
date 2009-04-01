@@ -2,9 +2,9 @@
 #include "util.h"
 #include <stdlib.h>
 
-void free_const(Const_type* ct){
-	if(ct->const_type == SC){
-		free(ct->const_u.sc);
+void free_const(base_type* bt){
+	if(bt->type == S){
+		free(bt->const_u.sc);
 	}
-	free(ct);
+	free(bt);
 }

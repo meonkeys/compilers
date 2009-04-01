@@ -10,7 +10,7 @@ test: main valgrind
 	bash unit_test.sh $(TEST_DATA_DIR)
 
 # build a parser that prints trace output to stderr
-trace: main.c parser_debug.o lexer3.o symtab.o util.o
+trace: main.c parser_debug.o lexer3.o symtab.o ourtypes.o util.o
 	$(CC) $(CFLAGS) -DYYDEBUG=1 -o $@ $^
 
 parser_debug.o: y.tab.c
@@ -23,7 +23,7 @@ y.tab.c: parser.y
 valgrind: main
 	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/simple.in > /dev/null
 
-main: main.c parser.o lexer3.o symtab.o util.o
+main: main.c parser.o lexer3.o ourtypes.o symtab.o util.o
 
 .PHONY: distclean clean tools valgrind
 

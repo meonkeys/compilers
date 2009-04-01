@@ -3,6 +3,6 @@
 
 #include "ourtypes.h"
 
-void free_const(Const_type* ct);
+void free_const(base_type* bt);
 
 #endif
