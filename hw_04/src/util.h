@@ -3,6 +3,6 @@
 
 #include <ourtypes.h>
 
-void free_const(base_type* bt);
+void free_const(semrec_t* bt);
 
 #endif

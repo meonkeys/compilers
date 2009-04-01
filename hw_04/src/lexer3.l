@@ -82,16 +82,15 @@ error    .
 {kwUnion}	return UNION;
 {kwTypedef}     return TYPEDEF;
 {kwReturn}      return RETURN;
-{ID}            {   /*
+{ID}            {
                     int len = strlen (yytext);
-                    symrec_t *tmp = NULL;
+                    semrec_t *tmp = NULL;
                     assert (len < MAX_ID_LENGTH);
                     tmp = getsym (yytext);
                     if (NULL == tmp) {
                         tmp = putsym (yytext, ID);
                     }
-                    yylval.sym_ptr = tmp;
-                    */
+                    yylval.sem_ptr = tmp;
                     return ID;
                 }
 {op_assign}     return OP_ASSIGN;
@@ -109,28 +108,28 @@ error    .
 {op_times}      return OP_TIMES;
 {op_divide}     return OP_DIVIDE;
 {iconstant}	{
-                    struct base_type *p;
-                    p = (struct base_type *) malloc (sizeof (base_type));
+                    semrec_t *p;
+                    p = (semrec_t *) malloc (sizeof (semrec_t));
                     p->type = TYPE_INT;
-                    p->const_u.intval = atoi (yytext);
-                    yylval.base_t_ptr = p;
+                    p->value.intval = atoi (yytext);
+                    yylval.sem_ptr = p;
                     return CONST;
                 }
 {fconstant}     {
-                    struct base_type *p;
-                    p = (struct base_type *) malloc (sizeof (base_type));
+                    semrec_t *p;
+                    p = (semrec_t *) malloc (sizeof (semrec_t));
                     p->type = TYPE_FLOAT;
-                    p->const_u.fval = atof (yytext);
-                    yylval.base_t_ptr = p;
+                    p->value.fval = atof (yytext);
+                    yylval.sem_ptr = p;
                     return CONST;
                 }
 {s-const}       {
-                    struct base_type *p;
-                    p = (struct base_type *) malloc (sizeof (base_type));
+                    semrec_t *p;
+                    p = (semrec_t *) malloc (sizeof (semrec_t));
                     p->type = TYPE_STRING;
-                    p->const_u.sc = malloc (sizeof (char) * strlen (yytext) + 1);
-                    p->const_u.sc = strcpy (p->const_u.sc, yytext);
-                    yylval.base_t_ptr = p;
+                    p->value.stringval = malloc (sizeof (char) * strlen (yytext) + 1);
+                    p->value.stringval = strcpy (p->value.stringval, yytext);
+                    yylval.sem_ptr = p;
                     return CONST;
                 }
 {mk_lparen}     return MK_LPAREN;

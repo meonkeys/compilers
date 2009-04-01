@@ -6,10 +6,10 @@
  * somewhere around here if we wanted.
  * TODO: write an int2float() and figure out where to call it
  */
-base_type *
-arith_op_type_reduce (base_type * t1, base_type * t2)
+semrec_t *
+arith_op_type_reduce (semrec_t * t1, semrec_t * t2)
 {
-    base_type *ct = (struct base_type *) malloc (sizeof (base_type));
+    semrec_t *ct = (semrec_t *) malloc (sizeof (semrec_t));
 
     /* set it to the "shared" type */
     ct->type = t1->type;

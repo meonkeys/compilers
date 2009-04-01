@@ -1,6 +1,6 @@
 %{
-#include <y.tab.h>
 #include <ourtypes.h>
+#include <y.tab.h>
 #include <util.h>
 
 int yylex(void);
@@ -10,8 +10,7 @@ void yyerror (char const *mesg);
 
 %union{
     int num;
-    struct base_type* base_t_ptr;
-    struct symrec* sym_ptr;
+    struct semrec_s* sem_ptr;
 }
 
 %defines
@@ -24,7 +23,7 @@ void yyerror (char const *mesg);
  */
 %expect 1
 
-%token <sym_ptr> ID
+%token <sem_ptr> ID
 %token CONST
 %token VOID
 %token INT
@@ -62,15 +61,15 @@ void yyerror (char const *mesg);
 %token ERROR
 %token RETURN
 
-%type <base_t_ptr> CONST
-%type <base_t_ptr> cexpr
-%type <base_t_ptr> cfactor
-%type <base_t_ptr> expr
-%type <base_t_ptr> factor
-%type <base_t_ptr> unary
+%type <sem_ptr> CONST
+%type <sem_ptr> cexpr
+%type <sem_ptr> cfactor
+%type <sem_ptr> expr
+%type <sem_ptr> factor
+%type <sem_ptr> unary
 
-%type <sym_ptr> param_list
-%type <sym_ptr> param
+%type <sem_ptr> param_list
+%type <sem_ptr> param
 
 
 %left OP_OR OP_AND
@@ -199,12 +198,12 @@ cexpr		: cexpr OP_PLUS cexpr
 		| cexpr OP_DIVIDE cexpr {$$ = arith_op_type_reduce($1, $3);
                      free_const($1);
                      free_const($3);}
-		| cfactor {$$ = $1; free_const($1);}
+		| cfactor {$$ = $1}
 		;
 
-cfactor		: CONST		{$$ = $1; free_const($1);}
+cfactor		: CONST		{$$ = $1}
 		| ID error		/* Error Routine */
-		| MK_LPAREN cexpr MK_RPAREN {$$ = $2; free_const($2); }
+		| MK_LPAREN cexpr MK_RPAREN {$$ = $2 }
 		;
 
 init_id_list	: init_id
@@ -290,7 +289,7 @@ unary		: OP_MINUS unary {$$ = $2}
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN
-		| CONST		{$$ = $1}
+		| CONST		{$$ = $1} /* TODO: remove, this is the default */
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 		| var_ref
 		;

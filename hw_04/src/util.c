@@ -2,11 +2,11 @@
 #include <stdlib.h>
 
 void
-free_const (base_type * bt)
+free_const (semrec_t * bt)
 {
     if (bt->type == TYPE_STRING)
     {
-        free (bt->const_u.sc);
+        free (bt->value.stringval);
     }
     free (bt);
 }
