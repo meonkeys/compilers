@@ -1,4 +1,3 @@
-/* set noexpandtab shiftwidth=8 tabstop=8 number */
 
 %{
 /* System Headers */
@@ -79,11 +78,16 @@ void yyerror (char const *mesg);
 %type <sem_ptr> cfactor;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
+%type <sem_ptr> function_decl;
+%type <sem_ptr> func_start;
 %type <sem_ptr> init_id;
 %type <sem_ptr> id_list;
 %type <sem_ptr> init_id_list;
+%type <sem_ptr> param;
+%type <sem_ptr> param_list;
 %type <sem_ptr> relop_expr;
 %type <sem_ptr> stmt;
+%type <sem_ptr> struct_type;
 %type <sem_ptr> type;
 %type <sem_ptr> unary;
 %type <sem_ptr> var_decl;
@@ -107,18 +111,39 @@ global_decl	: decl_list function_decl
 function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
 		;
 
-func_start	: type ID {$2->type = $1->type; putsym($2); our_free($1);}
+func_start	: type ID 
+				{
+					$2->type = TYPE_FUNCTION;
+					$2->value.funcval = malloc(sizeof(func_t));
+					$2->value.funcval->return_type = $1->type;
+					putsym($2);
+					our_free($1);
+					$$ = $2;
+				}
 		| VOID ID /* function returns void */
 		| ID ID   /* for a typedef'd return type */
 		;
 
 param_list	: param_list MK_COMMA param
+				{
+					$1->next = $3;
+					$$ = $1;
+				}
 		| param
-		| /* empty */
+		| /* empty */ {}
 		;
 
 param		: type ID
+				{
+					$2->type = $1->type;
+					our_free($1);
+					$$ = $2;
+				}
 		| struct_type ID
+				{
+					/* Do this later */
+					$$ = $1;
+				}
 		| type ID dim_fn
 		| struct_type ID dim_fn
 		;

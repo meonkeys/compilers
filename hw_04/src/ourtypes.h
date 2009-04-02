@@ -24,19 +24,20 @@ typedef enum TYPE_T
 } type_t;
 
 typedef struct array_s{
-	semrec_t* dimension;
+	struct semrec_s* dimension;
 } array_t;
 
 typedef struct func_s{
+	type_t return_type;
 	int num_params;
-	semrec_t* param_list;
-}
+	struct semrec_s* param_list;
+} func_t;
 
 typedef struct struct_s{
 	char* tag; /* string before the structure/union */
 	char* alias; /* string after the structure/union */
 	/* type_t type; */ /* use the type_t type in parent semrec */
-	semrec_t* member_list;
+	struct semrec_s* member_list;
 } struct_t;
 
 
