@@ -347,3 +347,6 @@ struct_tail	: MK_DOT ID
 
 %%
 
+/*
+vim: noexpandtab shiftwidth=8 tabstop=8
+*/
