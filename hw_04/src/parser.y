@@ -1,5 +1,7 @@
 %{
 /* System Headers */
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 
 /* Custom Headers */
@@ -8,10 +10,12 @@
 #include <util.h>
 
 int yylex (void);
-void yyerror (char const *mesg);
+void yyerror (char const *fmt, ...);
+extern int yylineno;
 
-/*#define YYSTYPE semrec_t* */
 #include <y.tab.h>
+
+static char *ERR_START = "Error found in line";
 %}
 
 %defines
@@ -76,8 +80,18 @@ void yyerror (char const *mesg);
 %type <sem_ptr> cfactor;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
+%type <sem_ptr> function_decl;
+%type <sem_ptr> func_start;
+%type <sem_ptr> init_id;
 %type <sem_ptr> id_list;
 %type <sem_ptr> init_id_list;
+%type <sem_ptr> nonempty_relop_expr_list;
+%type <sem_ptr> param;
+%type <sem_ptr> param_list;
+%type <sem_ptr> relop_expr_list;
+%type <sem_ptr> relop_expr;
+%type <sem_ptr> stmt;
+%type <sem_ptr> struct_type;
 %type <sem_ptr> type;
 %type <sem_ptr> unary;
 %type <sem_ptr> var_decl;
@@ -99,21 +113,72 @@ global_decl	: decl_list function_decl
 		;
 
 function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
-		| func_start MK_LPAREN param_list error MK_LBRACE block MK_RBRACE
+			{
+				$1->value.funcval->param_list = $3;
+				$1->value.funcval->num_params = list_length($3);
+				$$ = $1;
+			}
 		;
 
 func_start	: type ID
+			{
+				$2->type = TYPE_FUNCTION;
+				$2->value.funcval = malloc(sizeof(func_t));
+				$2->value.funcval->return_type = $1->type;
+				/* putsym($2); */ /* add to symtab in function_decl */
+				our_free($1);
+				$$ = $2;
+			}
 		| VOID ID /* function returns void */
+			{
+				$2->type = TYPE_FUNCTION;
+				$2->value.funcval = malloc(sizeof(func_t));
+				$2->value.funcval->return_type = TYPE_VOID;
+				/* putsym($2) */ /* add to symtab in function_decl */
+				$$ = $2;
+			}
 		| ID ID   /* for a typedef'd return type */
+			{
+				$2->type = TYPE_FUNCTION;
+				$2->value.funcval = malloc(sizeof(func_t));
+
+				$$ = getsym($1->name);
+				/* first ID not in symtab */
+				if(NULL == $$){
+					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
+					$1->is_temp = TRUE;
+					our_free($1);
+					YYERROR;
+				}
+				/* first ID found in symtab */
+				else{
+					$2->value.funcval->return_type = $1->type;
+					/* Do not free first ID from symbol table */
+					$$ = $2;
+				}
+			}
 		;
 
 param_list	: param_list MK_COMMA param
+				{
+					$1->next = $3;
+					$$ = $1;
+				}
 		| param
-		| /* empty */
+		| /* empty */ {}
 		;
 
 param		: type ID
+				{
+					$2->type = $1->type;
+					our_free($1);
+					$$ = $2;
+				}
 		| struct_type ID
+				{
+					/* Do this later */
+					$$ = $1;
+				}
 		| type ID dim_fn
 		| struct_type ID dim_fn
 		;
@@ -158,8 +223,6 @@ struct_decl	: struct_type id_list
 		| TYPEDEF struct_type ID struct_body id_list
 		| TYPEDEF struct_type struct_body id_list
 		| TYPEDEF struct_type id_list
-		/* no tag or name: error */
-		| struct_type struct_body error
 		;
 
 struct_body	: MK_LBRACE decl_list MK_RBRACE
@@ -169,19 +232,32 @@ struct_body	: MK_LBRACE decl_list MK_RBRACE
  * No real need to keep them on the value stack
  */
 var_decl	: type init_id_list MK_SEMICOLON /* TODO: set type of ID */
-                 { putsymlist ($2, $1->type); our_free($1) }
+			{ putsymlist ($2, $1->type); our_free($1); }
 		| ID id_list MK_SEMICOLON /* TODO: set type of ID */
+			{
+				$$ = getsym($1->name);
+				if(NULL == $$){
+					yyerror($1->name);
+					printf("ID %s undeclared.\n", $1->name);
+					$1->is_temp = TRUE;
+					our_free($1);
+					YYERROR;
+				}
+				putsymlist($2, $$->type);
+			}
 		;
 
 type		: INT
                         {
-                            $$ = new_semrec ("");
-                            $$->type = TYPE_INT;
+				$$ = new_semrec ("INT");
+				$$->type = TYPE_INT;
+				$$->is_temp = TRUE;
                         }
 		| FLOAT
                         {
-                            $$ = new_semrec ("");
-                            $$->type = TYPE_FLOAT;
+				$$ = new_semrec ("FLOAT");
+				$$->type = TYPE_FLOAT;
+				$$->is_temp = TRUE;
                         }
 		;
 
@@ -190,7 +266,7 @@ struct_type	: STRUCT
 		;
 
 id_list		: ID
-		| id_list MK_COMMA ID {$1->next = $3}
+		| id_list MK_COMMA ID {$1->next = $3; $$ = $1;}
 		| id_list MK_COMMA ID dim_decl
 		| ID dim_decl
 		;
@@ -216,12 +292,11 @@ cexpr		: cexpr OP_PLUS cexpr
 		;
 
 cfactor		: CONST
-		| ID error		/* Error Routine */
 		| MK_LPAREN cexpr MK_RPAREN {$$ = $2 }
 		;
 
 init_id_list	: init_id
-		| init_id_list MK_COMMA init_id
+		| init_id_list MK_COMMA init_id {$1->next = $3; $$ = $1;}
 		;
 
 init_id		: ID
@@ -236,10 +311,20 @@ stmt_list	: stmt_list stmt
 stmt		: MK_LBRACE block MK_RBRACE
 		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
-		| ELSE error stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
+			{
+				printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
+				printf("$1 name = %s\n", $1->name);
+				printf("$1 type = %d\n", $1->type);
+				if(TRUE == typecmp($1->type, $3->type)){
+					our_free($1); /* var_ref so it's temp */
+					our_free($3);
+					/* ID gets new value? */
+				}
+			}
 		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
+		| error MK_SEMICOLON { yyerrok }
 		| MK_SEMICOLON
 		| RETURN MK_SEMICOLON
 		| RETURN relop_expr MK_SEMICOLON
@@ -256,6 +341,7 @@ assign_expr_list: nonempty_assign_expr_list
 nonempty_assign_expr_list: nonempty_assign_expr_list MK_COMMA assign_expr
 		| assign_expr
 
+/* I don't know why this isnt used, it's in stmt instead */
 assign_expr	: ID OP_ASSIGN relop_expr
 		| relop_expr
 
@@ -275,11 +361,15 @@ rel_op		: OP_LT
 		;
 
 relop_expr_list	: nonempty_relop_expr_list
-		| /* empty */
+		| /* empty */ {}
 		;
 
 nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
-		| relop_expr
+			{
+				$1->next = $3;
+				$$ = $1;
+			}
+		| relop_expr 
 		;
 
 expr		: expr OP_PLUS expr {$$ = arith_op_type_reduce($1, $3);
@@ -305,10 +395,48 @@ unary		: OP_MINUS unary {$$ = $2}
 factor		: MK_LPAREN relop_expr MK_RPAREN
 		| CONST
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
+			/* Function call */
+			{
+				$$ = getsym($1->name);
+				/* is the function in the symbol table? */
+				if(NULL == $$){
+					yyerror($1->name);
+					printf("ID (%s) undeclared.\n", $1->name);
+					$1->is_temp = TRUE;
+					our_free($1);
+					YYERROR;
+				}
+				/* is the param list length correct? */
+				if(list_length($3) > $$->value.funcval->num_params){
+					yyerror("too many arguments to function (%s).\n", $1->name);
+					YYERROR;
+				}
+				else if (list_length($3) < $$->value.funcval->num_params){
+					yyerror("too few arguments to function (%s).\n", $1->name);
+					YYERROR;
+				}
+				$$ = $1; /* return the function call semrec */
+			}
 		| var_ref
 		;
 
-var_ref		: ID {$$ = getsym($1->name)}
+var_ref		: ID
+			{
+				$$ = getsym($1->name);
+				/* Gotta do this to delete dangling semrec_ts if
+				      they already exist in the symbol table */
+				if(NULL == $$){
+					$$ = $1;
+					yyerror($1->name);
+					printf("ID (%s) undeclared.\n", $1->name);
+					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
+					YYERROR;
+					/*putsym($1);*/
+				}
+				$1->type = $$->type;
+				$1->is_temp = TRUE;
+				our_free($1);
+			}
 		| var_ref dim
 		| var_ref struct_tail
 		;
@@ -322,3 +450,6 @@ struct_tail	: MK_DOT ID
 
 %%
 
+/*
+vim: noexpandtab shiftwidth=8 tabstop=8
+*/

@@ -1,11 +1,14 @@
 #include <util.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 void
 our_free (semrec_t * bt)
 {
-    if (TRUE == bt->is_const)
+    if (TRUE == bt->is_const || TRUE == bt->is_temp)
     {
+        /* printf("freeing %s\n", bt->name); */
+        free (bt->name);        /* don't know how well this holds */
         if (TYPE_STRING == bt->type)
         {
             free (bt->value.stringval);
@@ -13,3 +16,20 @@ our_free (semrec_t * bt)
         free (bt);
     }
 }
+
+truth_t
+typecmp (type_t t1, type_t t2)
+{
+    if (t1 == t2)
+    {
+        return TRUE;
+    }
+    else
+    {
+        return FALSE;
+    }
+}
+
+/*
+vim: expandtab shiftwidth=4 tabstop=4 smarttab
+*/

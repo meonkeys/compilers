@@ -1,0 +1,6 @@
+Coding style for parser.y:
+	use tabs for each indentation level
+	tabs are 8 spaces
+Coding style for other source:
+	use 4 spaces for each indentation level
+	do not use tabs

@@ -8,7 +8,8 @@ void destroy_sym_table (void);
 semrec_t *putsym (semrec_t *ptr);
 semrec_t *getsym (char const *);
 semrec_t *new_semrec (char const *sym_name);
-semrec_t *putsymlist (semrec_t *item, type_t type);
+void putsymlist (semrec_t *item, type_t type);
+int list_length (semrec_t *list);
 void dump_symtab (void);
 
 #endif

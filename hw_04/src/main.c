@@ -1,5 +1,6 @@
 /* System headers */
 #include <assert.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,7 +45,7 @@ main (int argc, char *argv[])
     parse_rv = yyparse ();
 
     if (0 == parse_rv)
-        printf ("Parsing complete.\n");
+        printf ("Parsing completed.\n");
     else
         printf ("Parsing aborted due to unrecoverable error(s).\n");
 
@@ -69,10 +70,14 @@ main (int argc, char *argv[])
 }
 
 
-int
-yyerror (char const *mesg)
+void
+yyerror (char const *fmt, ...)
 {
-    printf ("%s\t%d\t%s\t%s\n", "Error found in Line ", yylineno,
-            "next token: ", yytext);
-    return 1;
+    va_list ap;
+    va_start(ap, fmt);
+    vprintf (fmt, ap);
 }
+
+/*
+vim: expandtab shiftwidth=4 tabstop=4 smarttab
+*/
