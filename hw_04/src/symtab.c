@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <lexer3.h>
-#include <y.tab.h>
-
 /* Custom Headers */
 #include <lexer3.h>
 #include <symtab.h>
@@ -118,6 +115,15 @@ getsym (char const *sym_name)
         }
     }
     return 0;
+}
+
+int
+list_length (semrec_t *list)
+{
+    int num_items = 0;
+    for (; list != (semrec_t *) 0; list = list->next)
+        num_items++;
+    return num_items;
 }
 
 void

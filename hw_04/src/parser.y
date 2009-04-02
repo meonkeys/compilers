@@ -1,5 +1,3 @@
-/* set noexpandtab shiftwidth=8 tabstop=8 number */
-
 %{
 /* System Headers */
 #include <stdio.h>
@@ -351,4 +349,8 @@ struct_tail	: MK_DOT ID
 		;
 
 %%
+
+/*
+vim: noexpandtab shiftwidth=8 tabstop=8
+*/
 
