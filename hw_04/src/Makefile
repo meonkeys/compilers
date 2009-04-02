@@ -24,7 +24,7 @@ valgrind: main
 	$@ $(VALGRIND_OPTS) ./$< < $(TEST_DATA_DIR)/simple.in > /dev/null
 
 pretty:
-	indent -bli0 -nut -i4 *.c
+	indent -bli0 -nut -i4 *.c *.h
 
 main: main.c parser.o lexer3.o ourtypes.o symtab.o util.o
 

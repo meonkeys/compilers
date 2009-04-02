@@ -86,7 +86,7 @@ putsym (semrec_t * ptr)
 {
     semrec_t *sym = NULL;
 
-	/* printf("trying to add %s\n", ptr->name); */
+    /* printf("trying to add %s\n", ptr->name); */
     sym = getsym (ptr->name);
     if (NULL == sym)
     {
@@ -117,7 +117,7 @@ getsym (char const *sym_name)
 }
 
 int
-list_length (semrec_t *list)
+list_length (semrec_t * list)
 {
     int num_items = 0;
     for (; list != (semrec_t *) 0; list = list->next)

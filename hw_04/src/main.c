@@ -74,7 +74,7 @@ void
 yyerror (char const *fmt, ...)
 {
     va_list ap;
-    va_start(ap, fmt);
+    va_start (ap, fmt);
     vprintf (fmt, ap);
 }
 
