@@ -90,7 +90,7 @@ putsym (semrec_t * ptr)
 {
     semrec_t *sym = NULL;
 
-	printf("trying to add %s\n", ptr->name);
+	/* printf("trying to add %s\n", ptr->name); */
     sym = getsym (ptr->name);
     if (NULL == sym)
     {
