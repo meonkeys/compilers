@@ -22,7 +22,7 @@ init_sym_table (void)
     tmp = new_semrec("fwrite");
     tmp->type = TYPE_KEYWORD;
     putsym (tmp);
-    tmp = new_semrec("a");
+    tmp = new_semrec("i");
     tmp->type = TYPE_INT;
     putsym (tmp);
 

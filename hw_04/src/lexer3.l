@@ -54,7 +54,7 @@ op_divide "/"
 iconstant {digit}+
 fconstant {digit}+(("."){digit}+)?
 comment	"/*"(([^*])|([*]+[^/*]))*("*")+"/"
-s-const \"([^"\n])*\"
+strconst \"([^"\n])*\"
 ws       [ \t]+
 newline  "\n"
 mk_lparen "("
@@ -104,7 +104,7 @@ error    .
 {op_times}      return OP_TIMES;
 {op_divide}     return OP_DIVIDE;
 {iconstant}	{
-                    semrec_t *p = new_semrec ("");
+                    semrec_t *p = new_semrec ("--iconstant--");
                     p->type = TYPE_INT;
                     p->is_const = TRUE;
                     p->value.intval = atoi (yytext);
@@ -112,15 +112,15 @@ error    .
                     return CONST;
                 }
 {fconstant}     {
-                    semrec_t *p = new_semrec ("");
+                    semrec_t *p = new_semrec ("--fconstant--");
                     p->type = TYPE_FLOAT;
                     p->is_const = TRUE;
                     p->value.fval = atof (yytext);
                     yylval.sem_ptr = p;
                     return CONST;
                 }
-{s-const}       {
-                    semrec_t *p = new_semrec ("");
+{strconst}      {
+                    semrec_t *p = new_semrec ("--strconst--");
                     p->type = TYPE_STRING;
                     p->is_const = TRUE;
                     p->value.stringval = malloc (sizeof (char) * strlen (yytext) + 1);
