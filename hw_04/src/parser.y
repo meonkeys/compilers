@@ -404,9 +404,12 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 					YYERROR;
 				}
 				/* is the param list length correct? */
-				if(list_length($3) != $$->value.funcval->num_params){
-					yyerror("");
-					printf("too few arguments to function (%s)\n", $1->name);
+				if(list_length($3) > $$->value.funcval->num_params){
+					yyerror("too many arguments to function (%s).\n", $1->name);
+					YYERROR;
+				}
+				else if (list_length($3) < $$->value.funcval->num_params){
+					yyerror("too few arguments to function (%s).\n", $1->name);
 					YYERROR;
 				}
 				$$ = $1; /* return the function call semrec */
