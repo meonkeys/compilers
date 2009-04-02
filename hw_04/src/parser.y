@@ -1,5 +1,6 @@
 %{
 /* System Headers */
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -9,9 +10,12 @@
 #include <util.h>
 
 int yylex (void);
-void yyerror (char const *mesg);
+void yyerror (char const *fmt, ...);
+extern int yylineno;
 
 #include <y.tab.h>
+
+static char *ERR_START = "Error found in line";
 %}
 
 %defines
@@ -116,7 +120,7 @@ function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBR
 			}
 		;
 
-func_start	: type ID 
+func_start	: type ID
 			{
 				$2->type = TYPE_FUNCTION;
 				$2->value.funcval = malloc(sizeof(func_t));
@@ -137,12 +141,11 @@ func_start	: type ID
 			{
 				$2->type = TYPE_FUNCTION;
 				$2->value.funcval = malloc(sizeof(func_t));
-	
+
 				$$ = getsym($1->name);
 				/* first ID not in symtab */
 				if(NULL == $$){
-					yyerror($1->name);
-					printf("ID (%s) undeclared.\n", $1->name);
+					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
 					$1->is_temp = TRUE;
 					our_free($1);
 					YYERROR;
@@ -417,7 +420,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		| var_ref
 		;
 
-var_ref		: ID 
+var_ref		: ID
 			{
 				$$ = getsym($1->name);
 				/* Gotta do this to delete dangling semrec_ts if
@@ -426,6 +429,7 @@ var_ref		: ID
 					$$ = $1;
 					yyerror($1->name);
 					printf("ID (%s) undeclared.\n", $1->name);
+					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
 					YYERROR;
 					/*putsym($1);*/
 				}
