@@ -3,3 +3,4 @@
 [_] design symbol table
 [_] use strtol() instead of atof()
 [_] move keywords to symbol table
+[_] how to report errors? yyerror doesn't seem appropriate
