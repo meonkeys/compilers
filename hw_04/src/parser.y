@@ -195,7 +195,24 @@ struct_type	: STRUCT
 		| UNION
 		;
 
-id_list		: ID
+id_list		: ID		
+					{
+						$$ = getsym($1->name);
+					  /* Gotta do this to add semrec_ts if
+						they already exist in the symbol table 
+						As well as throw an error*/
+					  if((semrec_t*)0 == $$){
+						$$ = $1;
+					  }
+					  else{
+						/* TODO: this branch signifies an error: ID (%s) redefined*/
+						$1->type = $$->type;
+						$1->is_temp = TRUE;
+						our_free($1);
+						yyerror($1->name);
+					  }
+			
+					}
 		| id_list MK_COMMA ID {$1->next = $3}
 		| id_list MK_COMMA ID dim_decl
 		| ID dim_decl
