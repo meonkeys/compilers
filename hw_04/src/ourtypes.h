@@ -15,12 +15,28 @@ typedef enum TYPE_T
     TYPE_FLOAT,
     TYPE_STRING,
     TYPE_VOID,
+	TYPE_STRUCT,
+	TYPE_UNION,
     TYPE_ID,
     TYPE_KEYWORD
 } type_t;
 
-/* Function type.  */
-typedef double (*func_t) (double);
+typedef struct array_s{
+	semrec_t* dimension;
+} array_t;
+
+typedef struct func_s{
+	int num_params;
+	semrec_t* param_list;
+}
+
+typedef struct struct_s{
+	char* tag; /* string before the structure/union */
+	char* alias; /* string after the structure/union */
+	/* type_t type; */ /* use the type_t type in parent semrec */
+	semrec_t* member_list;
+} struct_t;
+
 
 /* Data type for links in the chain of symbols.  */
 typedef struct semrec_s
@@ -32,10 +48,12 @@ typedef struct semrec_s
     truth_t is_declared;          /* has this ID been declared? */
     union
     {
-        func_t fnctptr;         /* value of a FNCT */
         int intval;
         double fval;
         char *stringval;
+		array_t* arrayval;
+		func_t* funcval;
+		struct_t* structval;
     } value;
     struct semrec_s *next;      /* link field */
 } semrec_t;
