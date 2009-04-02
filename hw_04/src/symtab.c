@@ -65,10 +65,7 @@ new_semrec (char const *sym_name)
     ptr->is_const = FALSE;
     ptr->is_temp = FALSE;
     ptr->next = NULL;
-<<<<<<< HEAD:hw_04/src/symtab.c
 	printf("made record %s\n", ptr->name);
-=======
->>>>>>> ece580e7d3acdd2d7b2b24dbcfca18f2fff978b3:hw_04/src/symtab.c
     return ptr;
 }
 
