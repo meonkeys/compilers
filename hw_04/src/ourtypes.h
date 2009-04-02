@@ -43,9 +43,9 @@ typedef struct semrec_s
 {
     char *name;                 /* name of symbol */
     type_t type;
-    truth_t is_const;             /* is this a constant? */
-	truth_t is_temp;			  /* is this record restricted to the stack? */
-    truth_t is_declared;          /* has this ID been declared? */
+    truth_t is_const;           /* is this a constant? */
+    truth_t is_temp;            /* is this record restricted to the stack? */
+    truth_t is_declared;        /* has this ID been declared? */
     union
     {
         int intval;
