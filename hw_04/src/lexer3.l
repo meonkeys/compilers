@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 /* Custom headers */
+/* #define YYSTYPE semrec_t* */
 #include <y.tab.h>
 #include <ourtypes.h>
 #include <symtab.h>
@@ -84,13 +85,8 @@ error    .
 {kwReturn}      return RETURN;
 {ID}            {
                     int len = strlen (yytext);
-                    semrec_t *tmp = NULL;
                     assert (len < MAX_ID_LENGTH);
-                    tmp = getsym (yytext);
-                    if (NULL == tmp) {
-                        tmp = putsym (yytext, ID);
-                    }
-                    yylval.sem_ptr = tmp;
+                    yylval = new_semrec (yytext); 
                     return ID;
                 }
 {op_assign}     return OP_ASSIGN;
@@ -108,28 +104,28 @@ error    .
 {op_times}      return OP_TIMES;
 {op_divide}     return OP_DIVIDE;
 {iconstant}	{
-                    semrec_t *p;
-                    p = (semrec_t *) malloc (sizeof (semrec_t));
+                    semrec_t *p = new_semrec ("");
                     p->type = TYPE_INT;
+                    p->is_const = TRUE;
                     p->value.intval = atoi (yytext);
-                    yylval.sem_ptr = p;
+                    yylval = p;
                     return CONST;
                 }
 {fconstant}     {
-                    semrec_t *p;
-                    p = (semrec_t *) malloc (sizeof (semrec_t));
+                    semrec_t *p = new_semrec ("");
                     p->type = TYPE_FLOAT;
+                    p->is_const = TRUE;
                     p->value.fval = atof (yytext);
-                    yylval.sem_ptr = p;
+                    yylval = p;
                     return CONST;
                 }
 {s-const}       {
-                    semrec_t *p;
-                    p = (semrec_t *) malloc (sizeof (semrec_t));
+                    semrec_t *p = new_semrec ("");
                     p->type = TYPE_STRING;
+                    p->is_const = TRUE;
                     p->value.stringval = malloc (sizeof (char) * strlen (yytext) + 1);
                     p->value.stringval = strcpy (p->value.stringval, yytext);
-                    yylval.sem_ptr = p;
+                    yylval = p;
                     return CONST;
                 }
 {mk_lparen}     return MK_LPAREN;

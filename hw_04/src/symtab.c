@@ -16,6 +16,7 @@ init_sym_table (void)
     putsym ("read", TYPE_KEYWORD);
     putsym ("write", TYPE_KEYWORD);
     putsym ("fwrite", TYPE_KEYWORD);
+    putsym ("a", TYPE_INT);
 
     /*
      * FIXME: we need to add the real keywords
@@ -38,16 +39,33 @@ destroy_sym_table (void)
 }
 
 semrec_t *
-putsym (char const *sym_name, int sym_type)
+new_semrec (char const *sym_name)
 {
     semrec_t *ptr;
     ptr = (semrec_t *) malloc (sizeof (semrec_t));
     ptr->name = (char *) calloc (strlen (sym_name) + 1, 1);
     strcpy (ptr->name, sym_name);
     ptr->type = sym_type;
-    /* FIXME: initialize stuff here */
     ptr->value.fval = 0;         /* Set value to 0 even if fctn.  */
     ptr->is_declared = FALSE;
+    ptr->is_declared = FALSE;
+    return ptr;
+}
+
+semrec_t *
+putsymlist (semrec_t *item, type_t type)
+{
+    /* TODO: add check for existing symrec_ts with getsym */
+    for (; item != (semrec_t *) 0; item = (semrec_t *) item->next)
+    {
+        /* TODO: later */
+    }
+    return ptr;
+}
+
+semrec_t *
+putsym (semrec_t *)
+{
     ptr->next = (semrec_t *) sym_table;
     sym_table = ptr;
     return ptr;

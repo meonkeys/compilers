@@ -7,7 +7,7 @@ typedef enum TRUTH
 {
     FALSE = 0,
     TRUE = 1
-} truth;
+} truth_t;
 
 typedef enum TYPE_T
 {
@@ -26,8 +26,9 @@ typedef double (*func_t) (double);
 typedef struct semrec_s
 {
     char *name;                 /* name of symbol */
-    enum TYPE_T type;        /* type of symbol: SYMTYPE_KEYWORD, SYMTYPE_ID, etc. */
-    truth is_declared;          /* has this ID been declared? */
+    type_t type;
+    truth_t is_const;             /* is this a constant? */
+    truth_t is_declared;          /* has this ID been declared? */
     union
     {
         func_t fnctptr;         /* value of a FNCT */

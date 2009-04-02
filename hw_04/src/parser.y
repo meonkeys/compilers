@@ -1,17 +1,18 @@
 %{
+/* System Headers */
+#include <string.h>
+
+/* Custom Headers */
 #include <ourtypes.h>
-#include <y.tab.h>
+#include <symtab.h>
 #include <util.h>
 
-int yylex(void);
+int yylex (void);
 void yyerror (char const *mesg);
 
+#define YYSTYPE semrec_t*
+#include <y.tab.h>
 %}
-
-%union{
-    int num;
-    struct semrec_s* sem_ptr;
-}
 
 %defines
 %output="y.tab.c"
@@ -23,8 +24,8 @@ void yyerror (char const *mesg);
  */
 %expect 1
 
-%token <sem_ptr> ID
-%token <sem_ptr>CONST
+%token ID
+%token CONST
 %token VOID
 %token INT
 %token FLOAT
@@ -60,16 +61,6 @@ void yyerror (char const *mesg);
 %token MK_DOT
 %token ERROR
 %token RETURN
-
-%type <sem_ptr> cexpr
-%type <sem_ptr> cfactor
-%type <sem_ptr> expr
-%type <sem_ptr> factor
-%type <sem_ptr> unary
-
-%type <sem_ptr> param_list
-%type <sem_ptr> param
-
 
 %left OP_OR OP_AND
 %left OP_LT OP_GT OP_GE OP_LE OP_NE OP_EQ
@@ -162,12 +153,21 @@ struct_body	: MK_LBRACE decl_list MK_RBRACE
 /* This production inserts sym_recs into the symbol table
  * No real need to keep them on the value stack
  */
-var_decl	: type init_id_list MK_SEMICOLON
-		| ID id_list MK_SEMICOLON
+var_decl	: type init_id_list MK_SEMICOLON /* TODO: set type of ID */
+                 { putsymlist ($2, $1->type); our_free($1) }
+		| ID id_list MK_SEMICOLON /* TODO: set type of ID */
 		;
 
 type		: INT
+                        {
+                            $$ = new_semrec ("");
+                            $$->type = TYPE_INT;
+                        }
 		| FLOAT
+                        {
+                            $$ = new_semrec ("");
+                            $$->type = TYPE_FLOAT;
+                        }
 		;
 
 struct_type	: STRUCT
@@ -175,7 +175,7 @@ struct_type	: STRUCT
 		;
 
 id_list		: ID
-		| id_list MK_COMMA ID
+		| id_list MK_COMMA ID {$1->next = $3}
 		| id_list MK_COMMA ID dim_decl
 		| ID dim_decl
 		;
@@ -186,21 +186,21 @@ dim_decl	: MK_LB cexpr MK_RB
 
 cexpr		: cexpr OP_PLUS cexpr
                     {$$ = arith_op_type_reduce($1, $3);
-                     free_const($1);
-                     free_const($3);}
+                     our_free($1);
+                     our_free($3);}
 		| cexpr OP_MINUS cexpr {$$ = arith_op_type_reduce($1, $3);
-                     free_const($1);
-                     free_const($3);}
+                     our_free($1);
+                     our_free($3);}
 		| cexpr OP_TIMES cexpr {$$ = arith_op_type_reduce($1, $3);
-                     free_const($1);
-                     free_const($3);}
+                     our_free($1);
+                     our_free($3);}
 		| cexpr OP_DIVIDE cexpr {$$ = arith_op_type_reduce($1, $3);
-                     free_const($1);
-                     free_const($3);}
-		| cfactor {$$ = $1}
+                     our_free($1);
+                     our_free($3);}
+		| cfactor
 		;
 
-cfactor		: CONST		{$$ = $1}
+cfactor		: CONST
 		| ID error		/* Error Routine */
 		| MK_LPAREN cexpr MK_RPAREN {$$ = $2 }
 		;
@@ -268,32 +268,32 @@ nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
 		;
 
 expr		: expr OP_PLUS expr {$$ = arith_op_type_reduce($1, $3);
-                     free_const($1);
-                     free_const($3);}
+                     our_free($1);
+                     our_free($3);}
 		| expr OP_MINUS expr {$$ = arith_op_type_reduce($1, $3);
-                     free_const($1);
-                     free_const($3);}
+                     our_free($1);
+                     our_free($3);}
 		| expr OP_TIMES expr {$$ = arith_op_type_reduce($1, $3);
-                     free_const($1);
-                     free_const($3);}
+                     our_free($1);
+                     our_free($3);}
 		| expr OP_DIVIDE expr {$$ = arith_op_type_reduce($1, $3);
-                     free_const($1);
-                     free_const($3);}
-		| unary {$$ = $1}
+                     our_free($1);
+                     our_free($3);}
+		| unary
 		;
 
 unary		: OP_MINUS unary {$$ = $2}
 		| OP_NOT unary {$$ = $2}
-		| factor {$$ = $1}
+		| factor
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN
-		| CONST		{$$ = $1} /* TODO: remove, this is the default */
+		| CONST
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 		| var_ref
 		;
 
-var_ref		: ID
+var_ref		: ID {$$ = getsym($1->name)}
 		| var_ref dim
 		| var_ref struct_tail
 		;
