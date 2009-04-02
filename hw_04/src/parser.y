@@ -243,7 +243,6 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr error MK_SEMICOLON
 			{
-				yyerrok;
 				printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
 				printf("$1 name = %s\n", $1->name);
 				printf("$1 type = %d\n", $1->type);
@@ -254,6 +253,7 @@ stmt		: MK_LBRACE block MK_RBRACE
 				}
 			}
 		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
+		| error MK_SEMICOLON { yyerrok }
 		| MK_SEMICOLON
 		| RETURN MK_SEMICOLON
 		| RETURN relop_expr MK_SEMICOLON
