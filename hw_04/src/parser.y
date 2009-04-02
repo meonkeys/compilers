@@ -241,7 +241,7 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
-		| var_ref OP_ASSIGN relop_expr error MK_SEMICOLON
+		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			{
 				printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
 				printf("$1 name = %s\n", $1->name);
