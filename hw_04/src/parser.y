@@ -10,12 +10,16 @@
 int yylex (void);
 void yyerror (char const *mesg);
 
-#define YYSTYPE semrec_t*
+/*#define YYSTYPE semrec_t* */
 #include <y.tab.h>
 %}
 
 %defines
 %output="y.tab.c"
+
+%union{
+    struct semrec_s* sem_ptr;
+}
 
 /*
  * Expect 1 shift/reduce conflict. Bison automatically handles the "dangling
@@ -24,8 +28,8 @@ void yyerror (char const *mesg);
  */
 %expect 1
 
-%token ID
-%token CONST
+%token <sem_ptr> ID
+%token <sem_ptr> CONST
 %token VOID
 %token INT
 %token FLOAT
@@ -67,6 +71,17 @@ void yyerror (char const *mesg);
 %left OP_PLUS OP_MINUS
 %left OP_TIMES OP_DIVIDE
 %left MK_DOT
+
+%type <sem_ptr> cexpr;
+%type <sem_ptr> cfactor;
+%type <sem_ptr> expr;
+%type <sem_ptr> factor;
+%type <sem_ptr> id_list;
+%type <sem_ptr> init_id_list;
+%type <sem_ptr> type;
+%type <sem_ptr> unary;
+%type <sem_ptr> var_decl;
+%type <sem_ptr> var_ref;
 
 %start program
 
