@@ -237,8 +237,7 @@ var_decl	: type init_id_list MK_SEMICOLON /* TODO: set type of ID */
 			{
 				$$ = getsym($1->name);
 				if(NULL == $$){
-					yyerror($1->name);
-					printf("ID %s undeclared.\n", $1->name);
+					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
 					$1->is_temp = TRUE;
 					our_free($1);
 					YYERROR;
@@ -400,19 +399,18 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 				$$ = getsym($1->name);
 				/* is the function in the symbol table? */
 				if(NULL == $$){
-					yyerror($1->name);
-					printf("ID (%s) undeclared.\n", $1->name);
+					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
 					$1->is_temp = TRUE;
 					our_free($1);
 					YYERROR;
 				}
 				/* is the param list length correct? */
 				if(list_length($3) > $$->value.funcval->num_params){
-					yyerror("too many arguments to function (%s).\n", $1->name);
+					yyerror("%s %d: too many arguments to function (%s).\n", ERR_START, yylineno, $1->name);
 					YYERROR;
 				}
 				else if (list_length($3) < $$->value.funcval->num_params){
-					yyerror("too few arguments to function (%s).\n", $1->name);
+					yyerror("%s %d: too few arguments to function (%s).\n", ERR_START, yylineno, $1->name);
 					YYERROR;
 				}
 				$$ = $1; /* return the function call semrec */
@@ -427,8 +425,6 @@ var_ref		: ID
 				      they already exist in the symbol table */
 				if(NULL == $$){
 					$$ = $1;
-					yyerror($1->name);
-					printf("ID (%s) undeclared.\n", $1->name);
 					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
 					YYERROR;
 					/*putsym($1);*/
