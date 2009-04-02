@@ -79,6 +79,7 @@ void yyerror (char const *mesg);
 %type <sem_ptr> cfactor;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
+%type <sem_ptr> init_id;
 %type <sem_ptr> id_list;
 %type <sem_ptr> init_id_list;
 %type <sem_ptr> relop_expr;
@@ -177,13 +178,13 @@ var_decl	: type init_id_list MK_SEMICOLON /* TODO: set type of ID */
 
 type		: INT
                         {
-				$$ = new_semrec ("");
+				$$ = new_semrec ("INT");
 				$$->type = TYPE_INT;
 				$$->is_temp = TRUE;
                         }
 		| FLOAT
                         {
-				$$ = new_semrec ("");
+				$$ = new_semrec ("FLOAT");
 				$$->type = TYPE_FLOAT;
 				$$->is_temp = TRUE;
                         }
@@ -194,7 +195,7 @@ struct_type	: STRUCT
 		;
 
 id_list		: ID
-		| id_list MK_COMMA ID {$1->next = $3}
+		| id_list MK_COMMA ID {$1->next = $3; $$ = $1;}
 		| id_list MK_COMMA ID dim_decl
 		| ID dim_decl
 		;
@@ -224,7 +225,7 @@ cfactor		: CONST
 		;
 
 init_id_list	: init_id
-		| init_id_list MK_COMMA init_id
+		| init_id_list MK_COMMA init_id {$1->next = $3; $$ = $1;}
 		;
 
 init_id		: ID
@@ -349,6 +350,3 @@ struct_tail	: MK_DOT ID
 
 %%
 
-/*
-vim: noexpandtab shiftwidth=8 tabstop=8
-*/

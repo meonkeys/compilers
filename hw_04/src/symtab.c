@@ -65,7 +65,7 @@ new_semrec (char const *sym_name)
     ptr->is_const = FALSE;
     ptr->is_temp = FALSE;
     ptr->next = NULL;
-	printf("made record %s\n", ptr->name);
+	/* printf("made record %s\n", ptr->name); */
     return ptr;
 }
 
@@ -90,6 +90,7 @@ putsym (semrec_t * ptr)
 {
     semrec_t *sym = NULL;
 
+	printf("trying to add %s\n", ptr->name);
     sym = getsym (ptr->name);
     if (NULL == sym)
     {
@@ -113,7 +114,6 @@ getsym (char const *sym_name)
     {
         if (strcmp (ptr->name, sym_name) == 0)
         {
-            printf ("----------- Found %s\n", sym_name);
             return ptr;
         }
     }

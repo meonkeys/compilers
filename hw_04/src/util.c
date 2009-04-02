@@ -7,7 +7,7 @@ our_free (semrec_t * bt)
 {
     if (TRUE == bt->is_const || TRUE == bt->is_temp)
     {
-		printf("freeing %s\n", bt->name);
+		/* printf("freeing %s\n", bt->name); */
         free (bt->name);        /* don't know how well this holds */
         if (TYPE_STRING == bt->type)
         {
