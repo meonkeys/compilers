@@ -66,7 +66,7 @@ new_semrec (char const *sym_name)
     return ptr;
 }
 
-semrec_t *
+void
 putsymlist (semrec_t * item, type_t type)
 {
     semrec_t *head = item;
@@ -79,7 +79,6 @@ putsymlist (semrec_t * item, type_t type)
         putsym (item);
         item = head;
     }
-    return sym_table;           /* return the symbol table? */
 }
 
 semrec_t *
