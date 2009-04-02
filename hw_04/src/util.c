@@ -29,3 +29,7 @@ typecmp (type_t t1, type_t t2)
         return FALSE;
     }
 }
+
+/*
+vim: expandtab shiftwidth=4 tabstop=4 smarttab
+*/
