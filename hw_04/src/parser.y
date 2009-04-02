@@ -330,8 +330,9 @@ var_ref		: ID {
 			if(NULL == $$){
 				$$ = $1;
 				/* TODO: this branch signifies an error: ID (%s) undefined*/
-				yyerror($1->name); YYERROR;
-				printf("ID (%s) undeclared.", $1->name);
+				yyerror($1->name);
+				printf("ID (%s) undeclared.\n", $1->name);
+				YYERROR;
 				/*putsym($1);*/
 			}
 			$1->type = $$->type;
