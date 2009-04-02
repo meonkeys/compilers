@@ -69,9 +69,14 @@ main (int argc, char *argv[])
 }
 
 
-int
-yyerror (char const *mesg)
+void
+yyerror (char const *fmt, ...)
 {
-    printf ("Error found in line %d: %s\n", yylineno, mesg);
-    return 1;
+    va_list ap;
+    va_start(ap, fmt);
+    vprintf (fmt, ap);
 }
+
+/*
+vim: expandtab shiftwidth=4 tabstop=4 smarttab
+*/

@@ -1,5 +1,6 @@
 %{
 /* System Headers */
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -9,9 +10,12 @@
 #include <util.h>
 
 int yylex (void);
-void yyerror (char const *mesg);
+void yyerror (char const *fmt, ...);
+extern int yylineno;
 
 #include <y.tab.h>
+
+static char *ERR_START = "Error found in line";
 %}
 
 %defines
@@ -109,7 +113,7 @@ global_decl	: decl_list function_decl
 function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
 		;
 
-func_start	: type ID 
+func_start	: type ID
 				{
 					$2->type = TYPE_FUNCTION;
 					$2->value.funcval = malloc(sizeof(func_t));
@@ -130,13 +134,12 @@ func_start	: type ID
 				{
 					$2->type = TYPE_FUNCTION;
 					$2->value.funcval = malloc(sizeof(func_t));
-	
+
 					$$ = getsym($1->name);
 					/* first ID not in symtab */
 					if(NULL == $$){
 						$$ = $1;
-						yyerror($1->name);
-						printf("ID (%s) undeclared.\n", $1->name);
+						yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
 						$1->is_temp = TRUE;
 						our_free($1);
 						YYERROR;
@@ -380,10 +383,8 @@ var_ref		: ID {
 			      they already exist in the symbol table */
 			if(NULL == $$){
 				$$ = $1;
-				yyerror($1->name);
-				printf("ID (%s) undeclared.\n", $1->name);
+				yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
 				YYERROR;
-				/*putsym($1);*/
 			}
 			$1->type = $$->type;
 			$1->is_temp = TRUE;
