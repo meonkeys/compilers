@@ -327,11 +327,12 @@ var_ref		: ID {
 			$$ = getsym($1->name);
 			/* Gotta do this to delete dangling semrec_ts if
 			      they already exist in the symbol table */
-			if((semrec_t*)0 == $$){
-			      $$ = $1;
-			      /* TODO: this branch signifies an error: ID (%s) undefined*/
-			      yyerror($1->name); YYERROR;
-			      /*putsym($1);*/
+			if(NULL == $$){
+				$$ = $1;
+				/* TODO: this branch signifies an error: ID (%s) undefined*/
+				yyerror($1->name); YYERROR;
+				printf("ID (%s) undeclared.", $1->name);
+				/*putsym($1);*/
 			}
 			$1->type = $$->type;
 			$1->is_temp = TRUE;
