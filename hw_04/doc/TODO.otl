@@ -1,6 +1,9 @@
-[X] set up sandbox for testing out semantic checks
-[_] start adding semantic checking
 [_] design symbol table
 [_] use strtol() instead of atof()
 [_] move keywords to symbol table
-[_] how to report errors? yyerror doesn't seem appropriate
+[_] remove is_const, if possible
+
+[X] start adding semantic checking
+[X] how to report errors? yyerror doesn't seem appropriate
+	nevermind, yyerror appears to work
+[X] set up sandbox for testing out semantic checks
