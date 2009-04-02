@@ -60,6 +60,7 @@ new_semrec (char const *sym_name)
     ptr->is_declared = FALSE;
     ptr->is_const = FALSE;
 	ptr->is_temp = FALSE;
+	ptr->next = NULL;
     return ptr;
 }
 

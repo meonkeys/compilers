@@ -44,7 +44,7 @@ main (int argc, char *argv[])
     parse_rv = yyparse ();
 
     if (0 == parse_rv)
-        printf ("Parsing complete.\n");
+        printf ("Parsing completed. No errors found.\n");
     else
         printf ("Parsing aborted due to unrecoverable error(s).\n");
 
@@ -72,7 +72,7 @@ main (int argc, char *argv[])
 int
 yyerror (char const *mesg)
 {
-    printf ("%s\t%d\t%s\t%s\n", "Error found in Line ", yylineno,
-            "next token: ", yytext);
+    printf ("%s\t%d\t%s\n", "Error found in Line ", yylineno,
+            mesg);
     return 1;
 }

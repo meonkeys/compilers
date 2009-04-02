@@ -250,7 +250,6 @@ stmt		: MK_LBRACE block MK_RBRACE
 											printf("$1 name = %s\n", $1->name);
 											printf("$1 type = %d\n", $1->type);
 											if(TRUE == typecmp($1->type, $3->type)){
-												printf("types match\n");
 												our_free($1); /* var_ref so it's temp */
 												our_free($3);
 												/* ID gets new value? */
@@ -327,13 +326,13 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		;
 
 var_ref		: ID {
-					printf("reffing a var\n");
 		          $$ = getsym($1->name);
 				  /* Gotta do this to delete dangling semrec_ts if
 					they already exist in the symbol table */
 				  if((semrec_t*)0 == $$){
 					$$ = $1;
-					printf("t1 type %d\n", $1->type);
+					/* TODO: this branch signifies an error: ID (%s) undefined*/
+					yyerror($1->name);
 					putsym($1);
 				  }
 				  else{
