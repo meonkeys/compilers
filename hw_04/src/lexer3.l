@@ -86,7 +86,7 @@ error    .
 {ID}            {
                     int len = strlen (yytext);
                     assert (len < MAX_ID_LENGTH);
-                    yylval = new_semrec (yytext);
+                    yylval.sem_ptr = new_semrec (yytext); 
                     return ID;
                 }
 {op_assign}     return OP_ASSIGN;
@@ -108,7 +108,7 @@ error    .
                     p->type = TYPE_INT;
                     p->is_const = TRUE;
                     p->value.intval = atoi (yytext);
-                    yylval = p;
+                    yylval.sem_ptr = p;
                     return CONST;
                 }
 {fconstant}     {
@@ -116,7 +116,7 @@ error    .
                     p->type = TYPE_FLOAT;
                     p->is_const = TRUE;
                     p->value.fval = atof (yytext);
-                    yylval = p;
+                    yylval.sem_ptr = p;
                     return CONST;
                 }
 {s-const}       {
@@ -125,7 +125,7 @@ error    .
                     p->is_const = TRUE;
                     p->value.stringval = malloc (sizeof (char) * strlen (yytext) + 1);
                     p->value.stringval = strcpy (p->value.stringval, yytext);
-                    yylval = p;
+                    yylval.sem_ptr = p;
                     return CONST;
                 }
 {mk_lparen}     return MK_LPAREN;

@@ -13,10 +13,18 @@ void
 init_sym_table (void)
 {
     /* these are library functions, not keywords... do we need another type? */
-    putsym ("read", TYPE_KEYWORD);
-    putsym ("write", TYPE_KEYWORD);
-    putsym ("fwrite", TYPE_KEYWORD);
-    putsym ("a", TYPE_INT);
+    semrec_t* tmp = new_semrec("read");
+    tmp->type = TYPE_KEYWORD;
+    putsym (tmp);
+    tmp = new_semrec("write");
+    tmp->type = TYPE_KEYWORD;
+    putsym (tmp);
+    tmp = new_semrec("fwrite");
+    tmp->type = TYPE_KEYWORD;
+    putsym (tmp);
+    tmp = new_semrec("a");
+    tmp->type = TYPE_INT;
+    putsym (tmp);
 
     /*
      * FIXME: we need to add the real keywords
@@ -45,7 +53,6 @@ new_semrec (char const *sym_name)
     ptr = (semrec_t *) malloc (sizeof (semrec_t));
     ptr->name = (char *) calloc (strlen (sym_name) + 1, 1);
     strcpy (ptr->name, sym_name);
-    ptr->type = sym_type;
     ptr->value.fval = 0;         /* Set value to 0 even if fctn.  */
     ptr->is_declared = FALSE;
     ptr->is_declared = FALSE;
@@ -55,16 +62,17 @@ new_semrec (char const *sym_name)
 semrec_t *
 putsymlist (semrec_t *item, type_t type)
 {
+    semrec_t* head = item;
     /* TODO: add check for existing symrec_ts with getsym */
     for (; item != (semrec_t *) 0; item = (semrec_t *) item->next)
     {
         /* TODO: later */
     }
-    return ptr;
+    return head;
 }
 
 semrec_t *
-putsym (semrec_t *)
+putsym (semrec_t * ptr)
 {
     ptr->next = (semrec_t *) sym_table;
     sym_table = ptr;
