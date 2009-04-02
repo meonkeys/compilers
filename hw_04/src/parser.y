@@ -1,5 +1,6 @@
 %{
 /* System Headers */
+#include <stdio.h>
 #include <string.h>
 
 /* Custom Headers */
@@ -78,6 +79,8 @@ void yyerror (char const *mesg);
 %type <sem_ptr> factor;
 %type <sem_ptr> id_list;
 %type <sem_ptr> init_id_list;
+%type <sem_ptr> relop_expr;
+%type <sem_ptr> stmt;
 %type <sem_ptr> type;
 %type <sem_ptr> unary;
 %type <sem_ptr> var_decl;
@@ -102,7 +105,7 @@ function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBR
 		| func_start MK_LPAREN param_list error MK_LBRACE block MK_RBRACE
 		;
 
-func_start	: type ID
+func_start	: type ID {$2->type = $1->type; putsym($2); our_free($1);}
 		| VOID ID /* function returns void */
 		| ID ID   /* for a typedef'd return type */
 		;
@@ -169,19 +172,22 @@ struct_body	: MK_LBRACE decl_list MK_RBRACE
  * No real need to keep them on the value stack
  */
 var_decl	: type init_id_list MK_SEMICOLON /* TODO: set type of ID */
-                 { putsymlist ($2, $1->type); our_free($1) }
+                 { putsymlist ($2, $1->type); our_free($1); }
 		| ID id_list MK_SEMICOLON /* TODO: set type of ID */
 		;
 
 type		: INT
                         {
+							printf("making INT record\n");
                             $$ = new_semrec ("");
                             $$->type = TYPE_INT;
+							$$->is_temp = TRUE;
                         }
 		| FLOAT
                         {
                             $$ = new_semrec ("");
                             $$->type = TYPE_FLOAT;
+							$$->is_temp = TRUE;
                         }
 		;
 
@@ -238,7 +244,18 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
 		| ELSE error stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
-		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
+		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON 
+									{
+											printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
+											printf("$1 name = %s\n", $1->name);
+											printf("$1 type = %d\n", $1->type);
+											if(TRUE == typecmp($1->type, $3->type)){
+												printf("types match\n");
+												our_free($1); /* var_ref so it's temp */
+												our_free($3);
+												/* ID gets new value? */
+											}
+									 }
 		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
 		| MK_SEMICOLON
 		| RETURN MK_SEMICOLON
@@ -256,11 +273,12 @@ assign_expr_list: nonempty_assign_expr_list
 nonempty_assign_expr_list: nonempty_assign_expr_list MK_COMMA assign_expr
 		| assign_expr
 
-assign_expr	: ID OP_ASSIGN relop_expr
+/* I don't know why this isnt used, it's in stmt instead */
+assign_expr	: ID OP_ASSIGN relop_expr 
 		| relop_expr
 
 
-relop_expr	: expr
+relop_expr	: expr 
 		| relop_expr rel_op expr
 		;
 
@@ -308,7 +326,22 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		| var_ref
 		;
 
-var_ref		: ID {$$ = getsym($1->name)}
+var_ref		: ID {
+					printf("reffing a var\n");
+		          $$ = getsym($1->name);
+				  /* Gotta do this to delete dangling semrec_ts if
+					they already exist in the symbol table */
+				  if((semrec_t*)0 == $$){
+					$$ = $1;
+					printf("t1 type %d\n", $1->type);
+					putsym($1);
+				  }
+				  else{
+					$1->type = $$->type;
+					$1->is_temp = TRUE;
+					our_free($1);
+				  }
+				 }
 		| var_ref dim
 		| var_ref struct_tail
 		;

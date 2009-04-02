@@ -22,9 +22,12 @@ init_sym_table (void)
     tmp = new_semrec("fwrite");
     tmp->type = TYPE_KEYWORD;
     putsym (tmp);
-    tmp = new_semrec("a");
+	/*
+    tmp = new_semrec("i");
     tmp->type = TYPE_INT;
+	tmp->is_const = FALSE;
     putsym (tmp);
+	*/
 
     /*
      * FIXME: we need to add the real keywords
@@ -55,7 +58,8 @@ new_semrec (char const *sym_name)
     strcpy (ptr->name, sym_name);
     ptr->value.fval = 0;         /* Set value to 0 even if fctn.  */
     ptr->is_declared = FALSE;
-    ptr->is_declared = FALSE;
+    ptr->is_const = FALSE;
+	ptr->is_temp = FALSE;
     return ptr;
 }
 
@@ -64,18 +68,30 @@ putsymlist (semrec_t *item, type_t type)
 {
     semrec_t* head = item;
     /* TODO: add check for existing symrec_ts with getsym */
-    for (; item != (semrec_t *) 0; item = (semrec_t *) item->next)
+    while (head != (semrec_t *) 0)
     {
-        /* TODO: later */
+		/* TODO: needs a better check for scoping */
+		item->type = type;
+		head = (semrec_t*) item->next;
+		putsym(item);
+		item = head;
     }
-    return head;
+    return sym_table; /* return the symbol table? */
 }
 
 semrec_t *
 putsym (semrec_t * ptr)
 {
-    ptr->next = (semrec_t *) sym_table;
-    sym_table = ptr;
+	semrec_t* sym = NULL;
+
+	sym = getsym(ptr->name);
+	if(NULL == sym){
+	    ptr->next = (semrec_t *) sym_table;
+		sym_table = ptr;
+	}
+	else{
+		printf("ID (%s) redeclared.\n", sym->name);
+	}
     return ptr;
 }
 
@@ -87,6 +103,7 @@ getsym (char const *sym_name)
     {
         if (strcmp (ptr->name, sym_name) == 0)
         {
+			printf("----------- Found %s\n", sym_name);
             return ptr;
         }
     }

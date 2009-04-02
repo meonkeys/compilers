@@ -86,6 +86,7 @@ error    .
 {ID}            {
                     int len = strlen (yytext);
                     assert (len < MAX_ID_LENGTH);
+					printf("making ID with name = %s\n", yytext);
                     yylval.sem_ptr = new_semrec (yytext); 
                     return ID;
                 }
