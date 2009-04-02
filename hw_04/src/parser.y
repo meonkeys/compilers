@@ -116,12 +116,40 @@ func_start	: type ID
 					$2->type = TYPE_FUNCTION;
 					$2->value.funcval = malloc(sizeof(func_t));
 					$2->value.funcval->return_type = $1->type;
-					putsym($2);
+					/* putsym($2); */ /* add to symtab in function_decl */
 					our_free($1);
 					$$ = $2;
 				}
 		| VOID ID /* function returns void */
+				{
+					$2->type = TYPE_FUNCTION;
+					$2->value.funcval = malloc(sizeof(func_t));
+					$2->value.funcval->return_type = TYPE_VOID;
+					/* putsym($2) */ /* add to symtab in function_decl */
+					$$ = $2;
+				}
 		| ID ID   /* for a typedef'd return type */
+				{
+					$2->type = TYPE_FUNCTION;
+					$2->value.funcval = malloc(sizeof(func_t));
+	
+					$$ = getsym($1->name);
+					/* first ID not in symtab */
+					if(NULL == $$){
+						$$ = $1;
+						yyerror($1->name);
+						printf("ID (%s) undeclared.\n", $1->name);
+						$1->is_temp = TRUE;
+						our_free($1);
+						YYERROR;
+					}
+					/* first ID found in symtab */
+					else{
+						$2->value.funcval->return_type = $1->type;
+						/* Do not free first ID from symbol table */
+						$$ = $2;
+					}
+				}
 		;
 
 param_list	: param_list MK_COMMA param
@@ -354,7 +382,6 @@ var_ref		: ID {
 			      they already exist in the symbol table */
 			if(NULL == $$){
 				$$ = $1;
-				/* TODO: this branch signifies an error: ID (%s) undefined*/
 				yyerror($1->name);
 				printf("ID (%s) undeclared.\n", $1->name);
 				YYERROR;
