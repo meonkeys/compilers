@@ -160,25 +160,25 @@ func_start	: type ID
 		;
 
 param_list	: param_list MK_COMMA param
-				{
-					$1->next = $3;
-					$$ = $1;
-				}
+			{
+				$1->next = $3;
+				$$ = $1;
+			}
 		| param
 		| /* empty */ {}
 		;
 
 param		: type ID
-				{
-					$2->type = $1->type;
-					our_free($1);
-					$$ = $2;
-				}
+			{
+				$2->type = $1->type;
+				our_free($1);
+				$$ = $2;
+			}
 		| struct_type ID
-				{
-					/* Do this later */
-					$$ = $1;
-				}
+			{
+				/* TODO: complete later */
+				$$ = $1;
+			}
 		| type ID dim_fn
 		| struct_type ID dim_fn
 		;
@@ -231,9 +231,11 @@ struct_body	: MK_LBRACE decl_list MK_RBRACE
 /* This production inserts sym_recs into the symbol table
  * No real need to keep them on the value stack
  */
-var_decl	: type init_id_list MK_SEMICOLON /* TODO: set type of ID */
-			{ putsymlist ($2, $1->type); our_free($1); }
-		| ID id_list MK_SEMICOLON /* TODO: set type of ID */
+var_decl	: type init_id_list MK_SEMICOLON
+			{
+				putsymlist ($2, $1->type); our_free($1);
+			}
+		| ID id_list MK_SEMICOLON
 			{
 				$$ = getsym($1->name);
 				if(NULL == $$){
@@ -275,18 +277,29 @@ dim_decl	: MK_LB cexpr MK_RB
 		;
 
 cexpr		: cexpr OP_PLUS cexpr
-                    {$$ = arith_op_type_reduce($1, $3);
-                     our_free($1);
-                     our_free($3);}
-		| cexpr OP_MINUS cexpr {$$ = arith_op_type_reduce($1, $3);
-                     our_free($1);
-                     our_free($3);}
-		| cexpr OP_TIMES cexpr {$$ = arith_op_type_reduce($1, $3);
-                     our_free($1);
-                     our_free($3);}
-		| cexpr OP_DIVIDE cexpr {$$ = arith_op_type_reduce($1, $3);
-                     our_free($1);
-                     our_free($3);}
+			{
+				$$ = arith_op_type_reduce($1, $3);
+				our_free($1);
+				our_free($3);
+			}
+		| cexpr OP_MINUS cexpr
+			{
+				$$ = arith_op_type_reduce($1, $3);
+				our_free($1);
+				our_free($3);
+			}
+		| cexpr OP_TIMES cexpr
+			{
+				$$ = arith_op_type_reduce($1, $3);
+				our_free($1);
+				our_free($3);
+			}
+		| cexpr OP_DIVIDE cexpr
+			{
+				$$ = arith_op_type_reduce($1, $3);
+				our_free($1);
+				our_free($3);
+			}
 		| cfactor
 		;
 
@@ -368,21 +381,33 @@ nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
 				$1->next = $3;
 				$$ = $1;
 			}
-		| relop_expr 
+		| relop_expr
 		;
 
-expr		: expr OP_PLUS expr {$$ = arith_op_type_reduce($1, $3);
-                     our_free($1);
-                     our_free($3);}
-		| expr OP_MINUS expr {$$ = arith_op_type_reduce($1, $3);
-                     our_free($1);
-                     our_free($3);}
-		| expr OP_TIMES expr {$$ = arith_op_type_reduce($1, $3);
-                     our_free($1);
-                     our_free($3);}
-		| expr OP_DIVIDE expr {$$ = arith_op_type_reduce($1, $3);
-                     our_free($1);
-                     our_free($3);}
+expr		: expr OP_PLUS expr
+			{
+				$$ = arith_op_type_reduce($1, $3);
+				our_free($1);
+				our_free($3);
+			}
+		| expr OP_MINUS expr
+			{
+				$$ = arith_op_type_reduce($1, $3);
+				our_free($1);
+				our_free($3);
+			}
+		| expr OP_TIMES expr
+			{
+				$$ = arith_op_type_reduce($1, $3);
+				our_free($1);
+				our_free($3);
+			}
+		| expr OP_DIVIDE expr
+			{
+				$$ = arith_op_type_reduce($1, $3);
+				our_free($1);
+				our_free($3);
+			}
 		| unary
 		;
 
