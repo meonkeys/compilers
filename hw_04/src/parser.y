@@ -11,7 +11,6 @@
 int yylex (void);
 void yyerror (char const *mesg);
 
-/*#define YYSTYPE semrec_t* */
 #include <y.tab.h>
 %}
 
