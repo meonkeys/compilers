@@ -3,6 +3,13 @@
 [_] move keywords to symbol table
 [_] remove is_const, if possible
 [_] remove debugging
+[_] binary conversions (Adam)
+[_] type checking rules
+	[_] everything except structure and union references (Joe)
+	[_] structure and union references
+[_] scoping
+	[_] multi-level symbol table
+	[_] keep track of what scope we're currently in, maintain symbol table thusly
 
 [X] start adding semantic checking
 [X] how to report errors? yyerror doesn't seem appropriate
