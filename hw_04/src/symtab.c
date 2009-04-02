@@ -17,21 +17,21 @@ void
 init_sym_table (void)
 {
     /* these are library functions, not keywords... do we need another type? */
-    semrec_t* tmp = new_semrec("read");
+    semrec_t *tmp = new_semrec ("read");
     tmp->type = TYPE_KEYWORD;
     putsym (tmp);
-    tmp = new_semrec("write");
+    tmp = new_semrec ("write");
     tmp->type = TYPE_KEYWORD;
     putsym (tmp);
-    tmp = new_semrec("fwrite");
+    tmp = new_semrec ("fwrite");
     tmp->type = TYPE_KEYWORD;
     putsym (tmp);
-	/*
-    tmp = new_semrec("i");
-    tmp->type = TYPE_INT;
-	tmp->is_const = FALSE;
-    putsym (tmp);
-	*/
+    /*
+       tmp = new_semrec("i");
+       tmp->type = TYPE_INT;
+       tmp->is_const = FALSE;
+       putsym (tmp);
+     */
 
     /*
      * FIXME: we need to add the real keywords
@@ -60,45 +60,47 @@ new_semrec (char const *sym_name)
     ptr = (semrec_t *) malloc (sizeof (semrec_t));
     ptr->name = (char *) calloc (strlen (sym_name) + 1, 1);
     strcpy (ptr->name, sym_name);
-    ptr->value.fval = 0;         /* Set value to 0 even if fctn.  */
+    ptr->value.fval = 0;        /* Set value to 0 even if fctn.  */
     ptr->is_declared = FALSE;
     ptr->is_const = FALSE;
-	ptr->is_temp = FALSE;
-	ptr->next = NULL;
+    ptr->is_temp = FALSE;
+    ptr->next = NULL;
     return ptr;
 }
 
 semrec_t *
-putsymlist (semrec_t *item, type_t type)
+putsymlist (semrec_t * item, type_t type)
 {
-    semrec_t* head = item;
+    semrec_t *head = item;
     /* TODO: add check for existing symrec_ts with getsym */
     while (head != (semrec_t *) 0)
     {
-		/* TODO: needs a better check for scoping */
-		item->type = type;
-		head = (semrec_t*) item->next;
-		putsym(item);
-		item = head;
+        /* TODO: needs a better check for scoping */
+        item->type = type;
+        head = (semrec_t *) item->next;
+        putsym (item);
+        item = head;
     }
-    return sym_table; /* return the symbol table? */
+    return sym_table;           /* return the symbol table? */
 }
 
 semrec_t *
 putsym (semrec_t * ptr)
 {
-	semrec_t* sym = NULL;
+    semrec_t *sym = NULL;
 
-	sym = getsym(ptr->name);
-	if(NULL == sym){
-	    ptr->next = (semrec_t *) sym_table;
-		sym_table = ptr;
-	}
-	else{
-		printf("ID (%s) redeclared.\n", sym->name);
-		ptr->is_temp = TRUE;
-		our_free(ptr);
-	}
+    sym = getsym (ptr->name);
+    if (NULL == sym)
+    {
+        ptr->next = (semrec_t *) sym_table;
+        sym_table = ptr;
+    }
+    else
+    {
+        printf ("ID (%s) redeclared.\n", sym->name);
+        ptr->is_temp = TRUE;
+        our_free (ptr);
+    }
     return ptr;
 }
 
@@ -110,7 +112,7 @@ getsym (char const *sym_name)
     {
         if (strcmp (ptr->name, sym_name) == 0)
         {
-			printf("----------- Found %s\n", sym_name);
+            printf ("----------- Found %s\n", sym_name);
             return ptr;
         }
     }
