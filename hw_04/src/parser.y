@@ -102,7 +102,6 @@ global_decl	: decl_list function_decl
 		;
 
 function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
-		| func_start MK_LPAREN param_list error MK_LBRACE block MK_RBRACE
 		;
 
 func_start	: type ID {$2->type = $1->type; putsym($2); our_free($1);}
@@ -161,8 +160,6 @@ struct_decl	: struct_type id_list
 		| TYPEDEF struct_type ID struct_body id_list
 		| TYPEDEF struct_type struct_body id_list
 		| TYPEDEF struct_type id_list
-		/* no tag or name: error */
-		| struct_type struct_body error
 		;
 
 struct_body	: MK_LBRACE decl_list MK_RBRACE
@@ -178,7 +175,6 @@ var_decl	: type init_id_list MK_SEMICOLON /* TODO: set type of ID */
 
 type		: INT
                         {
-							printf("making INT record\n");
                             $$ = new_semrec ("");
                             $$->type = TYPE_INT;
 							$$->is_temp = TRUE;
@@ -195,24 +191,7 @@ struct_type	: STRUCT
 		| UNION
 		;
 
-id_list		: ID		
-					{
-						$$ = getsym($1->name);
-					  /* Gotta do this to add semrec_ts if
-						they already exist in the symbol table 
-						As well as throw an error*/
-					  if((semrec_t*)0 == $$){
-						$$ = $1;
-					  }
-					  else{
-						/* TODO: this branch signifies an error: ID (%s) redefined*/
-						$1->type = $$->type;
-						$1->is_temp = TRUE;
-						our_free($1);
-						yyerror($1->name);
-					  }
-			
-					}
+id_list		: ID
 		| id_list MK_COMMA ID {$1->next = $3}
 		| id_list MK_COMMA ID dim_decl
 		| ID dim_decl
@@ -239,7 +218,6 @@ cexpr		: cexpr OP_PLUS cexpr
 		;
 
 cfactor		: CONST
-		| ID error		/* Error Routine */
 		| MK_LPAREN cexpr MK_RPAREN {$$ = $2 }
 		;
 
@@ -259,18 +237,18 @@ stmt_list	: stmt_list stmt
 stmt		: MK_LBRACE block MK_RBRACE
 		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
-		| ELSE error stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
-		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON 
+		| var_ref OP_ASSIGN relop_expr error MK_SEMICOLON 
 									{
-											printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
-											printf("$1 name = %s\n", $1->name);
-											printf("$1 type = %d\n", $1->type);
-											if(TRUE == typecmp($1->type, $3->type)){
-												our_free($1); /* var_ref so it's temp */
-												our_free($3);
-												/* ID gets new value? */
-											}
+										yyerrok;
+										printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
+										printf("$1 name = %s\n", $1->name);
+										printf("$1 type = %d\n", $1->type);
+										if(TRUE == typecmp($1->type, $3->type)){
+											our_free($1); /* var_ref so it's temp */
+											our_free($3);
+											/* ID gets new value? */
+										}
 									 }
 		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
 		| MK_SEMICOLON
@@ -349,14 +327,12 @@ var_ref		: ID {
 				  if((semrec_t*)0 == $$){
 					$$ = $1;
 					/* TODO: this branch signifies an error: ID (%s) undefined*/
-					yyerror($1->name);
-					putsym($1);
+					yyerror($1->name); YYERROR;
+					/*putsym($1);*/
 				  }
-				  else{
-					$1->type = $$->type;
-					$1->is_temp = TRUE;
-					our_free($1);
-				  }
+				  $1->type = $$->type;
+				  $1->is_temp = TRUE;
+				  our_free($1);
 				 }
 		| var_ref dim
 		| var_ref struct_tail

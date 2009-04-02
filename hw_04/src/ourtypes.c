@@ -1,7 +1,10 @@
-#include <ourtypes.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+/* Custom Headers */
+#include <ourtypes.h>
 #include <symtab.h>
+#include <util.h>
 
 /*
  * We're only doing type checking.  We could do constant folding
@@ -17,7 +20,7 @@ arith_op_type_reduce (semrec_t * t1, semrec_t * t2)
     /* set it to the "shared" type */
     ct->type = t1->type;
 
-    if ((t1->type != t2->type))
+    if (FALSE == typecmp(t1->type, t2->type))
     {
         /*
          * One float - one int

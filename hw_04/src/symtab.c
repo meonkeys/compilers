@@ -1,10 +1,14 @@
-#include <symtab.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <lexer3.h>
+#include <y.tab.h>
+
+/* Custom Headers */
+#include <lexer3.h>
+#include <symtab.h>
+#include <util.h>
 #include <y.tab.h>
 
 semrec_t *sym_table;
@@ -92,6 +96,8 @@ putsym (semrec_t * ptr)
 	}
 	else{
 		printf("ID (%s) redeclared.\n", sym->name);
+		ptr->is_temp = TRUE;
+		our_free(ptr);
 	}
     return ptr;
 }
