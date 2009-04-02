@@ -241,7 +241,7 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
-		| var_ref OP_ASSIGN relop_expr error MK_SEMICOLON 
+		| var_ref OP_ASSIGN relop_expr error MK_SEMICOLON
 			{
 				yyerrok;
 				printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
@@ -271,11 +271,11 @@ nonempty_assign_expr_list: nonempty_assign_expr_list MK_COMMA assign_expr
 		| assign_expr
 
 /* I don't know why this isnt used, it's in stmt instead */
-assign_expr	: ID OP_ASSIGN relop_expr 
+assign_expr	: ID OP_ASSIGN relop_expr
 		| relop_expr
 
 
-relop_expr	: expr 
+relop_expr	: expr
 		| relop_expr rel_op expr
 		;
 
