@@ -1,0 +1,2 @@
+Vim settings:
+	noexpandtab shiftwidth=8 tabstop=8 number
