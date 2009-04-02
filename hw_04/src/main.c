@@ -72,7 +72,6 @@ main (int argc, char *argv[])
 int
 yyerror (char const *mesg)
 {
-    printf ("%s\t%d\t%s\n", "Error found in Line ", yylineno,
-            mesg);
+    printf ("%s\t%d\t%s\n", "Error found in Line ", yylineno, mesg);
     return 1;
 }

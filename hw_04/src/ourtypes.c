@@ -14,13 +14,13 @@
 semrec_t *
 arith_op_type_reduce (semrec_t * t1, semrec_t * t2)
 {
-    semrec_t *ct = new_semrec("");
-	ct->is_temp = TRUE;
+    semrec_t *ct = new_semrec ("");
+    ct->is_temp = TRUE;
 
     /* set it to the "shared" type */
     ct->type = t1->type;
 
-    if (FALSE == typecmp(t1->type, t2->type))
+    if (FALSE == typecmp (t1->type, t2->type))
     {
         /*
          * One float - one int

@@ -1,3 +1,5 @@
+/* set noexpandtab shiftwidth=8 tabstop=8 number */
+
 %{
 /* System Headers */
 #include <stdio.h>
@@ -175,15 +177,15 @@ var_decl	: type init_id_list MK_SEMICOLON /* TODO: set type of ID */
 
 type		: INT
                         {
-                            $$ = new_semrec ("");
-                            $$->type = TYPE_INT;
-							$$->is_temp = TRUE;
+				$$ = new_semrec ("");
+				$$->type = TYPE_INT;
+				$$->is_temp = TRUE;
                         }
 		| FLOAT
                         {
-                            $$ = new_semrec ("");
-                            $$->type = TYPE_FLOAT;
-							$$->is_temp = TRUE;
+				$$ = new_semrec ("");
+				$$->type = TYPE_FLOAT;
+				$$->is_temp = TRUE;
                         }
 		;
 
@@ -239,17 +241,17 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr error MK_SEMICOLON 
-									{
-										yyerrok;
-										printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
-										printf("$1 name = %s\n", $1->name);
-										printf("$1 type = %d\n", $1->type);
-										if(TRUE == typecmp($1->type, $3->type)){
-											our_free($1); /* var_ref so it's temp */
-											our_free($3);
-											/* ID gets new value? */
-										}
-									 }
+			{
+				yyerrok;
+				printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
+				printf("$1 name = %s\n", $1->name);
+				printf("$1 type = %d\n", $1->type);
+				if(TRUE == typecmp($1->type, $3->type)){
+					our_free($1); /* var_ref so it's temp */
+					our_free($3);
+					/* ID gets new value? */
+				}
+			}
 		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
 		| MK_SEMICOLON
 		| RETURN MK_SEMICOLON
@@ -321,19 +323,19 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		;
 
 var_ref		: ID {
-		          $$ = getsym($1->name);
-				  /* Gotta do this to delete dangling semrec_ts if
-					they already exist in the symbol table */
-				  if((semrec_t*)0 == $$){
-					$$ = $1;
-					/* TODO: this branch signifies an error: ID (%s) undefined*/
-					yyerror($1->name); YYERROR;
-					/*putsym($1);*/
-				  }
-				  $1->type = $$->type;
-				  $1->is_temp = TRUE;
-				  our_free($1);
-				 }
+			$$ = getsym($1->name);
+			/* Gotta do this to delete dangling semrec_ts if
+			      they already exist in the symbol table */
+			if((semrec_t*)0 == $$){
+			      $$ = $1;
+			      /* TODO: this branch signifies an error: ID (%s) undefined*/
+			      yyerror($1->name); YYERROR;
+			      /*putsym($1);*/
+			}
+			$1->type = $$->type;
+			$1->is_temp = TRUE;
+			our_free($1);
+		    }
 		| var_ref dim
 		| var_ref struct_tail
 		;
