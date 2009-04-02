@@ -23,12 +23,6 @@ init_sym_table (void)
     tmp = new_semrec ("fwrite");
     tmp->type = TYPE_KEYWORD;
     putsym (tmp);
-    /*
-       tmp = new_semrec("i");
-       tmp->type = TYPE_INT;
-       tmp->is_const = FALSE;
-       putsym (tmp);
-     */
 
     /*
      * FIXME: we need to add the real keywords
