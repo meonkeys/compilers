@@ -65,7 +65,7 @@ new_semrec (char const *sym_name)
     ptr->is_const = FALSE;
     ptr->is_temp = FALSE;
     ptr->next = NULL;
-	/* printf("made record %s\n", ptr->name); */
+    /* printf("made record %s\n", ptr->name); */
     return ptr;
 }
 
@@ -136,3 +136,7 @@ dump_symtab (void)
         printf ("\t\tnext = %p\n", (void *) ptr->next);
     }
 }
+
+/*
+vim: expandtab shiftwidth=4 tabstop=4 smarttab
+*/

@@ -31,3 +31,7 @@ arith_op_type_reduce (semrec_t * t1, semrec_t * t2)
 
     return ct;
 }
+
+/*
+vim: expandtab shiftwidth=4 tabstop=4 smarttab
+*/
