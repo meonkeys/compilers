@@ -331,9 +331,11 @@ stmt		: MK_LBRACE block MK_RBRACE
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			{
+				/*
 				printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
 				printf("$1 name = %s\n", $1->name);
 				printf("$1 type = %d\n", $1->type);
+				*/
 				if(TRUE == typecmp($1->type, $3->type)){
 					our_free($1); /* var_ref so it's temp */
 					our_free($3);
