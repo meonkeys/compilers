@@ -118,6 +118,7 @@ function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBR
 				$1->value.funcval->num_params = list_length($3);
 				$$ = $1;
 			}
+		| error MK_RBRACE { yyerrok }
 		;
 
 func_start	: type ID
