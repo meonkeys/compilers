@@ -65,7 +65,7 @@ putsymlist (semrec_t * item, type_t type)
 {
     semrec_t *head = item;
     /* TODO: add check for existing symrec_ts with getsym */
-    while (head != (semrec_t *) 0)
+    while (head != NULL)
     {
         /* TODO: needs a better check for scoping */
         item->type = type;
