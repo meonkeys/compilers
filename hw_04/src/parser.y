@@ -233,6 +233,10 @@ type_decl	: TYPEDEF type id_list MK_SEMICOLON
 struct_decl	: struct_type id_list
 	    	| struct_type ID id_list
 	    	| struct_type ID struct_body
+			{
+				newstructlist("", $3, $2, $1->type);
+				our_free($1);
+			}
 		| struct_type ID struct_body id_list
 			{
 				newstructlist($2->name, $3, $4, $1->type);

@@ -82,9 +82,10 @@ yyerror (char const *fmt, ...)
 {
     va_list ap;
     char *ending = "\n";
-    size_t len_fmt = strlen(fmt);
-    size_t len_end = strlen(ending) + 1;
-    char *newfmt = calloc (sizeof (char) * (len_fmt + len_end), sizeof (char));
+    size_t len_fmt = strlen (fmt);
+    size_t len_end = strlen (ending) + 1;
+    char *newfmt =
+        calloc (sizeof (char) * (len_fmt + len_end), sizeof (char));
 
     assert (NULL != newfmt);
     strncpy (newfmt, fmt, len_fmt);
