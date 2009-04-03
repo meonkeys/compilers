@@ -1,0 +1,3 @@
+Error found in line 1: bar
+ID (bar) undeclared.
+Parsing aborted due to unrecoverable error(s).
