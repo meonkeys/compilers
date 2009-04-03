@@ -234,7 +234,7 @@ expr_or_null	: expr
 block		: decl_list stmt_list
 		| decl_list
 		| stmt_list
-		| /* empty */ {}
+		| /* empty */ { $$ = new_semrec("--empty block--") }
 		;
 
 decl_list	: decl_list decl
