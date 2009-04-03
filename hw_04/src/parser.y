@@ -116,6 +116,7 @@ function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBR
 			{
 				$1->value.funcval->param_list = $3;
 				$1->value.funcval->num_params = list_length($3);
+				putsym($1);
 				$$ = $1;
 			}
 		| error MK_RBRACE { yyerrok }
@@ -126,7 +127,6 @@ func_start	: type ID
 				$2->type = TYPE_FUNCTION;
 				$2->value.funcval = malloc(sizeof(func_t));
 				$2->value.funcval->return_type = $1->type;
-				/* putsym($2); */ /* add to symtab in function_decl */
 				our_free($1);
 				$$ = $2;
 			}
