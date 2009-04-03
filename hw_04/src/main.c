@@ -45,7 +45,7 @@ main (int argc, char *argv[])
     parse_rv = yyparse ();
 
     if (0 == parse_rv)
-        printf ("Parsing completed.\n");
+        printf ("Parsing completed. No errors found.\n");
     else
         printf ("Parsing aborted due to unrecoverable error(s).\n");
 
