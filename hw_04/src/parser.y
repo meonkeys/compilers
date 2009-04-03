@@ -275,10 +275,12 @@ struct_type	: STRUCT
 id_list		: ID
 		| id_list MK_COMMA ID {$1->next = $3; $$ = $1;}
 		| id_list MK_COMMA ID dim_decl
+		| id_list MK_COMMA dim_decl ID { yyerror("%s %d: Dimensions must follow ID.\n", ERR_START, yylineno); YYERROR }
 		| ID dim_decl
 		;
 
 dim_decl	: MK_LB cexpr MK_RB
+		| MK_LB MK_RB { yyerror("%s %d: Empty dimensions disallowed.\n", ERR_START, yylineno); YYERROR }
 		| dim_decl MK_LB cexpr MK_RB
 		;
 
@@ -323,6 +325,7 @@ init_id_list	: init_id
 		;
 
 init_id		: ID
+		| dim_decl ID { yyerror("%s %d: Dimensions must follow ID.\n", ERR_START, yylineno); YYERROR }
 		| ID dim_decl
 		| ID OP_ASSIGN relop_expr
 		;
