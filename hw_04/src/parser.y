@@ -79,8 +79,10 @@ static char *ERR_START = "Error found in line";
 %left MK_DOT
 
 %type <sem_ptr> block;
+%type <sem_ptr> body_list;
 %type <sem_ptr> cexpr;
 %type <sem_ptr> cfactor;
+%type <sem_ptr> decl;
 %type <sem_ptr> decl_list;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
@@ -207,18 +209,20 @@ expr_or_null	: expr
 		| /* empty */
 		;
 
-block		: decl_list stmt_list 
-			{
-				putsymlist($1);
-				$$ = $1; /* ????? */
-			}
+block		: /*decl_list */body_list
+		  stmt_list
 		| stmt_list
-		| decl_list
+		| body_list /*decl_list */
+		| /* empty */
+		;
+
+body_list	: decl_list
 			{
+				printf("b: %p\n", (void*)$1);
 				putsymlist($1);
 				$$ = $1; /* ????? */
 			}
-		| /* empty */
+
 		;
 
 decl_list	: decl_list decl
@@ -226,7 +230,7 @@ decl_list	: decl_list decl
 		;
 
 decl		: type_decl
-		| var_decl
+		| var_decl 
 		;
 
 /* according to these rules, struct/union tag is _required_ */

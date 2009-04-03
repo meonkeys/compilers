@@ -65,10 +65,15 @@ putsymlist (semrec_t * list)
 {
     semrec_t *head = list;
     /* TODO: add check for existing symrec_ts with getsym */
+    printf("are we tring to add? %p\n", (void*)head);
+    printf("whats null? %p\n", (void*)NULL);
+
     while (head != NULL)
     {
+        /*printf("in the while loop\n"); */
         /* TODO: needs a better check for scoping */
         head = list->next;
+        printf("Adding %s\n", list->name);
         putsym (list);
         list = head;
     }
