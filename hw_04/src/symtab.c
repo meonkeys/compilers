@@ -17,17 +17,17 @@ init_sym_table (void)
     semrec_t *tmp = new_semrec ("read");
     tmp->scope = 0;
     tmp->type = TYPE_KEYWORD;
-    tmp->value.funcval = malloc(sizeof(func_t));
+    tmp->value.funcval = malloc (sizeof (func_t));
     putsym (tmp);
     tmp = new_semrec ("write");
     tmp->scope = 0;
     tmp->type = TYPE_KEYWORD;
-    tmp->value.funcval = malloc(sizeof(func_t));
+    tmp->value.funcval = malloc (sizeof (func_t));
     putsym (tmp);
     tmp = new_semrec ("fwrite");
     tmp->scope = 0;
     tmp->type = TYPE_KEYWORD;
-    tmp->value.funcval = malloc(sizeof(func_t));
+    tmp->value.funcval = malloc (sizeof (func_t));
     putsym (tmp);
 
     /*
@@ -85,18 +85,18 @@ putsym (semrec_t * ptr)
 {
     semrec_t *sym = NULL;
 
-    /*fprintf(stderr, "trying to add %s\n", ptr->name);*/
+    /*fprintf(stderr, "trying to add %s\n", ptr->name); */
     sym = getsym (ptr->name, ptr->scope);
     if (NULL == sym)
     {
-        /*fprintf(stderr, "putting %s in scope %d\n", ptr->name, ptr->scope);*/
+        /*fprintf(stderr, "putting %s in scope %d\n", ptr->name, ptr->scope); */
         ptr->next = (semrec_t *) sym_table;
         sym_table = ptr;
     }
     else
     {
         /* FIXME: reporting and recovering from redeclared variables must
-         * happen within the parser using yyerror, YYERROR, yyerrok, etc. 
+         * happen within the parser using yyerror, YYERROR, yyerrok, etc.
          * TODO: possibly use the NULL return value to throw a YYERROR?
          */
         fprintf (stderr, "[FIXME] ID (%s) redeclared.\n", sym->name);
@@ -114,14 +114,14 @@ getsym (char const *sym_name, int scope)
     for (ptr = sym_table; ptr != NULL; ptr = ptr->next)
     {
         /*
-        fprintf(stderr, "looking for %s in %d\tcmp: %s in %d\n", sym_name, scope, ptr->name, ptr->scope);
-        fprintf(stderr, "\tstrcmp = %d\t %d <= %d\n", strcmp (ptr->name, sym_name), ptr->scope, scope);
-        */
+           fprintf(stderr, "looking for %s in %d\tcmp: %s in %d\n", sym_name, scope, ptr->name, ptr->scope);
+           fprintf(stderr, "\tstrcmp = %d\t %d <= %d\n", strcmp (ptr->name, sym_name), ptr->scope, scope);
+         */
         if (strcmp (ptr->name, sym_name) == 0 && ptr->scope <= scope)
         {
             /*
-            fprintf(stderr, "\tFOUND\n");
-            */
+               fprintf(stderr, "\tFOUND\n");
+             */
             return ptr;
         }
     }
@@ -154,7 +154,9 @@ dump_symtab (void)
     }
 }
 
-void apply_type(semrec_t* list, type_t type){
+void
+apply_type (semrec_t * list, type_t type)
+{
     semrec_t *head = list;
     /* TODO: add check for existing symrec_ts with getsym */
     while (head != NULL)
@@ -166,7 +168,9 @@ void apply_type(semrec_t* list, type_t type){
     }
 }
 
-void apply_scope(semrec_t* list, int scope){
+void
+apply_scope (semrec_t * list, int scope)
+{
     semrec_t *head = list;
     /* TODO: add check for existing symrec_ts with getsym */
     while (head != NULL)
@@ -182,19 +186,22 @@ void apply_scope(semrec_t* list, int scope){
  * The most recent scope is always at the head
  * of the list
  */
-void free_scope(int scope){
-    
+void
+free_scope (int scope)
+{
+
     semrec_t *head = sym_table;
-    /*fprintf(stderr, "freeing scope %d\n", scope);*/
+    /*fprintf(stderr, "freeing scope %d\n", scope); */
     /* TODO: add check for existing symrec_ts with getsym */
     while (head->scope == scope)
     {
         /* TODO: needs a better check for scoping */
         head = sym_table->next;
-        if(sym_table->scope == scope){
+        if (sym_table->scope == scope)
+        {
             sym_table->is_temp = TRUE;
-            /*fprintf(stderr, "freeing %s in %d\n", sym_table->name, scope);*/
-            our_free(sym_table); /* only frees the head */
+            /*fprintf(stderr, "freeing %s in %d\n", sym_table->name, scope); */
+            our_free (sym_table);       /* only frees the head */
         }
         sym_table = head;
     }

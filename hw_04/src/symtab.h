@@ -12,11 +12,11 @@ void putsymlist (semrec_t * item);
 int list_length (semrec_t * list);
 void dump_symtab (void);
 
-void apply_type(semrec_t* list, type_t type);
-void apply_scope(semrec_t* list, int scope);
+void apply_type (semrec_t * list, type_t type);
+void apply_scope (semrec_t * list, int scope);
 
 /* removes all elements in scope from the symbol table */
-void free_scope(int scope);
+void free_scope (int scope);
 
 #endif
 

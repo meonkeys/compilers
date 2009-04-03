@@ -123,21 +123,21 @@ global_decl	: decl_list function_decl
 		;
 
 /* There is a lot going on in the mid rule actions here */
-function_decl	: func_start MK_LPAREN {scope++;} 
-			param_list 
+function_decl	: func_start MK_LPAREN {scope++;}
+			param_list
 				{
 					apply_scope($4, scope);
 					$1->value.funcval->param_list = $4;
 					$1->value.funcval->num_params = list_length($4);
 					/*
-					fprintf(stderr, 
-						"%s num params: %d\n", 
+					fprintf(stderr,
+						"%s num params: %d\n",
 						$1->name, $1->value.funcval->num_params);
 					*/
 					$$ = $1;
 					putsymlist($4)
-				} 
-			MK_RPAREN MK_LBRACE block MK_RBRACE 
+				}
+			MK_RPAREN MK_LBRACE block MK_RBRACE
 				{free_scope(scope);scope--;}
 		| error MK_RBRACE { yyerrok; scope--;}
 		;
@@ -226,7 +226,7 @@ expr_or_null	: expr
 
 block		: decl_list stmt_list
 		| decl_list
-		| stmt_list 
+		| stmt_list
 		| /* empty */ {}
 		;
 
@@ -370,12 +370,12 @@ id_list		: ID
 		| id_list MK_COMMA dim_decl ID { yyerror("%s %d: Dimensions must follow ID.", ERR_START, yylineno); YYERROR }
 		| ID dim_decl
 /*
-		| id_list ID 
+		| id_list ID
 			{
 				yyerror("%s %d: IDs must be seperated by commas.\n", ERR_START, yylineno);
 				YYERROR;
 			}
-*/		
+*/
 		;
 
 dim_decl	: MK_LB cexpr MK_RB
@@ -436,8 +436,8 @@ stmt_list	: stmt_list stmt
 stmt		: MK_LBRACE block MK_RBRACE
 		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
-		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON 
-				relop_expr_list MK_SEMICOLON 
+		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON
+				relop_expr_list MK_SEMICOLON
 				assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			{
