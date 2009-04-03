@@ -1,2 +1,2 @@
-Error found in Line 	5	next token: 	}
-Parsing aborted due to unrecoverable error(s).
+syntax error, unexpected MK_RBRACE, expecting MK_COMMA or MK_SEMICOLON
+Parsing completed.
