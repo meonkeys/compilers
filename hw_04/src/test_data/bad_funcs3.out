@@ -1,3 +1,3 @@
-syntax error, unexpected MK_LBRACE, expecting MK_RPAREN or MK_COMMA
-syntax error, unexpected MK_LBRACE, expecting MK_RPAREN or MK_COMMA
+syntax error, unexpected MK_LBRACE, expecting MK_RPAREN
+syntax error, unexpected MK_LBRACE, expecting MK_RPAREN
 Parsing completed.
