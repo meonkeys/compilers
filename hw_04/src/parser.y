@@ -81,7 +81,6 @@ static char *ERR_START = "Error found in line";
 %type <sem_ptr> block;
 %type <sem_ptr> cexpr;
 %type <sem_ptr> cfactor;
-%type <sem_ptr> decl;
 %type <sem_ptr> decl_list;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
@@ -208,6 +207,7 @@ expr_or_null	: expr
 		| /* empty */
 		;
 
+<<<<<<< HEAD:hw_04/src/parser.y
 /*
 block		: decl_list 
 			{
@@ -222,10 +222,20 @@ block		: decl_list
 */
 
 block		: decl_list
+=======
+block		: decl_list stmt_list 
+			{
+				putsymlist($1);
+				$$ = $1; /* ????? */
+			}
+		| stmt_list
+		| decl_list
+>>>>>>> dcfaa2c955847946c451f33f3f3ea8a33d1da134:hw_04/src/parser.y
 			{
 				putsymlist($1);
 				 $$ = $1;
 			}
+<<<<<<< HEAD:hw_04/src/parser.y
 		   optional_list
 		| stmt_list
 		| /* empty */
@@ -233,6 +243,8 @@ block		: decl_list
 
 
 optional_list	: stmt_list
+=======
+>>>>>>> dcfaa2c955847946c451f33f3f3ea8a33d1da134:hw_04/src/parser.y
 		| /* empty */
 		;
 
@@ -241,7 +253,7 @@ decl_list	: decl_list decl
 		;
 
 decl		: type_decl
-		| var_decl 
+		| var_decl
 		;
 
 /* according to these rules, struct/union tag is _required_ */
