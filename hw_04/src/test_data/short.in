@@ -3,7 +3,7 @@ int main()
     int a = 0;
     struct a {int a; float b;};
     /*struct sometag {int a; float b;} b;*/
-    /*struct a c;*/
+    struct a c;
     write("foo");
     while(a < 10)
         a = a + 1;

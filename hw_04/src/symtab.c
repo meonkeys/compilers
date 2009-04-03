@@ -61,17 +61,16 @@ new_semrec (char const *sym_name)
 }
 
 void
-putsymlist (semrec_t * item, type_t type)
+putsymlist (semrec_t * list)
 {
-    semrec_t *head = item;
+    semrec_t *head = list;
     /* TODO: add check for existing symrec_ts with getsym */
     while (head != NULL)
     {
         /* TODO: needs a better check for scoping */
-        item->type = type;
-        head = (semrec_t *) item->next;
-        putsym (item);
-        item = head;
+        head = list->next;
+        putsym (list);
+        list = head;
     }
 }
 
@@ -136,6 +135,16 @@ dump_symtab (void)
             printf ("\t\tvalue = %g\n", ptr->value.fval);
         }
         printf ("\t\tnext = %p\n", (void *) ptr->next);
+    }
+}
+void apply_type(semrec_t* list, type_t type){
+    semrec_t *head = list;
+    /* TODO: add check for existing symrec_ts with getsym */
+    while (head != NULL)
+    {
+        /* TODO: needs a better check for scoping */
+        head->type = type;
+        head = list->next;
     }
 }
 

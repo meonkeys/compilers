@@ -78,6 +78,7 @@ static char *ERR_START = "Error found in line";
 %left OP_TIMES OP_DIVIDE
 %left MK_DOT
 
+%type <sem_ptr> block;
 %type <sem_ptr> cexpr;
 %type <sem_ptr> cfactor;
 %type <sem_ptr> decl_list;
@@ -206,9 +207,17 @@ expr_or_null	: expr
 		| /* empty */
 		;
 
-block		: decl_list stmt_list
+block		: decl_list stmt_list 
+			{
+				putsymlist($1);
+				$$ = $1; /* ????? */
+			}
 		| stmt_list
 		| decl_list
+			{
+				putsymlist($1);
+				$$ = $1; /* ????? */
+			}
 		| /* empty */
 		;
 
@@ -223,7 +232,9 @@ decl		: type_decl
 /* according to these rules, struct/union tag is _required_ */
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
 			{
-				putsymlist($3, $2->type); our_free($2);
+				apply_type($3, $2->type);
+				putsymlist($3);
+				our_free($2);
 			}
 		| TYPEDEF ID id_list MK_SEMICOLON
 		| TYPEDEF VOID id_list MK_SEMICOLON
@@ -267,7 +278,10 @@ struct_body	: MK_LBRACE decl_list MK_RBRACE
  */
 var_decl	: type init_id_list MK_SEMICOLON
 			{
-				putsymlist ($2, $1->type); our_free($1);
+				/*putsymlist ($2, $1->type);*/
+				apply_type($2, $1->type);
+				our_free($1);
+				$$ = $2;
 			}
 		| VOID id_list MK_SEMICOLON
 			{
@@ -290,7 +304,10 @@ var_decl	: type init_id_list MK_SEMICOLON
 
 				}
 				else{
-					putsymlist($2, $$->type);
+					/* putsymlist($2, $$->type); */
+					apply_type($2, $1->type);
+					our_free($1);
+					$$ = $2;
 				}
 			}
 		;
