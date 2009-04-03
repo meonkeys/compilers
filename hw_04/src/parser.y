@@ -122,23 +122,36 @@ global_decl	: decl_list function_decl
 		| function_decl
 		;
 
-function_decl	: func_start MK_LPAREN {scope++} param_list MK_RPAREN MK_LBRACE block MK_RBRACE {scope--}
-			{
-				$1->value.funcval->param_list = $4;
-				$1->value.funcval->num_params = list_length($4);
-				putsym($1);
-				$$ = $1;
-			}
+/* There is a lot going on in the mid rule actions here */
+function_decl	: func_start MK_LPAREN {scope++;} 
+			param_list 
+				{
+					apply_scope($4, scope);
+					$1->value.funcval->param_list = $4;
+					$1->value.funcval->num_params = list_length($4);
+					/*
+					fprintf(stderr, 
+						"%s num params: %d\n", 
+						$1->name, $1->value.funcval->num_params);
+					*/
+					$$ = $1;
+					putsymlist($4)
+				} 
+			MK_RPAREN MK_LBRACE block MK_RBRACE 
+				{free_scope(scope);scope--;}
 		| error MK_RBRACE { yyerrok; scope--;}
 		;
 
 func_start	: type ID
 			{
+				/*fprintf(stderr, "func name: %s\tscope: %d\n", $2->name, scope);*/
 				$2->type = TYPE_FUNCTION;
 				$2->value.funcval = malloc(sizeof(func_t));
 				assert (NULL != $2->value.funcval);
 				$2->value.funcval->return_type = $1->type;
 				our_free($1);
+				$2->scope = scope;
+				putsym($2);
 				$$ = $2;
 			}
 		| VOID ID /* function returns void */
@@ -181,7 +194,7 @@ param_list	: param_list MK_COMMA param
 		| /* empty */
 			{
 				/* so list_length() doesn't segfault */
-				$$ = new_semrec ("--empty param list--")
+				$$ = NULL;/*new_semrec ("--empty param list--")*/
 			}
 		;
 
@@ -229,18 +242,21 @@ decl		: type_decl
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
 			{
 				apply_type($3, $2->type);
+				apply_scope($3, scope);
 				putsymlist($3);
 				our_free($2);
 			}
 		| TYPEDEF ID id_list MK_SEMICOLON
 			{
 				apply_type($3, $2->type);
+				apply_scope($3, scope);
 				putsymlist($3);
 				our_free($2);
 			}
 		| TYPEDEF VOID id_list MK_SEMICOLON
 			{
 				apply_type($3, TYPE_VOID);
+				apply_scope($3, scope);
 				putsymlist($3);
 			}
 		| struct_decl MK_SEMICOLON
@@ -312,6 +328,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 				else{
 					/* putsymlist($2, $$->type); */
 					apply_type($2, $1->type);
+					apply_scope($2, scope);
 					putsymlist($2);
 					our_free($1);
 					$$ = $2;
@@ -419,7 +436,9 @@ stmt_list	: stmt_list stmt
 stmt		: MK_LBRACE block MK_RBRACE
 		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
-		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
+		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON 
+				relop_expr_list MK_SEMICOLON 
+				assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			{
 				/*
@@ -532,6 +551,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 			/* Function call */
 			{
+				fprintf(stderr, "looking for %s in %d\n", $1->name, scope);
 				$$ = getsym($1->name, scope);
 				/* is the function in the symbol table? */
 				if(NULL == $$){
@@ -547,7 +567,6 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 					YYERROR;
 				}
 
-				fprintf(stderr, "list %p\n", (void*)$3);
 				if(list_length($3) > $$->value.funcval->num_params){
 					yyerror("%s %d: too many arguments to function (%s).", ERR_START, yylineno, $1->name);
 					YYERROR;

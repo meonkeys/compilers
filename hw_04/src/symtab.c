@@ -85,11 +85,11 @@ putsym (semrec_t * ptr)
 {
     semrec_t *sym = NULL;
 
-    /* printf("trying to add %s\n", ptr->name); */
+    /*fprintf(stderr, "trying to add %s\n", ptr->name);*/
     sym = getsym (ptr->name, ptr->scope);
     if (NULL == sym)
     {
-        fprintf(stderr, "putting %s in scope %d\n", ptr->name, ptr->scope);
+        /*fprintf(stderr, "putting %s in scope %d\n", ptr->name, ptr->scope);*/
         ptr->next = (semrec_t *) sym_table;
         sym_table = ptr;
     }
@@ -111,11 +111,15 @@ getsym (char const *sym_name, int scope)
     semrec_t *ptr;
     for (ptr = sym_table; ptr != NULL; ptr = ptr->next)
     {
-        /*fprintf(stderr, "looking for %s in %d\tcmp: %s in %d\n", sym_name, scope, ptr->name, ptr->scope);*/
-        /*fprintf(stderr, "\tstrcmp = %d\t %d <= %d\n", strcmp (ptr->name, sym_name), ptr->scope, scope);*/
+        /*
+        fprintf(stderr, "looking for %s in %d\tcmp: %s in %d\n", sym_name, scope, ptr->name, ptr->scope);
+        fprintf(stderr, "\tstrcmp = %d\t %d <= %d\n", strcmp (ptr->name, sym_name), ptr->scope, scope);
+        */
         if (strcmp (ptr->name, sym_name) == 0 && ptr->scope <= scope)
         {
+            /*
             fprintf(stderr, "\tFOUND\n");
+            */
             return ptr;
         }
     }
@@ -169,6 +173,28 @@ void apply_scope(semrec_t* list, int scope){
         head = list->next;
         list->scope = scope;
         list = head;
+    }
+}
+
+/*
+ * The most recent scope is always at the head
+ * of the list
+ */
+void free_scope(int scope){
+    
+    semrec_t *head = sym_table;
+    /*fprintf(stderr, "freeing scope %d\n", scope);*/
+    /* TODO: add check for existing symrec_ts with getsym */
+    while (head->scope == scope)
+    {
+        /* TODO: needs a better check for scoping */
+        head = sym_table->next;
+        if(sym_table->scope == scope){
+            sym_table->is_temp = TRUE;
+            /*fprintf(stderr, "freeing %s in %d\n", sym_table->name, scope);*/
+            our_free(sym_table); /* only frees the head */
+        }
+        sym_table = head;
     }
 }
 

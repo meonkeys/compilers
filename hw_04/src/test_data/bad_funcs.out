@@ -1,2 +1,2 @@
-syntax error, unexpected MK_RBRACE, expecting MK_COMMA or MK_SEMICOLON
-Parsing completed.
+syntax error, unexpected MK_RBRACE
+Parsing aborted due to unrecoverable error(s).
