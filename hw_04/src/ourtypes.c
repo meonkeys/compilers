@@ -28,6 +28,18 @@ arith_op_type_reduce (semrec_t * t1, semrec_t * t2)
          * Need to upconvert to float
          */
         ct->type = TYPE_FLOAT;
+
+        /* Binary conversion. */
+        if (TYPE_INT == t1->type)
+        {
+            t1->value.fval = t1->value.intval;
+            t1->type = TYPE_FLOAT;
+        }
+        else
+        {
+            t2->value.fval = t2->value.intval;
+            t2->type = TYPE_INT;
+        }
     }
 
     return ct;
