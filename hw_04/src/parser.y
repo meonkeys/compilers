@@ -17,6 +17,7 @@ extern int yylineno;
 #include <y.tab.h>
 
 static char *ERR_START = "Error found in line";
+int scope = 0;
 %}
 
 %defines
@@ -81,6 +82,7 @@ static char *ERR_START = "Error found in line";
 %type <sem_ptr> block;
 %type <sem_ptr> cexpr;
 %type <sem_ptr> cfactor;
+%type <sem_ptr> decl;
 %type <sem_ptr> decl_list;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
@@ -95,9 +97,12 @@ static char *ERR_START = "Error found in line";
 %type <sem_ptr> relop_expr_list;
 %type <sem_ptr> relop_expr;
 %type <sem_ptr> stmt;
+%type <sem_ptr> stmt_list
 %type <sem_ptr> struct_body;
+%type <sem_ptr> struct_decl;
 %type <sem_ptr> struct_type;
 %type <sem_ptr> type;
+%type <sem_ptr> type_decl;
 %type <sem_ptr> unary;
 %type <sem_ptr> var_decl;
 %type <sem_ptr> var_ref;
@@ -117,14 +122,14 @@ global_decl	: decl_list function_decl
 		| function_decl
 		;
 
-function_decl	: func_start MK_LPAREN param_list MK_RPAREN MK_LBRACE block MK_RBRACE
+function_decl	: func_start MK_LPAREN {scope++} param_list MK_RPAREN MK_LBRACE block MK_RBRACE {scope--}
 			{
-				$1->value.funcval->param_list = $3;
-				$1->value.funcval->num_params = list_length($3);
+				$1->value.funcval->param_list = $4;
+				$1->value.funcval->num_params = list_length($4);
 				putsym($1);
 				$$ = $1;
 			}
-		| error MK_RBRACE { yyerrok }
+		| error MK_RBRACE { yyerrok; scope--;}
 		;
 
 func_start	: type ID
@@ -142,7 +147,6 @@ func_start	: type ID
 				$2->value.funcval = malloc(sizeof(func_t));
 				assert (NULL != $2->value.funcval);
 				$2->value.funcval->return_type = TYPE_VOID;
-				/* putsym($2) */ /* add to symtab in function_decl */
 				$$ = $2;
 			}
 		| ID ID   /* for a typedef'd return type */
@@ -151,7 +155,7 @@ func_start	: type ID
 				$2->value.funcval = malloc(sizeof(func_t));
 				assert (NULL != $2->value.funcval);
 
-				$$ = getsym($1->name);
+				$$ = getsym($1->name, scope);
 				/* first ID not in symtab */
 				if(NULL == $$){
 					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
@@ -207,28 +211,11 @@ expr_or_null	: expr
 		| /* empty */
 		;
 
-block		: decl_list
-			{
-				putsymlist($1);
-				$$ = $1; /* ????? */
-			}
-		| stmt_list
+block		: decl_list stmt_list
 		| decl_list
-			{
-				putsymlist($1);
-			}
-		   stmt_list
-			{
-			    $$ = $1;
-			}
+		| stmt_list 
 		| /* empty */ {}
 		;
-
-/*
-optional_list	: stmt_list
-		| 
-		;
-*/
 
 decl_list	: decl_list decl
 		| decl
@@ -246,7 +233,16 @@ type_decl	: TYPEDEF type id_list MK_SEMICOLON
 				our_free($2);
 			}
 		| TYPEDEF ID id_list MK_SEMICOLON
+			{
+				apply_type($3, $2->type);
+				putsymlist($3);
+				our_free($2);
+			}
 		| TYPEDEF VOID id_list MK_SEMICOLON
+			{
+				apply_type($3, TYPE_VOID);
+				putsymlist($3);
+			}
 		| struct_decl MK_SEMICOLON
 		;
 
@@ -276,9 +272,9 @@ struct_decl	: struct_type id_list
 		| TYPEDEF struct_type id_list
 		;
 
-struct_body	: MK_LBRACE decl_list MK_RBRACE
+struct_body	: MK_LBRACE {scope++} decl_list MK_RBRACE {scope--}
 			{
-				$$ = $2;
+				$$ = $3;
 			}
 		;
 
@@ -287,8 +283,9 @@ struct_body	: MK_LBRACE decl_list MK_RBRACE
  */
 var_decl	: type init_id_list MK_SEMICOLON
 			{
-				/*putsymlist ($2, $1->type);*/
 				apply_type($2, $1->type);
+				apply_scope($2, scope);
+				putsymlist($2);
 				our_free($1);
 				$$ = $2;
 			}
@@ -301,7 +298,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 		| type error MK_SEMICOLON { yyerrok } /* FIXME: Review. Is this correct? */
 		| ID id_list MK_SEMICOLON
 			{
-				$$ = getsym($1->name);
+				$$ = getsym($1->name, scope);
 				if(NULL == $$){
 					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
 					$1->is_temp = TRUE;
@@ -315,6 +312,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 				else{
 					/* putsymlist($2, $$->type); */
 					apply_type($2, $1->type);
+					putsymlist($2);
 					our_free($1);
 					$$ = $2;
 				}
@@ -437,9 +435,17 @@ stmt		: MK_LBRACE block MK_RBRACE
 			}
 		| IF MK_LPAREN relop_expr_list MK_RPAREN stmt if_stmt_tail
 		| error MK_SEMICOLON { yyerrok }
-		| MK_SEMICOLON
+		| MK_SEMICOLON {}
 		| RETURN MK_SEMICOLON
+			{
+				$$ = new_semrec("--void--");
+				$$->type = TYPE_VOID;
+				$$->is_temp = TRUE;
+			}
 		| RETURN relop_expr MK_SEMICOLON
+			{
+				$$ = $2;
+			}
 		;
 
 if_stmt_tail	: ELSE stmt
@@ -475,7 +481,7 @@ rel_op		: OP_LT
 		;
 
 relop_expr_list	: nonempty_relop_expr_list
-		| /* empty */ {}
+		| /* empty */ {$$ = NULL}
 		;
 
 nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
@@ -519,11 +525,14 @@ unary		: OP_MINUS unary {$$ = $2}
 		;
 
 factor		: MK_LPAREN relop_expr MK_RPAREN
+			{
+				$$ = $2;
+			}
 		| CONST
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 			/* Function call */
 			{
-				$$ = getsym($1->name);
+				$$ = getsym($1->name, scope);
 				/* is the function in the symbol table? */
 				if(NULL == $$){
 					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
@@ -538,6 +547,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 					YYERROR;
 				}
 
+				fprintf(stderr, "list %p\n", (void*)$3);
 				if(list_length($3) > $$->value.funcval->num_params){
 					yyerror("%s %d: too many arguments to function (%s).", ERR_START, yylineno, $1->name);
 					YYERROR;
@@ -553,7 +563,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 
 var_ref		: ID
 			{
-				$$ = getsym($1->name);
+				$$ = getsym($1->name, scope);
 				/* Gotta do this to delete dangling semrec_ts if
 				      they already exist in the symbol table */
 				if(NULL == $$){

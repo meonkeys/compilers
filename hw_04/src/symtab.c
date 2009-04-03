@@ -15,13 +15,19 @@ init_sym_table (void)
 {
     /* these are library functions, not keywords... do we need another type? */
     semrec_t *tmp = new_semrec ("read");
+    tmp->scope = 0;
     tmp->type = TYPE_KEYWORD;
+    tmp->value.funcval = malloc(sizeof(func_t));
     putsym (tmp);
     tmp = new_semrec ("write");
+    tmp->scope = 0;
     tmp->type = TYPE_KEYWORD;
+    tmp->value.funcval = malloc(sizeof(func_t));
     putsym (tmp);
     tmp = new_semrec ("fwrite");
+    tmp->scope = 0;
     tmp->type = TYPE_KEYWORD;
+    tmp->value.funcval = malloc(sizeof(func_t));
     putsym (tmp);
 
     /*
@@ -80,9 +86,10 @@ putsym (semrec_t * ptr)
     semrec_t *sym = NULL;
 
     /* printf("trying to add %s\n", ptr->name); */
-    sym = getsym (ptr->name);
+    sym = getsym (ptr->name, ptr->scope);
     if (NULL == sym)
     {
+        fprintf(stderr, "putting %s in scope %d\n", ptr->name, ptr->scope);
         ptr->next = (semrec_t *) sym_table;
         sym_table = ptr;
     }
@@ -99,13 +106,16 @@ putsym (semrec_t * ptr)
 }
 
 semrec_t *
-getsym (char const *sym_name)
+getsym (char const *sym_name, int scope)
 {
     semrec_t *ptr;
     for (ptr = sym_table; ptr != NULL; ptr = ptr->next)
     {
-        if (strcmp (ptr->name, sym_name) == 0)
+        /*fprintf(stderr, "looking for %s in %d\tcmp: %s in %d\n", sym_name, scope, ptr->name, ptr->scope);*/
+        /*fprintf(stderr, "\tstrcmp = %d\t %d <= %d\n", strcmp (ptr->name, sym_name), ptr->scope, scope);*/
+        if (strcmp (ptr->name, sym_name) == 0 && ptr->scope <= scope)
         {
+            fprintf(stderr, "\tFOUND\n");
             return ptr;
         }
     }
@@ -146,6 +156,18 @@ void apply_type(semrec_t* list, type_t type){
         /* TODO: needs a better check for scoping */
         head = list->next;
         list->type = type;
+        list = head;
+    }
+}
+
+void apply_scope(semrec_t* list, int scope){
+    semrec_t *head = list;
+    /* TODO: add check for existing symrec_ts with getsym */
+    while (head != NULL)
+    {
+        /* TODO: needs a better check for scoping */
+        head = list->next;
+        list->scope = scope;
         list = head;
     }
 }
