@@ -86,7 +86,7 @@ error    .
 {ID}            {
                     int len = strlen (yytext);
                     assert (len < MAX_ID_LENGTH);
-                    yylval.sem_ptr = new_semrec (yytext); 
+                    yylval.sem_ptr = new_semrec (yytext);
                     return ID;
                 }
 {op_assign}     return OP_ASSIGN;
