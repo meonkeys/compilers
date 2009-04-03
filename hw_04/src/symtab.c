@@ -95,6 +95,11 @@ putsym (semrec_t * ptr)
         ptr->is_temp = TRUE;
         our_free (ptr);
     }
+
+    if(TYPE_STRUCT == ptr->type){
+        printf("added struct w/ name: %s\ttag: %s\n", ptr->name, ptr->value.structval->tag);
+    }
+
     return ptr;
 }
 
@@ -102,7 +107,7 @@ semrec_t *
 getsym (char const *sym_name)
 {
     semrec_t *ptr;
-    for (ptr = sym_table; ptr != NULL; ptr = (semrec_t *) ptr->next)
+    for (ptr = sym_table; ptr != NULL; ptr = ptr->next)
     {
         if (strcmp (ptr->name, sym_name) == 0)
         {

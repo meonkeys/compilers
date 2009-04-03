@@ -78,6 +78,7 @@ static char *ERR_START = "Error found in line";
 
 %type <sem_ptr> cexpr;
 %type <sem_ptr> cfactor;
+%type <sem_ptr> decl_list;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
 %type <sem_ptr> function_decl;
@@ -91,6 +92,7 @@ static char *ERR_START = "Error found in line";
 %type <sem_ptr> relop_expr_list;
 %type <sem_ptr> relop_expr;
 %type <sem_ptr> stmt;
+%type <sem_ptr> struct_body;
 %type <sem_ptr> struct_type;
 %type <sem_ptr> type;
 %type <sem_ptr> unary;
@@ -215,6 +217,9 @@ decl		: type_decl
 
 /* according to these rules, struct/union tag is _required_ */
 type_decl	: TYPEDEF type id_list MK_SEMICOLON
+			{
+				putsymlist($3, $2->type); our_free($2);
+			}
 		| TYPEDEF ID id_list MK_SEMICOLON
 		| TYPEDEF VOID id_list MK_SEMICOLON
 		| struct_decl MK_SEMICOLON
@@ -223,7 +228,13 @@ type_decl	: TYPEDEF type id_list MK_SEMICOLON
 struct_decl	: struct_type id_list
 	    	| struct_type ID id_list
 	    	| struct_type ID struct_body
-		| struct_type ID struct_body id_list
+		| struct_type ID struct_body id_list 
+			{
+				newstructlist($2->name, $3, $4, $1->type);
+				our_free($1);
+				our_free_list($4);
+				
+			}
 		| struct_type struct_body id_list
 		| TYPEDEF struct_type ID struct_body id_list
 		| TYPEDEF struct_type struct_body id_list
@@ -231,6 +242,9 @@ struct_decl	: struct_type id_list
 		;
 
 struct_body	: MK_LBRACE decl_list MK_RBRACE
+			{
+				$$ = $2;
+			}
 		;
 
 /* This production inserts sym_recs into the symbol table
@@ -249,7 +263,13 @@ var_decl	: type init_id_list MK_SEMICOLON
 					our_free($1);
 					YYERROR;
 				}
-				putsymlist($2, $$->type);
+				else if(TYPE_STRUCT == $$->type || TYPE_UNION == $$->type){
+					newstructlist($$->value.structval->tag, $$->value.structval->member_list, $2, $$->type);
+
+				}
+				else{
+					putsymlist($2, $$->type);
+				}
 			}
 		;
 
@@ -268,7 +288,17 @@ type		: INT
 		;
 
 struct_type	: STRUCT
+			{
+				$$ = new_semrec("STRUCT");
+				$$->type = TYPE_STRUCT;
+				$$->is_temp = TRUE;
+			}
 		| UNION
+			{
+				$$ = new_semrec("UNION");
+				$$->type = TYPE_UNION;
+				$$->is_temp = TRUE;
+			}
 		;
 
 id_list		: ID
