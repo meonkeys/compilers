@@ -138,7 +138,14 @@ function_decl	: func_start MK_LPAREN {scope++;}
 					putsymlist($4)
 				}
 			MK_RPAREN MK_LBRACE block MK_RBRACE
-				{free_scope(scope);scope--;}
+				{
+					free_scope(scope);
+					scope--;
+					if ($8->type != $1->value.funcval->return_type) {
+						yyerror("%s %d: Incompatible return type.", ERR_START, yylineno);
+						YYERROR;
+					}
+				}
 		| error MK_RBRACE { yyerrok; scope--;}
 		;
 
