@@ -95,6 +95,7 @@ putsym (semrec_t * ptr)
         ptr->is_temp = TRUE;
         our_free (ptr);
     }
+
     return ptr;
 }
 
@@ -102,7 +103,7 @@ semrec_t *
 getsym (char const *sym_name)
 {
     semrec_t *ptr;
-    for (ptr = sym_table; ptr != NULL; ptr = (semrec_t *) ptr->next)
+    for (ptr = sym_table; ptr != NULL; ptr = ptr->next)
     {
         if (strcmp (ptr->name, sym_name) == 0)
         {
