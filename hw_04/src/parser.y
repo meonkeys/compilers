@@ -79,7 +79,6 @@ static char *ERR_START = "Error found in line";
 %left MK_DOT
 
 %type <sem_ptr> block;
-%type <sem_ptr> body_list;
 %type <sem_ptr> cexpr;
 %type <sem_ptr> cfactor;
 %type <sem_ptr> decl;
@@ -209,20 +208,32 @@ expr_or_null	: expr
 		| /* empty */
 		;
 
-block		: /*decl_list */body_list
+/*
+block		: decl_list 
+			{
+				putsymlist($1);
+				 $$ = $1;
+			}
 		  stmt_list
 		| stmt_list
-		| body_list /*decl_list */
+		| decl_list
+		| / empty /
+		;
+*/
+
+block		: decl_list
+			{
+				putsymlist($1);
+				 $$ = $1;
+			}
+		   optional_list
+		| stmt_list
 		| /* empty */
 		;
 
-body_list	: decl_list
-			{
-				printf("b: %p\n", (void*)$1);
-				putsymlist($1);
-				$$ = $1; /* ????? */
-			}
 
+optional_list	: stmt_list
+		| /* empty */
 		;
 
 decl_list	: decl_list decl
