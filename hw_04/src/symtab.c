@@ -97,7 +97,7 @@ putsym (semrec_t * ptr)
     {
         /* FIXME: reporting and recovering from redeclared variables must
          * happen within the parser using yyerror, YYERROR, yyerrok, etc. */
-        printf ("[FIXME] ID (%s) redeclared.\n", sym->name);
+        fprintf (stderr, "[FIXME] ID (%s) redeclared.\n", sym->name);
         ptr->is_temp = TRUE;
         our_free (ptr);
     }

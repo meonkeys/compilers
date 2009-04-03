@@ -16,3 +16,4 @@
 [X] how to report errors? yyerror doesn't seem appropriate
 	nevermind, yyerror appears to work
 [X] set up sandbox for testing out semantic checks
+[_] verify expressions are passed as a single parameter to functions
