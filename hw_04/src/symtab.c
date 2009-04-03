@@ -109,7 +109,7 @@ getsym (char const *sym_name)
             return ptr;
         }
     }
-    return 0;
+    return NULL;
 }
 
 int
