@@ -148,10 +148,8 @@ void apply_type(semrec_t* list, type_t type){
     while (head != NULL)
     {
         /* TODO: needs a better check for scoping */
-
+        head->type = type;
         head = list->next;
-        list->type = type;
-        list = head;
     }
 }
 
