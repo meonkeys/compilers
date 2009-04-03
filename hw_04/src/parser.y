@@ -319,6 +319,11 @@ id_list		: ID
 		| id_list MK_COMMA ID dim_decl
 		| id_list MK_COMMA dim_decl ID { yyerror("%s %d: Dimensions must follow ID.\n", ERR_START, yylineno); YYERROR }
 		| ID dim_decl
+		| id_list error ID 
+			{
+				yyerror("%s %d: IDs must be seperated by commas.\n", ERR_START, yylineno);
+				YYERROR;
+			}
 		;
 
 dim_decl	: MK_LB cexpr MK_RB
