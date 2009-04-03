@@ -254,6 +254,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 			{
 				putsymlist ($2, $1->type); our_free($1);
 			}
+		| type error MK_SEMICOLON { yyerrok } /* FIXME: Review. Is this correct? */
 		| ID id_list MK_SEMICOLON
 			{
 				$$ = getsym($1->name);
@@ -304,10 +305,12 @@ struct_type	: STRUCT
 id_list		: ID
 		| id_list MK_COMMA ID {$1->next = $3; $$ = $1;}
 		| id_list MK_COMMA ID dim_decl
+		| id_list MK_COMMA dim_decl ID { yyerror("%s %d: Dimensions must follow ID.\n", ERR_START, yylineno); YYERROR }
 		| ID dim_decl
 		;
 
 dim_decl	: MK_LB cexpr MK_RB
+		| MK_LB MK_RB { yyerror("%s %d: Empty dimensions disallowed.\n", ERR_START, yylineno); YYERROR }
 		| dim_decl MK_LB cexpr MK_RB
 		;
 
@@ -340,6 +343,11 @@ cexpr		: cexpr OP_PLUS cexpr
 
 cfactor		: CONST
 		| MK_LPAREN cexpr MK_RPAREN {$$ = $2 }
+		| ID
+			{
+				yyerror("%s %d: Variable arrays are disallowed.\n", ERR_START, yylineno);
+				YYERROR
+			}
 		;
 
 init_id_list	: init_id
@@ -347,6 +355,7 @@ init_id_list	: init_id
 		;
 
 init_id		: ID
+		| dim_decl ID { yyerror("%s %d: Dimensions must follow ID.\n", ERR_START, yylineno); YYERROR }
 		| ID dim_decl
 		| ID OP_ASSIGN relop_expr
 		;
@@ -469,7 +478,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 					YYERROR;
 				}
 				/* is the param list length correct? */
-	
+
 				if(NULL == $$->value.funcval){
 					yyerror("%s %d: Function (%s) undeclared.\n", ERR_START, yylineno, $$->name);
 					YYERROR;

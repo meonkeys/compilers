@@ -1,2 +1,2 @@
-Error found in Line 	4	next token: 	]
-Parsing completed. No errors found.
+Error found in line 4: Variable arrays are disallowed.
+Parsing completed.
