@@ -240,6 +240,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 			{
 				putsymlist ($2, $1->type); our_free($1);
 			}
+		| type error MK_SEMICOLON { yyerrok } /* FIXME: Review. Is this correct? */
 		| ID id_list MK_SEMICOLON
 			{
 				$$ = getsym($1->name);
