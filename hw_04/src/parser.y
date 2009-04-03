@@ -260,7 +260,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 			{
 				putsymlist ($2, $1->type); our_free($1);
 			}
-		| VOID init_id_list MK_SEMICOLON
+		| VOID id_list MK_SEMICOLON
 			{
 				yyerror("%s %d: Invalid variable type (%s).\n", ERR_START, yylineno, "void");
 				our_free_list($2);
