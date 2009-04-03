@@ -137,13 +137,13 @@ dump_symtab (void)
         printf ("\t\tnext = %p\n", (void *) ptr->next);
     }
 }
+
 void apply_type(semrec_t* list, type_t type){
     semrec_t *head = list;
     /* TODO: add check for existing symrec_ts with getsym */
     while (head != NULL)
     {
         /* TODO: needs a better check for scoping */
-
         head = list->next;
         list->type = type;
         list = head;

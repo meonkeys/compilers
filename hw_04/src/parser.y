@@ -207,46 +207,28 @@ expr_or_null	: expr
 		| /* empty */
 		;
 
-<<<<<<< HEAD:hw_04/src/parser.y
-/*
-block		: decl_list 
-			{
-				putsymlist($1);
-				 $$ = $1;
-			}
-		  stmt_list
-		| stmt_list
-		| decl_list
-		| / empty /
-		;
-*/
-
 block		: decl_list
-=======
-block		: decl_list stmt_list 
 			{
 				putsymlist($1);
 				$$ = $1; /* ????? */
 			}
 		| stmt_list
 		| decl_list
->>>>>>> dcfaa2c955847946c451f33f3f3ea8a33d1da134:hw_04/src/parser.y
 			{
 				putsymlist($1);
-				 $$ = $1;
 			}
-<<<<<<< HEAD:hw_04/src/parser.y
-		   optional_list
-		| stmt_list
-		| /* empty */
+		   stmt_list
+			{
+			    $$ = $1;
+			}
+		| /* empty */ {}
 		;
 
-
+/*
 optional_list	: stmt_list
-=======
->>>>>>> dcfaa2c955847946c451f33f3f3ea8a33d1da134:hw_04/src/parser.y
-		| /* empty */
+		| 
 		;
+*/
 
 decl_list	: decl_list decl
 		| decl
