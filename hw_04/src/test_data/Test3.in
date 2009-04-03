@@ -10,7 +10,7 @@ int negative(int a)
   return -a;
 }
 
-float nagative_float(int a, float b)
+float negative_float(int a, float b)
 {
   /* allow same var name in different scope */
   float result;

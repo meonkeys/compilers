@@ -8,8 +8,6 @@
 #include <util.h>
 #include <y.tab.h>
 
-semrec_t *sym_table;
-
 void
 init_sym_table (void)
 {

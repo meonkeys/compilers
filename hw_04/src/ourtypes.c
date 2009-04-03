@@ -78,6 +78,22 @@ newstructlist (const char *tag, semrec_t * members, semrec_t * names_list,
     }
 }
 
+/* This is weird, don't touch */
+void
+break_from_symtab(int scope){
+    semrec_t *head = sym_table;
+    /*fprintf(stderr, "freeing scope %d\n", scope);*/
+    while (head->scope == scope)
+    {
+        head = sym_table->next;
+        if(sym_table->scope != scope){
+            /*fprintf(stderr, "freeing %s in %d\n", sym_table->name, scope);*/
+            sym_table->next = NULL;
+        }
+        sym_table = head;
+    }
+}
+
 /*
 vim: expandtab shiftwidth=4 tabstop=4 smarttab
 */

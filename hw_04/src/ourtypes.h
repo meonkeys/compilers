@@ -76,6 +76,8 @@ semrec_t *newstruct (const char *tag, semrec_t * members, const char *name,
 void newstructlist (const char *tag, semrec_t * members,
                     semrec_t * names_list, type_t type);
 
+void break_from_symtab(int scope);
+
 #endif
 
 /*

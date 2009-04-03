@@ -84,6 +84,7 @@ int scope = 0;
 %type <sem_ptr> cfactor;
 %type <sem_ptr> decl;
 %type <sem_ptr> decl_list;
+%type <sem_ptr> dim;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
 %type <sem_ptr> function_decl;
@@ -291,6 +292,11 @@ struct_decl	: struct_type id_list
 struct_body	: MK_LBRACE {scope++} decl_list MK_RBRACE {scope--}
 			{
 				$$ = $3;
+				/* 
+				 * this will disassociate the members_list
+				 * and the symbol_table	
+				 */
+				break_from_symtab(scope);
 			}
 		;
 
@@ -551,8 +557,12 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 			/* Function call */
 			{
-				fprintf(stderr, "looking for %s in %d\n", $1->name, scope);
+				/* fprintf(stderr, "looking for %s in %d\n", $1->name, scope); */
+				if($3 != NULL){
+					fprintf(stderr, "%s: first item in param_list: %s\n", $1->name, $3->name);
+				}
 				$$ = getsym($1->name, scope);
+				/*fprintf(stderr, "func %s num args: %d\n", $$->name, $$->value.funcval->num_params);*/
 				/* is the function in the symbol table? */
 				if(NULL == $$){
 					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
@@ -596,11 +606,14 @@ var_ref		: ID
 				our_free($1);
 			}
 		| var_ref dim
+			{
+				$$ = $1;
+			}
 		| var_ref struct_tail
 		;
 
 
-dim		: MK_LB expr MK_RB
+dim		: MK_LB expr MK_RB {$$ = $2}
 		;
 
 struct_tail	: MK_DOT ID

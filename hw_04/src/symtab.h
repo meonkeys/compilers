@@ -3,6 +3,8 @@
 
 #include "ourtypes.h"
 
+semrec_t *sym_table;
+
 void init_sym_table (void);
 void destroy_sym_table (void);
 semrec_t *putsym (semrec_t * ptr);
