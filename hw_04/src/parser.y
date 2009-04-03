@@ -233,12 +233,12 @@ type_decl	: TYPEDEF type id_list MK_SEMICOLON
 struct_decl	: struct_type id_list
 	    	| struct_type ID id_list
 	    	| struct_type ID struct_body
-		| struct_type ID struct_body id_list 
+		| struct_type ID struct_body id_list
 			{
 				newstructlist($2->name, $3, $4, $1->type);
 				our_free($1);
 				our_free_list($4);
-				
+
 			}
 		| struct_type struct_body id_list
 			{
@@ -267,7 +267,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 			}
 		| VOID id_list MK_SEMICOLON
 			{
-				yyerror("%s %d: Invalid variable type (%s).\n", ERR_START, yylineno, "void");
+				yyerror("%s %d: Invalid variable type (%s).", ERR_START, yylineno, "void");
 				our_free_list($2);
 				YYERROR;
 			}
@@ -289,7 +289,6 @@ var_decl	: type init_id_list MK_SEMICOLON
 					putsymlist($2, $$->type);
 				}
 			}
-		| VOID id_list { yyerror("%s %d: Void types not allowed.", ERR_START, yylineno); YYERROR }
 		;
 
 type		: INT

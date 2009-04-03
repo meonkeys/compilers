@@ -1,2 +1,2 @@
-Error found in Line 	1	next token: 	(
-Parsing aborted due to unrecoverable error(s).
+syntax error, unexpected MK_LPAREN, expecting MK_SEMICOLON
+Parsing completed.
