@@ -35,7 +35,7 @@ destroy_sym_table (void)
 {
     semrec_t *cur = sym_table;
     semrec_t *next = NULL;
-    while (cur != (semrec_t *) 0)
+    while (cur != NULL)
     {
         next = (semrec_t *) cur->next;
         free (cur->name);
@@ -65,7 +65,7 @@ putsymlist (semrec_t * item, type_t type)
 {
     semrec_t *head = item;
     /* TODO: add check for existing symrec_ts with getsym */
-    while (head != (semrec_t *) 0)
+    while (head != NULL)
     {
         /* TODO: needs a better check for scoping */
         item->type = type;
@@ -102,7 +102,7 @@ semrec_t *
 getsym (char const *sym_name)
 {
     semrec_t *ptr;
-    for (ptr = sym_table; ptr != (semrec_t *) 0; ptr = (semrec_t *) ptr->next)
+    for (ptr = sym_table; ptr != NULL; ptr = (semrec_t *) ptr->next)
     {
         if (strcmp (ptr->name, sym_name) == 0)
         {
@@ -116,7 +116,7 @@ int
 list_length (semrec_t * list)
 {
     int num_items = 0;
-    for (; list != (semrec_t *) 0; list = list->next)
+    for (; list != NULL; list = list->next)
         num_items++;
     return num_items;
 }
@@ -126,7 +126,7 @@ dump_symtab (void)
 {
     semrec_t *ptr;
     printf ("dumping symbol table\n");
-    for (ptr = sym_table; ptr != (semrec_t *) 0; ptr = (semrec_t *) ptr->next)
+    for (ptr = sym_table; ptr != NULL; ptr = (semrec_t *) ptr->next)
     {
         printf ("\tname = %s\n", ptr->name);
         printf ("\t\ttype = %d\n", ptr->type);
