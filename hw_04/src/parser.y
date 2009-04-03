@@ -166,7 +166,11 @@ param_list	: param_list MK_COMMA param
 				$$ = $1;
 			}
 		| param
-		| /* empty */ {}
+		| /* empty */
+			{
+				/* so list_length() doesn't segfault */
+				$$ = new_semrec ("--empty param list--")
+			}
 		;
 
 param		: type ID
@@ -353,10 +357,12 @@ assign_expr_list: nonempty_assign_expr_list
 
 nonempty_assign_expr_list: nonempty_assign_expr_list MK_COMMA assign_expr
 		| assign_expr
+/* FIXME: missing semicolon! */
 
 /* I don't know why this isnt used, it's in stmt instead */
 assign_expr	: ID OP_ASSIGN relop_expr
 		| relop_expr
+/* FIXME: missing semicolon! */
 
 
 relop_expr	: expr
