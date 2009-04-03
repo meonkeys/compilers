@@ -6,7 +6,9 @@ LEX=flex
 YACC=bison
 TEST_DATA_DIR=test_data
 
-test: main valgrind
+test: main unit valgrind
+
+unit: main
 	@bash unit_test.sh $(TEST_DATA_DIR)
 
 # build a parser that prints trace output to stderr
@@ -28,7 +30,7 @@ pretty:
 
 main: main.c parser.o lexer3.o ourtypes.o symtab.o util.o
 
-.PHONY: distclean clean tools valgrind
+.PHONY: distclean clean tools unit valgrind
 
 clean:
 	$(RM) main trace *.tab.{c,h} lexer3.{c,h} *.o *~ y.output lex.yy.c y.tab.c
