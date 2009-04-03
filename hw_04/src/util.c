@@ -13,16 +13,20 @@ our_free (semrec_t * bt)
         {
             free (bt->value.stringval);
         }
-        else if(TYPE_STRUCT == bt->type){
-            if(NULL != bt->value.structval){
+        else if (TYPE_STRUCT == bt->type)
+        {
+            if (NULL != bt->value.structval)
+            {
                 /* printf("freeing tag: %s\n", bt->value.structval->tag); */
-                if(NULL != bt->value.structval->tag){
-                    free(bt->value.structval->tag);
+                if (NULL != bt->value.structval->tag)
+                {
+                    free (bt->value.structval->tag);
                 }
-                if(NULL != bt->value.structval->member_list){
-                    our_free_list(bt->value.structval->member_list);
+                if (NULL != bt->value.structval->member_list)
+                {
+                    our_free_list (bt->value.structval->member_list);
                 }
-                free(bt->value.structval);
+                free (bt->value.structval);
             }
         }
         free (bt);
@@ -30,14 +34,15 @@ our_free (semrec_t * bt)
 }
 
 void
-our_free_list(semrec_t* rec){
+our_free_list (semrec_t * rec)
+{
     semrec_t *cur = rec;
     semrec_t *next = NULL;
     while (cur != NULL)
     {
         cur->is_temp = TRUE;
         next = (semrec_t *) cur->next;
-        our_free(cur);
+        our_free (cur);
         cur = next;
     };
 

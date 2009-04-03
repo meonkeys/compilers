@@ -38,7 +38,7 @@ typedef struct func_s
 typedef struct struct_s
 {
     char *tag;                  /* string before the structure/union */
-    /* char *alias; */          /* string after the structure/union */
+    /* char *alias; *//* string after the structure/union */
     /* type_t type; *//* use the type_t type in parent semrec */
     struct semrec_s *member_list;
 } struct_t;
@@ -66,12 +66,14 @@ typedef struct semrec_s
 
 semrec_t *arith_op_type_reduce (semrec_t * t1, semrec_t * t2);
 
-struct_t* newstructval(const char* tag, semrec_t* members);
+struct_t *newstructval (const char *tag, semrec_t * members);
 
-semrec_t* newstruct(const char* tag, semrec_t* members, const char* name, type_t type);
+semrec_t *newstruct (const char *tag, semrec_t * members, const char *name,
+                     type_t type);
 
 /* FIXME: This puts all the structs in the symbol table as well.  Probably too much going on here. */
-void newstructlist(const char* tag, semrec_t* members, semrec_t* names_list, type_t type);
+void newstructlist (const char *tag, semrec_t * members,
+                    semrec_t * names_list, type_t type);
 
 #endif
 
