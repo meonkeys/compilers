@@ -123,7 +123,8 @@ error    .
                     semrec_t *p = new_semrec ("--strconst--");
                     p->type = TYPE_STRING;
                     p->is_const = TRUE;
-                    p->value.stringval = malloc (sizeof (char) * strlen (yytext) + 1);
+                    p->value.stringval = malloc (sizeof (char) * (strlen (yytext) + 1));
+                    assert (NULL != p->value.stringval);
                     p->value.stringval = strcpy (p->value.stringval, yytext);
                     yylval.sem_ptr = p;
                     return CONST;

@@ -1,5 +1,6 @@
 %{
 /* System Headers */
+#include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,6 +20,7 @@ static char *ERR_START = "Error found in line";
 %}
 
 %defines
+%error-verbose
 %output="y.tab.c"
 
 %union{
@@ -128,6 +130,7 @@ func_start	: type ID
 			{
 				$2->type = TYPE_FUNCTION;
 				$2->value.funcval = malloc(sizeof(func_t));
+				assert (NULL != $2->value.funcval);
 				$2->value.funcval->return_type = $1->type;
 				our_free($1);
 				$$ = $2;
@@ -136,6 +139,7 @@ func_start	: type ID
 			{
 				$2->type = TYPE_FUNCTION;
 				$2->value.funcval = malloc(sizeof(func_t));
+				assert (NULL != $2->value.funcval);
 				$2->value.funcval->return_type = TYPE_VOID;
 				/* putsym($2) */ /* add to symtab in function_decl */
 				$$ = $2;
@@ -144,11 +148,12 @@ func_start	: type ID
 			{
 				$2->type = TYPE_FUNCTION;
 				$2->value.funcval = malloc(sizeof(func_t));
+				assert (NULL != $2->value.funcval);
 
 				$$ = getsym($1->name);
 				/* first ID not in symtab */
 				if(NULL == $$){
-					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
+					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
 					$1->is_temp = TRUE;
 					our_free($1);
 					YYERROR;
@@ -271,7 +276,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 			{
 				$$ = getsym($1->name);
 				if(NULL == $$){
-					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
+					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
 					$1->is_temp = TRUE;
 					our_free($1);
 					YYERROR;
@@ -284,6 +289,7 @@ var_decl	: type init_id_list MK_SEMICOLON
 					putsymlist($2, $$->type);
 				}
 			}
+		| VOID id_list { yyerror("%s %d: Void types not allowed.", ERR_START, yylineno); YYERROR }
 		;
 
 type		: INT
@@ -317,7 +323,7 @@ struct_type	: STRUCT
 id_list		: ID
 		| id_list MK_COMMA ID {$1->next = $3; $$ = $1;}
 		| id_list MK_COMMA ID dim_decl
-		| id_list MK_COMMA dim_decl ID { yyerror("%s %d: Dimensions must follow ID.\n", ERR_START, yylineno); YYERROR }
+		| id_list MK_COMMA dim_decl ID { yyerror("%s %d: Dimensions must follow ID.", ERR_START, yylineno); YYERROR }
 		| ID dim_decl
 		| id_list error ID 
 			{
@@ -327,7 +333,7 @@ id_list		: ID
 		;
 
 dim_decl	: MK_LB cexpr MK_RB
-		| MK_LB MK_RB { yyerror("%s %d: Empty dimensions disallowed.\n", ERR_START, yylineno); YYERROR }
+		| MK_LB MK_RB { yyerror("%s %d: Empty dimensions disallowed.", ERR_START, yylineno); YYERROR }
 		| dim_decl MK_LB cexpr MK_RB
 		;
 
@@ -362,7 +368,7 @@ cfactor		: CONST
 		| MK_LPAREN cexpr MK_RPAREN {$$ = $2 }
 		| ID
 			{
-				yyerror("%s %d: Variable arrays are disallowed.\n", ERR_START, yylineno);
+				yyerror("%s %d: Variable arrays are disallowed.", ERR_START, yylineno);
 				YYERROR
 			}
 		;
@@ -372,7 +378,7 @@ init_id_list	: init_id
 		;
 
 init_id		: ID
-		| dim_decl ID { yyerror("%s %d: Dimensions must follow ID.\n", ERR_START, yylineno); YYERROR }
+		| dim_decl ID { yyerror("%s %d: Dimensions must follow ID.", ERR_START, yylineno); YYERROR }
 		| ID dim_decl
 		| ID OP_ASSIGN relop_expr
 		;
@@ -489,7 +495,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 				$$ = getsym($1->name);
 				/* is the function in the symbol table? */
 				if(NULL == $$){
-					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
+					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
 					$1->is_temp = TRUE;
 					our_free($1);
 					YYERROR;
@@ -497,16 +503,16 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 				/* is the param list length correct? */
 
 				if(NULL == $$->value.funcval){
-					yyerror("%s %d: Function (%s) undeclared.\n", ERR_START, yylineno, $$->name);
+					yyerror("%s %d: Function (%s) undeclared.", ERR_START, yylineno, $$->name);
 					YYERROR;
 				}
 
 				if(list_length($3) > $$->value.funcval->num_params){
-					yyerror("%s %d: too many arguments to function (%s).\n", ERR_START, yylineno, $1->name);
+					yyerror("%s %d: too many arguments to function (%s).", ERR_START, yylineno, $1->name);
 					YYERROR;
 				}
 				else if (list_length($3) < $$->value.funcval->num_params){
-					yyerror("%s %d: too few arguments to function (%s).\n", ERR_START, yylineno, $1->name);
+					yyerror("%s %d: too few arguments to function (%s).", ERR_START, yylineno, $1->name);
 					YYERROR;
 				}
 				$$ = $1; /* return the function call semrec */
@@ -521,7 +527,7 @@ var_ref		: ID
 				      they already exist in the symbol table */
 				if(NULL == $$){
 					$$ = $1;
-					yyerror("%s %d: ID (%s) undeclared.\n", ERR_START, yylineno, $1->name);
+					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
 					YYERROR;
 					/*putsym($1);*/
 				}

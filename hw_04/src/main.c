@@ -81,8 +81,19 @@ void
 yyerror (char const *fmt, ...)
 {
     va_list ap;
+    char *ending = "\n";
+    size_t len_fmt = strlen(fmt);
+    size_t len_end = strlen(ending) + 1;
+    char *newfmt = calloc (sizeof (char) * (len_fmt + len_end), sizeof (char));
+
+    assert (NULL != newfmt);
+    strncpy (newfmt, fmt, len_fmt);
+    strcat (newfmt, ending);
+
     va_start (ap, fmt);
-    vprintf (fmt, ap);
+    vprintf (newfmt, ap);
+
+    free (newfmt);
     error_count++;
 }
 
