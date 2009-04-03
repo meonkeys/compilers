@@ -126,7 +126,7 @@ dump_symtab (void)
 {
     semrec_t *ptr;
     printf ("dumping symbol table\n");
-    for (ptr = sym_table; ptr != NULL; ptr = (semrec_t *) ptr->next)
+    for (ptr = sym_table; ptr != NULL; ptr = ptr->next)
     {
         printf ("\tname = %s\n", ptr->name);
         printf ("\t\ttype = %d\n", ptr->type);
