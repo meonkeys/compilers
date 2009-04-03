@@ -207,7 +207,7 @@ expr_or_null	: expr
 		| /* empty */
 		;
 
-block		: decl_list stmt_list 
+block		: decl_list stmt_list
 			{
 				putsymlist($1);
 				$$ = $1; /* ????? */
