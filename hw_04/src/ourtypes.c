@@ -40,8 +40,6 @@ newstructval(const char* tag, semrec_t* members){
     ptr->tag = strcpy(ptr->tag, tag);
     ptr->member_list = members;
 
-    printf("new structval with tag: %s\n", ptr->tag);
-
     return ptr;
 }
 
@@ -49,7 +47,6 @@ semrec_t* newstruct(const char* tag, semrec_t* members, const char* name, type_t
     semrec_t* ptr = new_semrec(name);
     ptr->type = type;
     ptr->value.structval = newstructval(tag, members);
-    printf("got structval with tag: %s\n", ptr->value.structval->tag);
     return ptr;
 }
 

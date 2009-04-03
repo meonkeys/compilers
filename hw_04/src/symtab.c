@@ -96,10 +96,6 @@ putsym (semrec_t * ptr)
         our_free (ptr);
     }
 
-    if(TYPE_STRUCT == ptr->type){
-        printf("added struct w/ name: %s\ttag: %s\n", ptr->name, ptr->value.structval->tag);
-    }
-
     return ptr;
 }
 

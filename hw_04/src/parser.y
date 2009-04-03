@@ -236,6 +236,12 @@ struct_decl	: struct_type id_list
 				
 			}
 		| struct_type struct_body id_list
+			{
+				newstructlist("", $2, $3, $1->type);
+				our_free($1);
+				our_free_list($3);
+
+			}
 		| TYPEDEF struct_type ID struct_body id_list
 		| TYPEDEF struct_type struct_body id_list
 		| TYPEDEF struct_type id_list
@@ -253,6 +259,12 @@ struct_body	: MK_LBRACE decl_list MK_RBRACE
 var_decl	: type init_id_list MK_SEMICOLON
 			{
 				putsymlist ($2, $1->type); our_free($1);
+			}
+		| VOID init_id_list MK_SEMICOLON
+			{
+				yyerror("%s %d: Invalid variable type (%s).\n", ERR_START, yylineno, "void");
+				our_free_list($2);
+				YYERROR;
 			}
 		| type error MK_SEMICOLON { yyerrok } /* FIXME: Review. Is this correct? */
 		| ID id_list MK_SEMICOLON
