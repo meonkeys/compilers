@@ -26,6 +26,8 @@ int yyparse (void);
 extern int yydebug;
 #endif
 
+static int error_count = 0;
+
 int
 main (int argc, char *argv[])
 {
@@ -45,7 +47,12 @@ main (int argc, char *argv[])
     parse_rv = yyparse ();
 
     if (0 == parse_rv)
-        printf ("Parsing completed.\n");
+    {
+        printf ("Parsing completed.");
+        if (0 == error_count)
+            printf (" No errors found.");
+        printf ("\n");
+    }
     else
         printf ("Parsing aborted due to unrecoverable error(s).\n");
 
@@ -76,6 +83,7 @@ yyerror (char const *fmt, ...)
     va_list ap;
     va_start (ap, fmt);
     vprintf (fmt, ap);
+    error_count++;
 }
 
 /*
