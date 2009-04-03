@@ -310,6 +310,11 @@ cexpr		: cexpr OP_PLUS cexpr
 
 cfactor		: CONST
 		| MK_LPAREN cexpr MK_RPAREN {$$ = $2 }
+		| ID
+			{
+				yyerror("%s %d: Variable arrays are disallowed.\n", ERR_START, yylineno);
+				YYERROR
+			}
 		;
 
 init_id_list	: init_id
@@ -439,7 +444,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 					YYERROR;
 				}
 				/* is the param list length correct? */
-	
+
 				if(NULL == $$->value.funcval){
 					yyerror("%s %d: Function (%s) undeclared.\n", ERR_START, yylineno, $$->name);
 					YYERROR;
