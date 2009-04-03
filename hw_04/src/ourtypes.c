@@ -57,7 +57,6 @@ void
 newstructlist (const char *tag, semrec_t * members, semrec_t * names_list,
                type_t type)
 {
-
     semrec_t *ptr;
     semrec_t *structptr;
     for (ptr = names_list; ptr != NULL; ptr = ptr->next)
