@@ -1,6 +1,5 @@
 [_] report and recover from redeclared variables in parser (Adam)
 	see symtab.h:putsym()
-[_] binary conversions (Adam)
 [_] type checking rules
 	[_] everything except structure and union references (Joe)
 	[_] structure and union references
@@ -12,6 +11,7 @@
 [_] move keywords to symbol table
 [_] use strtol() instead of atof()
 
+[X] binary conversions (Adam)
 [X] start adding semantic checking
 [X] how to report errors? yyerror doesn't seem appropriate
 	nevermind, yyerror appears to work
