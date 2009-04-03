@@ -437,6 +437,12 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 					YYERROR;
 				}
 				/* is the param list length correct? */
+	
+				if(NULL == $$->value.funcval){
+					yyerror("%s %d: Function (%s) undeclared.\n", ERR_START, yylineno, $$->name);
+					YYERROR;
+				}
+
 				if(list_length($3) > $$->value.funcval->num_params){
 					yyerror("%s %d: too many arguments to function (%s).\n", ERR_START, yylineno, $1->name);
 					YYERROR;
