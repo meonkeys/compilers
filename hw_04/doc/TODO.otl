@@ -1,4 +1,4 @@
-[_] document bugs
+[X] document bugs
 [_] function parameter lists
 	: modify nonempty_relop_expr_list to build up a new list of params, each
 	: deep-copied out of the symbol table. 
@@ -6,15 +6,15 @@
 	: this list is temporary, so free it once it is no longer needed (such as
 	: after the "Function call" comment on the right-hand side of the "factor"
 	: nonterminal (ID MK_LPAREN relop_expr_list MK_RPAREN)
-[_] report and recover from redeclared variables in parser (Adam)
+[X] report and recover from redeclared variables in parser (Adam)
 	see symtab.h:putsym()
-[_] type checking rules
-	[_] everything except structure and union references (Joe)
-	[_] structure and union references
-[_] scoping
-	[_] multi-level symbol table
-	[_] keep track of what scope we're currently in, maintain symbol table thusly
-[_] remove debugging
+[X] type checking rules
+	[X] everything except structure and union references (Joe)
+	[X] structure and union references
+[X] scoping
+	[X] multi-level symbol table
+	[X] keep track of what scope we're currently in, maintain symbol table thusly
+[X] remove debugging
 [_] remove is_const, if possible
 [_] move keywords to symbol table
 [_] use strtol() instead of atof()

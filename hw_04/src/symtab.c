@@ -55,7 +55,6 @@ new_semrec (char const *sym_name)
     ptr->is_const = FALSE;
     ptr->is_temp = FALSE;
     ptr->next = NULL;
-    /* printf("made record %s\n", ptr->name); */
     return ptr;
 }
 
@@ -83,11 +82,9 @@ putsym (semrec_t * ptr)
 {
     semrec_t *sym = NULL;
 
-    /*fprintf(stderr, "trying to add %s\n", ptr->name); */
     sym = getsym (ptr->name, ptr->scope);
     if (NULL == sym)
     {
-        /*fprintf(stderr, "putting %s in scope %d\n", ptr->name, ptr->scope); */
         ptr->next = (semrec_t *) sym_table;
         sym_table = ptr;
     }
@@ -108,13 +105,8 @@ getsym (char const *sym_name, int scope)
     semrec_t *ptr;
     for (ptr = sym_table; ptr != NULL; ptr = ptr->next)
     {
-        /*
-           fprintf(stderr, "looking for %s in %d\tcmp: %s in %d\n", sym_name, scope, ptr->name, ptr->scope);
-           fprintf(stderr, "\tstrcmp = %d\t %d <= %d\n", strcmp (ptr->name, sym_name), ptr->scope, scope);
-         */
         if (strcmp (ptr->name, sym_name) == 0 && ptr->scope <= scope)
         {
-            /* fprintf(stderr, "\tFOUND\n"); */
             return ptr;
         }
     }
@@ -125,29 +117,9 @@ int
 list_length (semrec_t * list)
 {
     int num_items = 0;
-    for (; list != NULL; list = list->next){
-        /* fprintf(stderr, "%s->", list->name); */
+    for (; list != NULL; list = list->next)
         num_items++;
-    }
-    /* fprintf(stderr, "\n"); */
     return num_items;
-}
-
-void
-dump_symtab (void)
-{
-    semrec_t *ptr;
-    printf ("dumping symbol table\n");
-    for (ptr = sym_table; ptr != NULL; ptr = ptr->next)
-    {
-        printf ("\tname = %s\n", ptr->name);
-        printf ("\t\ttype = %d\n", ptr->type);
-        if (ID == ptr->type)
-        {
-            printf ("\t\tvalue = %g\n", ptr->value.fval);
-        }
-        printf ("\t\tnext = %p\n", (void *) ptr->next);
-    }
 }
 
 void
@@ -186,7 +158,6 @@ void
 free_scope (int scope)
 {
     semrec_t *head = sym_table;
-    /*fprintf(stderr, "freeing scope %d\n", scope); */
     /* TODO: add check for existing symrec_ts with getsym */
     while (head->scope == scope)
     {
@@ -195,7 +166,6 @@ free_scope (int scope)
         if (sym_table->scope == scope)
         {
             sym_table->is_temp = TRUE;
-            /*fprintf(stderr, "freeing %s in %d\n", sym_table->name, scope); */
             our_free (sym_table);       /* only frees the head */
         }
         sym_table = head;

@@ -130,22 +130,11 @@ function_decl	: func_start MK_LPAREN {scope++;}
 					apply_scope($4, scope);
 					$1->value.funcval->param_list = $4;
 					$1->value.funcval->num_params = list_length($4);
-					/*
-					fprintf(stderr,
-						"%s num params: %d\n",
-						$1->name, $1->value.funcval->num_params);
-					*/
 					$$ = $1;
 					putsymlist($4)
 				}
 			MK_RPAREN MK_LBRACE block MK_RBRACE
 				{
-					/*
-					fprintf(stderr, "block name         : %s\n", $8->name);
-					fprintf(stderr, "block type         : %d\n", $8->type);
-					fprintf(stderr, "func name          : %s\n", $1->name);
-					fprintf(stderr, "func type          : %d\n", $1->value.funcval->return_type);
-					*/
 					if ($8->type != $1->value.funcval->return_type) {
 						yyerror("%s %d: Incompatible return type.", ERR_START, yylineno);
 						YYERROR;
@@ -160,7 +149,6 @@ function_decl	: func_start MK_LPAREN {scope++;}
 
 func_start	: type ID
 			{
-				/*fprintf(stderr, "func name: %s\tscope: %d\n", $2->name, scope);*/
 				$2->type = TYPE_FUNCTION;
 				$2->value.funcval = malloc(sizeof(func_t));
 				assert (NULL != $2->value.funcval);
@@ -473,11 +461,6 @@ stmt		: MK_LBRACE {scope++} block MK_RBRACE {free_scope(scope); scope--}
 				assign_expr_list MK_RPAREN stmt
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			{
-				/*
-				fprintf(stderr, "$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
-				fprintf(stderr, "$1 name = %s\n", $1->name);
-				fprintf(stderr, "$1 type = %d\n", $1->type);
-				*/
 				if(TRUE == typecmp($1->type, $3->type)){
 					our_free($1); /* var_ref so it's temp */
 					our_free($3);
@@ -537,7 +520,6 @@ relop_expr_list	: nonempty_relop_expr_list
 
 nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
 			{
-				fprintf(stderr, "adding %s to list\n", $3->name);
 				$1->next = $3;
 				$$ = $1;
 			}
@@ -584,13 +566,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 			/* Function call */
 			{
-				/* fprintf(stderr, "looking for %s in %d\n", $1->name, scope); */
-				if($3 != NULL){
-					fprintf(stderr, "%s: item 1/%d in param_list: %s\n", $1->name, list_length($3), $3->name);
-				}
 				$$ = getsym($1->name, scope);
-				/*fprintf(stderr, "func %s num args: %d\n", $$->name, $$->value.funcval->num_params);*/
-				/* is the function in the symbol table? */
 				if(NULL == $$){
 					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
 					$1->is_temp = TRUE;
