@@ -1,3 +1,10 @@
+[_] function parameter lists
+	: modify nonempty_relop_expr_list to build up a new list of params, each
+	: deep-copied out of the symbol table. 
+	:
+	: this list is temporary, so free it once it is no longer needed (such as
+	: after the "Function call" comment on the right-hand side of the "factor"
+	: nonterminal (ID MK_LPAREN relop_expr_list MK_RPAREN)
 [_] report and recover from redeclared variables in parser (Adam)
 	see symtab.h:putsym()
 [_] type checking rules

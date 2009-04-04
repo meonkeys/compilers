@@ -1,0 +1,2 @@
+struct foo func() { }
+int main() { }

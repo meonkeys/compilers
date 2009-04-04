@@ -3,6 +3,7 @@ typedef special very_special;
 
 special blah()
 {
+    return 1;
 }
 
 int main()

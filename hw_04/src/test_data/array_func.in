@@ -1,10 +1,12 @@
 int foo(int a[]){
+    return 1;
 }
 
 void foo1(int b[][5]){
 }
 
 float foo2(float c[][5][6]){
+    return 1.0;
 }
 
 void foo3(int b[2]){

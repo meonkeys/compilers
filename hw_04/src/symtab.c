@@ -16,17 +16,17 @@ init_sym_table (void)
     /* these are library functions, not keywords... do we need another type? */
     semrec_t *tmp = new_semrec ("read");
     tmp->scope = 0;
-    tmp->type = TYPE_KEYWORD;
+    tmp->type = TYPE_FUNCTION;
     tmp->value.funcval = malloc (sizeof (func_t));
     putsym (tmp);
     tmp = new_semrec ("write");
     tmp->scope = 0;
-    tmp->type = TYPE_KEYWORD;
+    tmp->type = TYPE_FUNCTION;
     tmp->value.funcval = malloc (sizeof (func_t));
     putsym (tmp);
     tmp = new_semrec ("fwrite");
     tmp->scope = 0;
-    tmp->type = TYPE_KEYWORD;
+    tmp->type = TYPE_FUNCTION;
     tmp->value.funcval = malloc (sizeof (func_t));
     putsym (tmp);
 

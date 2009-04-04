@@ -141,6 +141,12 @@ function_decl	: func_start MK_LPAREN {scope++;}
 				{
 					free_scope(scope);
 					scope--;
+					/*
+					fprintf(stderr, "block name         : %s\n", $8->name);
+					fprintf(stderr, "block type         : %d\n", $8->type);
+					fprintf(stderr, "func name          : %s\n", $1->name);
+					fprintf(stderr, "func type          : %d\n", $1->value.funcval->return_type);
+					*/
 					if ($8->type != $1->value.funcval->return_type) {
 						yyerror("%s %d: Incompatible return type.", ERR_START, yylineno);
 						YYERROR;
@@ -234,7 +240,11 @@ expr_or_null	: expr
 block		: decl_list stmt_list
 		| decl_list
 		| stmt_list
-		| /* empty */ { $$ = new_semrec("--empty block--") }
+		| /* empty */
+			{
+				$$ = new_semrec("--empty block--");
+				$$->type = TYPE_VOID;
+			}
 		;
 
 decl_list	: decl_list decl

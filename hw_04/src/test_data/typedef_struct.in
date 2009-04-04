@@ -4,7 +4,7 @@ typedef struct {
 
 struct {
 	float boat;
-} NoTag;
+} NoTypedefAndNoTag;
 
 struct blah{
 	int id;
@@ -15,4 +15,5 @@ int main()
 	typedef blah blag;
 
 	blag x;
+	return 0;
 }

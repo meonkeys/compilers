@@ -19,8 +19,7 @@ typedef enum TYPE_T
     TYPE_FUNCTION,
     TYPE_STRUCT,
     TYPE_UNION,
-    TYPE_ID,
-    TYPE_KEYWORD
+    TYPE_ID
 } type_t;
 
 typedef struct array_s

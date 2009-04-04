@@ -19,4 +19,5 @@ struct {
 
 int main() {
     struct animal dogs[5];
+    return 0;
 }
