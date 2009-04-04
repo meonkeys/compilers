@@ -518,6 +518,7 @@ relop_expr_list	: nonempty_relop_expr_list
 
 nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
 			{
+				fprintf(stderr, "adding %s to list\n", $3->name);
 				$1->next = $3;
 				$$ = $1;
 			}
@@ -566,7 +567,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 			{
 				/* fprintf(stderr, "looking for %s in %d\n", $1->name, scope); */
 				if($3 != NULL){
-					fprintf(stderr, "%s: first item in param_list: %s\n", $1->name, $3->name);
+					fprintf(stderr, "%s: item 1/%d in param_list: %s\n", $1->name, list_length($3), $3->name);
 				}
 				$$ = getsym($1->name, scope);
 				/*fprintf(stderr, "func %s num args: %d\n", $$->name, $$->value.funcval->num_params);*/
@@ -600,14 +601,17 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 var_ref		: ID
 			{
 				$$ = getsym($1->name, scope);
-				/* Gotta do this to delete dangling semrec_ts if
-				      they already exist in the symbol table */
 				if(NULL == $$){
 					$$ = $1;
 					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
 					YYERROR;
 					/*putsym($1);*/
 				}
+				/* $$->next = NULL;
+				 * We want to do this but it would break the symbol table
+				 */
+				/* Gotta do this to delete dangling semrec_ts if
+				      they already exist in the symbol table */
 				$1->type = $$->type;
 				$1->is_temp = TRUE;
 				our_free($1);

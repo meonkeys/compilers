@@ -130,8 +130,11 @@ int
 list_length (semrec_t * list)
 {
     int num_items = 0;
-    for (; list != NULL; list = list->next)
+    for (; list != NULL; list = list->next){
+        fprintf(stderr, "%s->", list->name);
         num_items++;
+    }
+    fprintf(stderr, "\n");
     return num_items;
 }
 
