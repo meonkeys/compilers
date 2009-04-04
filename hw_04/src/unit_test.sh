@@ -8,6 +8,7 @@ for t in `find $testDataDir -type f -name "*.in" | sort`
 do
     totalTests=$(($totalTests + 1))
     echo -n "$t ... "
+    testDir=`dirname $t`
     testBase=`basename $t .in`
     outFile=$testBase.out
     ./main $t > $tmpdir/$outFile
@@ -18,7 +19,7 @@ do
         failures=$(($failures + 1))
         continue
     fi
-    diff $testDataDir/$outFile $tmpdir/$outFile
+    diff $testDir/$outFile $tmpdir/$outFile
     testResult=$?
     if [ $testResult -ne 0 ]
     then
