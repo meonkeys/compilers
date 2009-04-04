@@ -5,12 +5,15 @@
 
 semrec_t *sym_table;
 
+#define MAX_ID_LENGTH 256
+char last_redeclared[MAX_ID_LENGTH];
+
 void init_sym_table (void);
 void destroy_sym_table (void);
 semrec_t *putsym (semrec_t * ptr);
 semrec_t *getsym (char const *, int scope);
 semrec_t *new_semrec (char const *sym_name);
-void putsymlist (semrec_t * item);
+semrec_t *putsymlist (semrec_t * item);
 int list_length (semrec_t * list);
 void dump_symtab (void);
 

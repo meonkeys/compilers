@@ -24,7 +24,7 @@ float myfunc3(int a, float b)
 
   {
   int a;
-  /* EDITED ++ operator is not in the C-- manual. */
+  /* ++ operator is not in the C-- manual; removed. */
   for (a=1; a < 10; a=a+1) {
   result = result + a * b;
   }

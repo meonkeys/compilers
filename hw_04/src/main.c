@@ -28,6 +28,12 @@ extern int yydebug;
 
 static int error_count = 0;
 
+void
+init_last_redeclared (void)
+{
+    memset(last_redeclared, '\0', MAX_ID_LENGTH);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -43,6 +49,7 @@ main (int argc, char *argv[])
     }
 
     init_sym_table ();
+    init_last_redeclared ();
 
     parse_rv = yyparse ();
 

@@ -140,11 +140,14 @@ function_decl	: func_start MK_LPAREN {scope++;}
 				}
 			MK_RPAREN MK_LBRACE block MK_RBRACE
 				{
-					free_scope(scope);
-					scope--;
+					/* FIXME: this doesn't quite work yet. */
 					if ($8->type != $1->value.funcval->return_type) {
 						yyerror("%s %d: Incompatible return type.", ERR_START, yylineno);
 						YYERROR;
+					}
+					else {
+						free_scope(scope);
+						scope--;
 					}
 				}
 		| error MK_RBRACE { yyerrok; scope--;}
@@ -310,22 +313,29 @@ struct_body	: MK_LBRACE {scope++} decl_list MK_RBRACE {scope--}
 /* This production inserts sym_recs into the symbol table
  * No real need to keep them on the value stack
  */
-var_decl	: type init_id_list MK_SEMICOLON
+var_decl	: type init_id_list
+			/* variable declaration for built-in types */
 			{
 				apply_type($2, $1->type);
 				apply_scope($2, scope);
-				putsymlist($2);
+				if (NULL == putsymlist($2)) {
+					yyerror("%s %d: ID (%s) redeclared.", ERR_START, yylineno, last_redeclared);
+					YYERROR;
+				}
 				our_free($1);
 				$$ = $2;
 			}
-		| VOID id_list MK_SEMICOLON
+			MK_SEMICOLON
+		| VOID id_list
 			{
 				yyerror("%s %d: Invalid variable type (%s).", ERR_START, yylineno, "void");
 				our_free_list($2);
 				YYERROR;
 			}
+			MK_SEMICOLON
 		| type error MK_SEMICOLON { yyerrok } /* FIXME: Review. Is this correct? */
 		| ID id_list MK_SEMICOLON
+			/* ID is a user-defined (typedef'd) type */
 			{
 				$$ = getsym($1->name, scope);
 				if(NULL == $$){

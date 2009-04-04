@@ -11,7 +11,6 @@
 void
 init_sym_table (void)
 {
-    /* these are library functions, not keywords... do we need another type? */
     semrec_t *tmp = new_semrec ("read");
     tmp->scope = 0;
     tmp->type = TYPE_KEYWORD;
@@ -27,11 +26,6 @@ init_sym_table (void)
     tmp->type = TYPE_KEYWORD;
     tmp->value.funcval = malloc (sizeof (func_t));
     putsym (tmp);
-
-    /*
-     * FIXME: we need to add the real keywords
-     * but I don't have that defined yet
-     */
 }
 
 void
@@ -55,6 +49,7 @@ new_semrec (char const *sym_name)
     ptr = (semrec_t *) malloc (sizeof (semrec_t));
     ptr->name = (char *) calloc (strlen (sym_name) + 1, 1);
     strcpy (ptr->name, sym_name);
+    ptr->scope = 0;             /* FIXME: Review. Is this a sane initialization value? */
     ptr->value.fval = 0;        /* Set value to 0 even if fctn.  */
     ptr->is_declared = FALSE;
     ptr->is_const = FALSE;
@@ -64,18 +59,23 @@ new_semrec (char const *sym_name)
     return ptr;
 }
 
-void
+semrec_t *
 putsymlist (semrec_t * list)
 {
+    semrec_t *return_value = list;
     semrec_t *head = list;
-    /* TODO: add check for existing symrec_ts with getsym */
+
     while (head != NULL)
     {
         /* TODO: needs a better check for scoping */
         head = list->next;
-        putsym (list);
+        if (NULL == putsym (list)) {
+            return_value = NULL;
+        }
         list = head;
     }
+
+    return return_value;
 }
 
 semrec_t *
@@ -93,13 +93,10 @@ putsym (semrec_t * ptr)
     }
     else
     {
-        /* FIXME: reporting and recovering from redeclared variables must
-         * happen within the parser using yyerror, YYERROR, yyerrok, etc.
-         * TODO: possibly use the NULL return value to throw a YYERROR?
-         */
-        fprintf (stderr, "[FIXME] ID (%s) redeclared.\n", sym->name);
+        strncpy(last_redeclared, ptr->name, MAX_ID_LENGTH - 1);
         ptr->is_temp = TRUE;
         our_free (ptr);
+        ptr = NULL;
     }
 
     return ptr;
@@ -117,9 +114,7 @@ getsym (char const *sym_name, int scope)
          */
         if (strcmp (ptr->name, sym_name) == 0 && ptr->scope <= scope)
         {
-            /*
-               fprintf(stderr, "\tFOUND\n");
-             */
+            /* fprintf(stderr, "\tFOUND\n"); */
             return ptr;
         }
     }
@@ -131,10 +126,10 @@ list_length (semrec_t * list)
 {
     int num_items = 0;
     for (; list != NULL; list = list->next){
-        fprintf(stderr, "%s->", list->name);
+        /* fprintf(stderr, "%s->", list->name); */
         num_items++;
     }
-    fprintf(stderr, "\n");
+    /* fprintf(stderr, "\n"); */
     return num_items;
 }
 
@@ -190,7 +185,6 @@ apply_scope (semrec_t * list, int scope)
 void
 free_scope (int scope)
 {
-
     semrec_t *head = sym_table;
     /*fprintf(stderr, "freeing scope %d\n", scope); */
     /* TODO: add check for existing symrec_ts with getsym */

@@ -14,13 +14,9 @@
 #include <stdio.h>
 
 /* Custom headers */
-/* #define YYSTYPE semrec_t* */
 #include <y.tab.h>
 #include <ourtypes.h>
 #include <symtab.h>
-
-/* Prototypes and C macro definitions */
-#define MAX_ID_LENGTH 256
 %}
 
 letter   [A-Za-z]
