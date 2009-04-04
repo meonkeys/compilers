@@ -1,3 +1,4 @@
+[_] document bugs
 [_] function parameter lists
 	: modify nonempty_relop_expr_list to build up a new list of params, each
 	: deep-copied out of the symbol table. 

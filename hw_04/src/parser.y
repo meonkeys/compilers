@@ -465,7 +465,7 @@ stmt_list	: stmt_list stmt
 		| stmt
 		;
 
-stmt		: MK_LBRACE block MK_RBRACE
+stmt		: MK_LBRACE {scope++} block MK_RBRACE {free_scope(scope); scope--}
 		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON
 		| WHILE MK_LPAREN relop_expr_list MK_RPAREN stmt
 		| FOR MK_LPAREN assign_expr_list MK_SEMICOLON
