@@ -84,6 +84,7 @@ int scope = 0;
 %type <sem_ptr> cfactor;
 %type <sem_ptr> decl;
 %type <sem_ptr> decl_list;
+%type <sem_ptr> dim;
 %type <sem_ptr> expr;
 %type <sem_ptr> factor;
 %type <sem_ptr> function_decl;
@@ -139,8 +140,6 @@ function_decl	: func_start MK_LPAREN {scope++;}
 				}
 			MK_RPAREN MK_LBRACE block MK_RBRACE
 				{
-					free_scope(scope);
-					scope--;
 					/*
 					fprintf(stderr, "block name         : %s\n", $8->name);
 					fprintf(stderr, "block type         : %d\n", $8->type);
@@ -150,6 +149,10 @@ function_decl	: func_start MK_LPAREN {scope++;}
 					if ($8->type != $1->value.funcval->return_type) {
 						yyerror("%s %d: Incompatible return type.", ERR_START, yylineno);
 						YYERROR;
+					}
+					else {
+						free_scope(scope);
+						scope--;
 					}
 				}
 		| error MK_RBRACE { yyerrok; scope--;}
@@ -308,28 +311,40 @@ struct_decl	: struct_type id_list
 struct_body	: MK_LBRACE {scope++} decl_list MK_RBRACE {scope--}
 			{
 				$$ = $3;
+				/* 
+				 * this will disassociate the members_list
+				 * and the symbol_table	
+				 */
+				break_from_symtab(scope);
 			}
 		;
 
 /* This production inserts sym_recs into the symbol table
  * No real need to keep them on the value stack
  */
-var_decl	: type init_id_list MK_SEMICOLON
+var_decl	: type init_id_list
+			/* variable declaration for built-in types */
 			{
 				apply_type($2, $1->type);
 				apply_scope($2, scope);
-				putsymlist($2);
+				if (NULL == putsymlist($2)) {
+					yyerror("%s %d: ID (%s) redeclared.", ERR_START, yylineno, last_redeclared);
+					YYERROR;
+				}
 				our_free($1);
 				$$ = $2;
 			}
-		| VOID id_list MK_SEMICOLON
+			MK_SEMICOLON
+		| VOID id_list
 			{
 				yyerror("%s %d: Invalid variable type (%s).", ERR_START, yylineno, "void");
 				our_free_list($2);
 				YYERROR;
 			}
+			MK_SEMICOLON
 		| type error MK_SEMICOLON { yyerrok } /* FIXME: Review. Is this correct? */
 		| ID id_list MK_SEMICOLON
+			/* ID is a user-defined (typedef'd) type */
 			{
 				$$ = getsym($1->name, scope);
 				if(NULL == $$){
@@ -522,6 +537,7 @@ relop_expr_list	: nonempty_relop_expr_list
 
 nonempty_relop_expr_list: nonempty_relop_expr_list MK_COMMA relop_expr
 			{
+				fprintf(stderr, "adding %s to list\n", $3->name);
 				$1->next = $3;
 				$$ = $1;
 			}
@@ -568,8 +584,12 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 		| ID MK_LPAREN relop_expr_list MK_RPAREN
 			/* Function call */
 			{
-				fprintf(stderr, "looking for %s in %d\n", $1->name, scope);
+				/* fprintf(stderr, "looking for %s in %d\n", $1->name, scope); */
+				if($3 != NULL){
+					fprintf(stderr, "%s: item 1/%d in param_list: %s\n", $1->name, list_length($3), $3->name);
+				}
 				$$ = getsym($1->name, scope);
+				/*fprintf(stderr, "func %s num args: %d\n", $$->name, $$->value.funcval->num_params);*/
 				/* is the function in the symbol table? */
 				if(NULL == $$){
 					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
@@ -600,24 +620,30 @@ factor		: MK_LPAREN relop_expr MK_RPAREN
 var_ref		: ID
 			{
 				$$ = getsym($1->name, scope);
-				/* Gotta do this to delete dangling semrec_ts if
-				      they already exist in the symbol table */
 				if(NULL == $$){
 					$$ = $1;
 					yyerror("%s %d: ID (%s) undeclared.", ERR_START, yylineno, $1->name);
 					YYERROR;
 					/*putsym($1);*/
 				}
+				/* $$->next = NULL;
+				 * We want to do this but it would break the symbol table
+				 */
+				/* Gotta do this to delete dangling semrec_ts if
+				      they already exist in the symbol table */
 				$1->type = $$->type;
 				$1->is_temp = TRUE;
 				our_free($1);
 			}
 		| var_ref dim
+			{
+				$$ = $1;
+			}
 		| var_ref struct_tail
 		;
 
 
-dim		: MK_LB expr MK_RB
+dim		: MK_LB expr MK_RB {$$ = $2}
 		;
 
 struct_tail	: MK_DOT ID
