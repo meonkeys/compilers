@@ -461,7 +461,7 @@ init_id		: ID
 		| ID OP_ASSIGN relop_expr
 		;
 
-stmt_list	: stmt_list stmt
+stmt_list	: stmt_list stmt {$$=$2} /* capture return value */
 		| stmt
 		;
 
@@ -474,9 +474,9 @@ stmt		: MK_LBRACE {scope++} block MK_RBRACE {free_scope(scope); scope--}
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			{
 				/*
-				printf("$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
-				printf("$1 name = %s\n", $1->name);
-				printf("$1 type = %d\n", $1->type);
+				fprintf(stderr, "$1=%p\t$3=%p\n", (void*)$1, (void*)$3);
+				fprintf(stderr, "$1 name = %s\n", $1->name);
+				fprintf(stderr, "$1 type = %d\n", $1->type);
 				*/
 				if(TRUE == typecmp($1->type, $3->type)){
 					our_free($1); /* var_ref so it's temp */
@@ -495,7 +495,7 @@ stmt		: MK_LBRACE {scope++} block MK_RBRACE {free_scope(scope); scope--}
 			}
 		| RETURN relop_expr MK_SEMICOLON
 			{
-				$$ = $2;
+				$$->type = $2->type;
 			}
 		;
 
