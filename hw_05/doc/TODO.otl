@@ -1,4 +1,10 @@
-extra credit
-	optimizations
+[_] required
+	[_] Assignment statements
+	[_] Arithmetic expressions
+	[_] Control statements: while, if-then-else
+	[_] Parameterless procedure calls
+	[_] Read and Write function calls 
+[_] extra credit
+	[_] optimizations
 		[_] change "callee saves all registers" to something more efficient
 			[_] only save registers that must be preserved across fn call
