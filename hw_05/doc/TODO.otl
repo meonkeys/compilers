@@ -1,0 +1,4 @@
+extra credit
+	optimizations
+		[_] change "callee saves all registers" to something more efficient
+			[_] only save registers that must be preserved across fn call

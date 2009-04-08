@@ -1,0 +1,5 @@
+int main()
+{
+	bar a;
+	a = 5;
+}

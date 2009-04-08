@@ -1,0 +1,23 @@
+struct animal {
+    int place;
+};
+
+union zoo {
+    int id;
+    struct animal this;
+} TheZoo;
+
+struct predeclared;
+
+typedef struct {
+    float boat;
+} NoTag;
+
+struct {
+    float boat;
+} NoTag;
+
+int main() {
+    struct animal dogs[5];
+    return 0;
+}

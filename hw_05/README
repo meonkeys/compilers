@@ -1,0 +1,46 @@
+CSCI 5161 -- Spring 2009
+Assignment 5
+Due April 19th, 2009
+
+AUTHORS
+
+    Joe Myre <myrex013@umn.edu>
+    Adam Monsen <mons0166@umn.edu>
+
+SYNOPSIS
+
+    make
+
+PREREQUISITES
+
+    * POSIX-compatible Make
+    * GCC
+    * Flex
+    * Bison
+
+EXECUTION DETAILS
+
+    Executing "make main" will compile the standalone parser.
+
+    Executing "make" in the top-level or src directory should compile and run
+    all unit tests except memory leak checks. All but 15 unit tests should pass.
+
+    * flex, gcc, and bison assumed present in PATH
+
+    If these paths are incorrect, edit Makefile before compiling and running
+    unit tests.
+
+    The code has been tested and works on Ubuntu 8.04.2 and Ubuntu 8.10.
+
+ASSIGNMENT DESCRIPTION
+
+    http://www-users.itlabs.umn.edu/classes/Spring-2009/csci5161/index.php?page=./handouts/assign4
+
+COPYRIGHT
+
+    (C)2009 Adam Monsen <haircut@gmail.com> and Joe Myre <myrex013@umn.edu>
+
+LICENSE
+
+    This software is available under the GNU General Public License
+    version 3 or any later version.

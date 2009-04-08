@@ -1,0 +1,9 @@
+src/trace
+src/main
+src/*.o
+src/tags
+src/lexer3.h
+src/y.tab.h
+src/cscope.out
+src/y.output
+*~

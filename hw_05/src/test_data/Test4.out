@@ -1,0 +1,5 @@
+Error found in line 17: ID (fread) undeclared.
+Error found in line 41: ID (double) undeclared.
+syntax error, unexpected ELSE
+syntax error, unexpected RETURN
+Parsing completed.

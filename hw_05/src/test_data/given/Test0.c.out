@@ -1,0 +1,4 @@
+Error found in line 7: ID (d) undeclared.
+Error found in line 13: ID (a) redeclared.
+Error found in line 34: Incompatible return type.
+Parsing completed.
