@@ -1,1 +1,3 @@
-Parsing completed. No errors found.
+error 9: tags are not supported by C--
+error 11: struct declaration with no variables
+Error found in Line 	15	next token: 	blah

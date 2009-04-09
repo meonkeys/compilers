@@ -29,4 +29,5 @@ int main()
 
  write("The factorial is");
  write(result);
+ return 0;
 }

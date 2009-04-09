@@ -1,3 +1,6 @@
-Error found in line 10: ID (i) undeclared.
-Error found in line 13: ID (i) undeclared.
-Parsing completed.
+error 10: undeclared variable i
+error 10: undeclared variable i
+error 13: undeclared variable i
+error 13: undeclared variable i
+error:  Semantic Analysis failed due to errors
+Error found in Line 	18	next token: 	

@@ -6,7 +6,7 @@ LEX=flex
 YACC=bison
 TEST_DATA_DIR=test_data
 
-test: main unit valgrind
+test: main unit
 
 unit: main
 	@bash unit_test.sh $(TEST_DATA_DIR)

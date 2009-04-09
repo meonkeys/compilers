@@ -925,7 +925,7 @@ VerifyMainCall ()
             && (temp->symtab_u.st_func->params == 0))
             return;
     }
-    printf ("Warning: no valid Main function \n");
+    printf ("Warning: no valid Main function\n");
 }
 
 /*

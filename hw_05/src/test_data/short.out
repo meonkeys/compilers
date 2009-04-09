@@ -1,2 +1,5 @@
-Error found in line 4: ID (a) redeclared.
-Parsing completed.
+error 4: tags are not supported by C--
+error 4: struct declaration with no variables
+error 6: cannot have `struct tag' declarations
+error:  Semantic Analysis failed due to errors
+Error found in Line 	12	next token: 	

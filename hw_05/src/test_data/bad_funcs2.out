@@ -1,2 +1,3 @@
-syntax error, unexpected MK_LPAREN, expecting MK_SEMICOLON
-Parsing completed.
+error 1: functions do not return structs in C--
+error:  Semantic Analysis failed due to errors
+Error found in Line 	5	next token: 	

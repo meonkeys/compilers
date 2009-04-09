@@ -6,4 +6,5 @@ int main()
     int a = 0;
     a = read();
     foo(57.5, 2);
+    return 0;
 }

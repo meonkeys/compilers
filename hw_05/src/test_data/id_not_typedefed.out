@@ -1,2 +1,4 @@
-Error found in line 3: ID (bar) undeclared.
-Parsing completed.
+error 3: undeclared type bar
+error 4: undeclared variable a
+error:  Semantic Analysis failed due to errors
+Error found in Line 	7	next token: 	

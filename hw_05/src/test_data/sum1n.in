@@ -15,4 +15,5 @@ int main()
 
  write("The sum is :");
  write(sum);
+ return 0;
 }

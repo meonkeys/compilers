@@ -12,19 +12,21 @@ do
     testBase=`basename $t .in`
     outFile=$testBase.out
     ./main $t > $tmpdir/$outFile
-    testResult=$?
-    if [ $testResult -ne 0 ]
-    then
-        exitCode=1
-        failures=$(($failures + 1))
-        continue
-    fi
+    # testResult=$?
+    # if [ $testResult -ne 0 ]
+    # then
+    #     exitCode=1
+    #     failures=$(($failures + 1))
+    #     echo "FAIL"
+    #     continue
+    # fi
     diff $testDir/$outFile $tmpdir/$outFile
     testResult=$?
     if [ $testResult -ne 0 ]
     then
         exitCode=1
         failures=$(($failures + 1))
+        echo Expected: $testDir/$outFile
         echo "FAIL"
         continue
     fi
