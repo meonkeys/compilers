@@ -1,9 +1,20 @@
+[_] prep
+	[X] switch to parser solution code for homework #4 
+	[_] get unit tests working
 [_] required
 	[_] Assignment statements
 	[_] Arithmetic expressions
-	[_] Control statements: while, if-then-else
+		[_] plus, minus, multiply, divide
+		[_] equality?
+		[_] greater-than, less-than?
+		[_] unary minus (negation)?
+	[_] Control statements
+		[_] while
+		[_] if-then-else
 	[_] Parameterless procedure calls
 	[_] Read and Write function calls 
+		[_] read()
+		[_] write()
 [_] extra credit
 	[_] optimizations
 		[_] change "callee saves all registers" to something more efficient

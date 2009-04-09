@@ -7,8 +7,8 @@
 
 /* Custom headers */
 #include <y.tab.h>
-#include <lexer3.h>
-#include <symtab.h>
+#include <lexer4.h>
+#include <header.h>
 
 /*
  * We need yylex_destroy or valgrind complains of memory leaks. When testing on
@@ -25,19 +25,12 @@ int yyparse (void);
 #ifdef YYDEBUG
 extern int yydebug;
 #endif
-
-static int error_count = 0;
-
-void
-init_last_redeclared (void)
-{
-    memset(last_redeclared, '\0', MAX_ID_LENGTH);
-}
+extern int ISERROR;
+extern int linenumber;
 
 int
 main (int argc, char *argv[])
 {
-    int parse_rv;
 #ifdef YYDEBUG
     yydebug = 1;
 #endif
@@ -48,27 +41,24 @@ main (int argc, char *argv[])
         assert (NULL != yyin);
     }
 
-    init_sym_table ();
-    init_last_redeclared ();
+    ISERROR = 0;
+    put_read_ST ();
+    yyparse ();
 
-    parse_rv = yyparse ();
-
-    if (0 == parse_rv)
-    {
-        printf ("Parsing completed.");
-        if (0 == error_count)
-            printf (" No errors found.");
-        printf ("\n");
-    }
+    if (0 == ISERROR)
+        printf ("Parsing completed. No errors found.\n");
     else
-        printf ("Parsing aborted due to unrecoverable error(s).\n");
+    {
+        if (argc > 1)
+            printf ("Errors found in file %s\n", argv[1]);
+        else
+            printf ("Errors found in file -stdin-\n");
+    }
 
     if (argc > 1)
     {
         assert (0 == fclose (yyin));
     }
-
-    destroy_sym_table ();
 
     /*
      * Not precisely as indicated by the manual, but seems to be the right
@@ -83,26 +73,12 @@ main (int argc, char *argv[])
     exit (EXIT_SUCCESS);
 }
 
-
-void
-yyerror (char const *fmt, ...)
+int
+yyerror (char *mesg)
 {
-    va_list ap;
-    char *ending = "\n";
-    size_t len_fmt = strlen (fmt);
-    size_t len_end = strlen (ending) + 1;
-    char *newfmt =
-        calloc (sizeof (char) * (len_fmt + len_end), sizeof (char));
-
-    assert (NULL != newfmt);
-    strncpy (newfmt, fmt, len_fmt);
-    strcat (newfmt, ending);
-
-    va_start (ap, fmt);
-    vprintf (newfmt, ap);
-
-    free (newfmt);
-    error_count++;
+    printf ("%s\t%d\t%s\t%s\n", "Error found in Line ", linenumber,
+            "next token: ", yytext);
+    exit (1);
 }
 
 /*

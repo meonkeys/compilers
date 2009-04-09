@@ -1,6 +1,6 @@
 %option warn nodefault
-%option noinput nounput noyywrap yylineno
-%option header-file="lexer3.h"
+%option noinput nounput noyywrap noyylineno
+%option header-file="lexer4.h"
 /* %option debug */
 
 %top{
@@ -9,14 +9,11 @@
 }
 
 %{
-/* System headers */
-#include <assert.h>
 #include <stdio.h>
-
-/* Custom headers */
+#include <string.h>
+#include <header.h>
 #include <y.tab.h>
-#include <ourtypes.h>
-#include <symtab.h>
+extern int linenumber;
 %}
 
 letter   [A-Za-z]
@@ -47,10 +44,10 @@ op_plus "+"
 op_minus "-"
 op_times "*"
 op_divide "/"
-iconstant {digit}+
-fconstant {digit}+(("."){digit}+)?
+int_constant {digit}+
+flt_constant {digit}+(("."){digit}+)?
+s-const \"([^"\n])*\"
 comment	"/*"(([^*])|([*]+[^/*]))*("*")+"/"
-strconst \"([^"\n])*\"
 ws       [ \t]+
 newline  "\n"
 mk_lparen "("
@@ -70,20 +67,22 @@ error    .
 {comment}	;
 {kwInt}         return INT;
 {kwFloat}       return FLOAT;
-{kwVoid}	return VOID;
+{kwVoid}		return VOID;
 {kwIf}          return IF;
 {kwElse}        return ELSE;
 {kwWhile}       return WHILE;
 {kwFor}      	return FOR;
-{kwStruct}	return STRUCT;
-{kwUnion}	return UNION;
+{kwStruct}		return STRUCT;
+{kwUnion}		return STRUCT;
 {kwTypedef}     return TYPEDEF;
 {kwReturn}      return RETURN;
-{ID}            {
-                    int len = strlen (yytext);
-                    assert (len < MAX_ID_LENGTH);
-                    yylval.sem_ptr = new_semrec (yytext);
-                    return ID;
+{ID}            { yylval.lexeme=strdup(yytext);
+		  if(!yylval.lexeme)
+		  {
+		      printf("out of memory\n");
+		      exit(0);
+	          }
+                  return ID;
                 }
 {op_assign}     return OP_ASSIGN;
 {op_and}        return OP_AND;
@@ -99,32 +98,9 @@ error    .
 {op_minus}      return OP_MINUS;
 {op_times}      return OP_TIMES;
 {op_divide}     return OP_DIVIDE;
-{iconstant}	{
-                    semrec_t *p = new_semrec ("--iconstant--");
-                    p->type = TYPE_INT;
-                    p->is_const = TRUE;
-                    p->value.intval = atoi (yytext);
-                    yylval.sem_ptr = p;
-                    return CONST;
-                }
-{fconstant}     {
-                    semrec_t *p = new_semrec ("--fconstant--");
-                    p->type = TYPE_FLOAT;
-                    p->is_const = TRUE;
-                    p->value.fval = atof (yytext);
-                    yylval.sem_ptr = p;
-                    return CONST;
-                }
-{strconst}      {
-                    semrec_t *p = new_semrec ("--strconst--");
-                    p->type = TYPE_STRING;
-                    p->is_const = TRUE;
-                    p->value.stringval = malloc (sizeof (char) * (strlen (yytext) + 1));
-                    assert (NULL != p->value.stringval);
-                    p->value.stringval = strcpy (p->value.stringval, yytext);
-                    yylval.sem_ptr = p;
-                    return CONST;
-                }
+{int_constant}  { CON_Type *p; p=(CON_Type *)malloc(sizeof(CON_Type)); p->const_type=INTEGERC, p->const_u.intval=atoi(yytext); yylval.const1=p; return CONST;}
+{flt_constant}  { CON_Type *p; p=(CON_Type *)malloc(sizeof(CON_Type)); p->const_type=FLOATC; p->const_u.fval=atof(yytext); yylval.const1=p; return CONST;}
+{s-const}       {  CON_Type *p; p=(CON_Type *)malloc(sizeof(CON_Type)); p->const_type=STRINGC; p->const_u.sc=strdup(yytext); yylval.const1=p; return CONST;}
 {mk_lparen}     return MK_LPAREN;
 {mk_rparen}     return MK_RPAREN;
 {mk_lbrace}     return MK_LBRACE;
@@ -133,8 +109,8 @@ error    .
 {mk_rsqbrace}   return MK_RB;
 {mk_comma}      return MK_COMMA;
 {mk_semicolon}  return MK_SEMICOLON;
-{mk_dot}	return MK_DOT;
-{newline}       ; /* we use the yylineno feature */
+{mk_dot}		return MK_DOT;
+{newline}       linenumber += 1;
 {error}         return ERROR;
 
 %%

@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 CC=gcc
-CFLAGS=-g -Wall -Werror -pedantic-errors -ansi -I.
+CFLAGS=-g -Wall -pedantic -ansi -I.
 VALGRIND_OPTS=--quiet --leak-check=full --show-reachable=yes --error-exitcode=2
 LEX=flex
 YACC=bison
@@ -12,13 +12,13 @@ unit: main
 	@bash unit_test.sh $(TEST_DATA_DIR)
 
 # build a parser that prints trace output to stderr
-trace: main.c parser_debug.o lexer3.o symtab.o ourtypes.o util.o
+trace: main.c parser4_debug.o lexer4.o functions.o symboltable.o
 	$(CC) $(CFLAGS) -DYYDEBUG=1 -o $@ $^
 
-parser_debug.o: y.tab.c
+parser4_debug.o: y.tab.c
 	$(CC) $(CFLAGS) -DYYDEBUG=1 -c -o $@ $<
 
-y.tab.c: parser.y
+y.tab.c: parser4.y
 	$(YACC) $(YFLAGS) --verbose $<
 
 # check for memory leaks
@@ -28,12 +28,12 @@ valgrind: main
 pretty:
 	indent -bli0 -nut -i4 *.c *.h
 
-main: main.c parser.o lexer3.o ourtypes.o symtab.o util.o
+main: main.c parser4.o lexer4.o functions.o symboltable.o
 
 .PHONY: distclean clean tools unit valgrind
 
 clean:
-	$(RM) main trace *.tab.{c,h} lexer3.{c,h} *.o *~ y.output lex.yy.c y.tab.c
+	$(RM) main trace *.tab.{c,h} lexer4.{c,h} *.o *~ y.output lex.yy.c y.tab.c
 
 tools:
 	cscope -bR
