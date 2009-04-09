@@ -119,7 +119,7 @@ int
 delete_scope (int scp)
 {
     int i;
-    symtab *ptr, *ptr1, *ptr2;
+    symtab *ptr, *ptr1;
 
     for (i = 0; i < TABLE_SIZE; i++)
     {
