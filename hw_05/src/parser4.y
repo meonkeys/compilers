@@ -105,8 +105,9 @@ void VerifyMainCall();
 /* ==== Grammar Section ==== */
 
 /* Productions */               /* Semantic actions */
-program		: global_decl_list{
-			 if ($1==ERROR_ || GLOBAL_ERROR) {
+program		: {asm_out(".text\nmain:\n");}
+		 global_decl_list {
+			 if ($2==ERROR_ || GLOBAL_ERROR) {
 			 printf("error:  Semantic Analysis failed due to errors\n");
 			 yyerror("");
 			 }
@@ -370,9 +371,9 @@ dim_decl	: MK_LB cexpr MK_RB
 			{
 			ArrayInfo* temp;
 			if ($2 <= 0) {
+				printf("Invalid dimension declaration %d \n", $2);
 				yyerror("");
-				printf("Invalid dimension declaration %d \n", $2); }
-			else {
+			} else {
 			temp = (ArrayInfo*)malloc(sizeof(ArrayInfo));
 			temp->dim = 1;
 			temp->dim_limit[0] = $2;
@@ -382,8 +383,9 @@ dim_decl	: MK_LB cexpr MK_RB
 			{
 			 if ($1->dim == 10 || ($3 <= 0) )
 			 { /* Limit reached */
+			 printf("Invalid dimension declaration \n");
 			 yyerror("");
-			 printf("Invalid dimension declaration \n"); }
+			 }
 			 else {
 			 $1->dim_limit[$1->dim] = $3;
 			 $1->dim +=1;
@@ -523,7 +525,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				$$=ERROR_;
 			}
 			if ($3->next !=NULL) {
-			 	printf("error %d: too many arguments to function write\n",linenumber);
+				printf("error %d: too many arguments to function write\n",linenumber);
 				$$=ERROR_;
 			}
 			else if($3->P_var_r->type!=INT_
