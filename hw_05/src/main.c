@@ -28,6 +28,8 @@ extern int yydebug;
 extern int ISERROR;
 extern int linenumber;
 
+FILE *asm_out_fp = NULL;
+
 int
 main (int argc, char *argv[])
 {
@@ -40,6 +42,9 @@ main (int argc, char *argv[])
         yyin = fopen (argv[1], "r");
         assert (NULL != yyin);
     }
+
+    asm_out_fp = fopen ("out.s", "wb");
+    assert (NULL != asm_out_fp);
 
     ISERROR = 0;
     put_read_ST ();
@@ -59,6 +64,8 @@ main (int argc, char *argv[])
     {
         assert (0 == fclose (yyin));
     }
+
+    assert (0 == fclose (asm_out_fp));
 
     /*
      * Not precisely as indicated by the manual, but seems to be the right

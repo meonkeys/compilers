@@ -1,6 +1,7 @@
 src/trace
 src/main
 src/*.o
+src/out.s
 src/tags
 src/lexer3.h
 src/y.tab.h

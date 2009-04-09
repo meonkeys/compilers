@@ -1,3 +1,5 @@
+#include <assert.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,6 +13,8 @@ extern int linenumber;
 extern int GLOBAL_ERROR;
 
 extern int linenumber;
+
+extern FILE *asm_out_fp;
 
 char *printarray[] =
     { "int", "float", "array", "struct", "function", "typedef", "void",
@@ -1038,6 +1042,16 @@ Allocate (ALL_TYPE type)
         return NULL;
     }
 }
+
+void
+asm_out (char const *fmt, ...)
+{
+    va_list ap;
+    assert (NULL != fmt);
+    va_start (ap, fmt);
+    vfprintf (asm_out_fp, fmt, ap);
+}
+
 
 /*
 vim: expandtab shiftwidth=4 tabstop=4 smarttab

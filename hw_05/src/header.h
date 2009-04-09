@@ -230,6 +230,7 @@ param_list *MakeParamList (param_list * a, param * b);
 TYPE param_P (param * a, char *b);
 void put_read_ST ();
 TYPE check_return (int flag, TYPE type);
+void asm_out (char const *fmt, ...);
 
 #endif
 
