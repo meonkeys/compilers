@@ -25,6 +25,7 @@ void VerifyMainCall();
 %}
 
 %defines
+%expect 1
 %error-verbose
 %output="y.tab.c"
 
