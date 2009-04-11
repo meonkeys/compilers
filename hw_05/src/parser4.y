@@ -15,11 +15,10 @@ int linenumber = 1;
 int scope=0;
 int STRUCT_DEC=0;
 int FUNC=0;
-TYPE func_return;
-int STRUCT_P;
+TYPE func_return = -1;
+int STRUCT_P = 0;
 int IS_RETURN=0;
-int GLOBAL_ERROR;
-#define STRING_CONST 5
+int GLOBAL_ERROR = 0;
 int ISERROR=0;
 void VerifyMainCall();
 %}
@@ -106,8 +105,13 @@ void VerifyMainCall();
 /* ==== Grammar Section ==== */
 
 /* Productions */               /* Semantic actions */
-program		: {asm_out(".text\nmain:\n");}
-		 global_decl_list {
+program		: {asm_out(
+			".text\n"
+			"exit:\n"	/* allow "b exit" at any time to exit the program */
+			"\tli $v0, 10\n"
+			"\tsyscall\n"
+			".data\n");}
+		global_decl_list {
 			 if ($2==ERROR_ || GLOBAL_ERROR) {
 			 printf("error:  Semantic Analysis failed due to errors\n");
 			 yyerror("");
@@ -217,6 +221,15 @@ decl_list	: decl_list decl{if($2==ERROR_)$$=$2;else $$=$1;}
 decl		: type_decl {$$=$1;}
 		| var_decl{
 			$$=decl_enter_ST($1);
+			/* FIXME: doesn't work yet. Is this the correct place to do this?
+
+			if ($1->P_id_l->P_ini_i->type == INT_)
+				asm_out("\t%s : .word\n", $1->type_name);
+			else if ($1->P_id_l->P_ini_i->type==FLOAT_)
+				asm_out("\t%s : .float\n", $1->type_name);
+			else
+				asm_out("\t%s : .poop\n", $1->P_id_l->P_ini_i->init_id_u.name);
+			*/
 		}
 		;
 
@@ -451,9 +464,11 @@ init_id		: ID{
 			$$->init_id_u.P_arr_s->arr_info->dim=$2->dim;
 			for (j=0; j< 10; j++)
 			{
-	    		$$->init_id_u.P_arr_s->arr_info->dim_limit[j] = $2->dim_limit[j];
+			$$->init_id_u.P_arr_s->arr_info->dim_limit[j] = $2->dim_limit[j];
 			}
 		}
+
+		/* assignment during variable initialization */
 		| ID OP_ASSIGN relop_expr{
 			$$=Allocate(INIT_ID);
 			if(STRUCT_DEC){
@@ -500,6 +515,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				$$=$7;
 		}
 
+		/* simple assignment statement */
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON{$$=stmt_assign_ex($1,$3);}
 		| IF MK_LPAREN test MK_RPAREN stmt{
 			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
@@ -597,6 +613,7 @@ nonempty_assign_expr_list        : nonempty_assign_expr_list MK_COMMA assign_exp
 test            : assign_expr{$$=$1;}
                 ;
 
+		/* assignment in initializer of "for loop" control expression */
 assign_expr     : ID OP_ASSIGN relop_expr
 			{
 			    $$=assign_ex($1,$3);}

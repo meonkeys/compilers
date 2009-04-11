@@ -1,8 +1,19 @@
-[_] prep
+[X] prep
 	[X] switch to parser solution code for homework #4 
-	[_] get unit tests working
+	[X] get unit tests working
 [_] required
 	[_] Assignment statements
+		[_] init_id → ID OP_ASSIGN relop_expr
+			assignment during initialization
+			[_] globals
+				in RHS of decl → var_decl ?
+					decl is type TYPE
+					var_decl is type var_decl
+			[_] locals
+		[_] stmt → var_ref OP_ASSIGN relop_expr MK_SEMICOLON
+			assignment statement (only used for locals)
+		[_] assign_expr → ID OP_ASSIGN relop_expr
+			assignment in initializer of "for loop" control expression
 	[_] Arithmetic expressions
 		[_] plus, minus, multiply, divide
 		[_] equality?
@@ -15,6 +26,13 @@
 	[_] Read and Write function calls 
 		[_] read()
 		[_] write()
+[_] required?
+	[_] return 0/1/etc. from main?
+		exit syscall is easy, but not sure how to return an int to the OS
+			li $v0, 10
+			syscall
+		first put return value into fp+4?
+			from class 19 slides, pg.39 - stack activation record layout
 [_] extra credit
 	[_] optimizations
 		[_] change "callee saves all registers" to something more efficient

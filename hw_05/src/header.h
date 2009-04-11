@@ -68,6 +68,7 @@ typedef struct
     Type_arr *arr_info;
     char *name;                 /*name of array in symbol table, filled in init_id or id_list */
 } array_semantic;
+
 struct struct_semantic
 {
     TYPE type;
@@ -124,7 +125,6 @@ struct id_list
     init_id *P_ini_i;
     struct id_list *next;
 };
-
 typedef struct id_list id_list;
 
 typedef struct var_decl_s
@@ -134,12 +134,10 @@ typedef struct var_decl_s
     /*if a typedef of struct, name of ST entry
        if a typedef of array, name of ST entry */
 
-
     id_list *P_id_l;
     int linnum;                 /*line number of declaration for
                                    error messages; */
 } var_decl;
-
 
 
 struct def_list
