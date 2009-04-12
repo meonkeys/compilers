@@ -109,14 +109,15 @@ program		: {asm_out(
 			".text\n"
 			"exit:\n"	/* allow "b exit" at any time to exit the program */
 			"\tli $v0, 10\n"
-			"\tsyscall\n"
-			".data\n");}
+			"\tsyscall\n");}
 		global_decl_list {
-			 if ($2==ERROR_ || GLOBAL_ERROR) {
-			 printf("error:  Semantic Analysis failed due to errors\n");
-			 yyerror("");
-			 }
-			 else VerifyMainCall(); }
+			if ($2==ERROR_ || GLOBAL_ERROR) {
+				printf("error:  Semantic Analysis failed due to errors\n");
+				yyerror("");
+			} else
+				VerifyMainCall();
+			asm_emit_global_decl_list();
+			}
 		;
 
 global_decl_list: global_decl_list global_decl{$$=($2==ERROR_)?ERROR_:$1;}
@@ -219,18 +220,7 @@ decl_list	: decl_list decl{if($2==ERROR_)$$=$2;else $$=$1;}
 		;
 
 decl		: type_decl {$$=$1;}
-		| var_decl{
-			$$=decl_enter_ST($1);
-			/* FIXME: doesn't work yet. Is this the correct place to do this?
-
-			if ($1->P_id_l->P_ini_i->type == INT_)
-				asm_out("\t%s : .word\n", $1->type_name);
-			else if ($1->P_id_l->P_ini_i->type==FLOAT_)
-				asm_out("\t%s : .float\n", $1->type_name);
-			else
-				asm_out("\t%s : .poop\n", $1->P_id_l->P_ini_i->init_id_u.name);
-			*/
-		}
+		| var_decl {$$=decl_enter_ST($1);}
 		;
 
 type_decl 	: TYPEDEF type id_list MK_SEMICOLON{

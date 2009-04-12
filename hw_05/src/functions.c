@@ -1052,6 +1052,23 @@ asm_out (char const *fmt, ...)
     vfprintf (asm_out_fp, fmt, ap);
 }
 
+void
+asm_emit_global_decl_list() {
+    asm_out(".data\n");
+    fprintf(stderr, "FIXME: asm_emit_global_decl_list unimplemented\n");
+    /* TODO: walk symbols in scope zero, emit global declarations */
+
+    /* XXX - old code from trying to emit globals right in decl production. Delete. */
+    /*
+	if (v->type == INT_)
+		asm_out("\t_%s: .word\n", v->P_id_l->P_ini_i->init_id_u.name);
+	else if (v->type==FLOAT_)
+		asm_out("\t_%s: .float\n", v->P_id_l->P_ini_i->init_id_u.name);
+	else
+        fprintf(stderr, "ERROR: unhandled exception\n");
+    */
+}
+
 
 /*
 vim: expandtab shiftwidth=4 tabstop=4 smarttab

@@ -1,4 +1,5 @@
 int main() {
-    int lid = 1;
+    int lid = 1, jar = 2;
+    float cat = 5;
     return 0;
 }
