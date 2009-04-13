@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 CC=gcc
-CFLAGS=-g -Wall -pedantic -ansi -I.
+CFLAGS=-g -Wall -Werror -pedantic -ansi -I.
 VALGRIND_OPTS=--quiet --leak-check=full --show-reachable=yes --error-exitcode=2
 LEX=flex
 YACC=bison
