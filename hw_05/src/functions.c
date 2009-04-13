@@ -597,9 +597,6 @@ decl_enter_ST (var_decl * a)
     if (a->type == ERROR_)
         return ERROR_;
 
-
-
-    PIL = a->P_id_l;
     if (PIL == NULL)
         return ERROR_;
 
