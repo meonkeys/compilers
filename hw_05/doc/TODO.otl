@@ -27,6 +27,11 @@
 		[_] read()
 		[_] write()
 [_] required?
+	[_] floating point error in emitted assembly
+		17.28 in C-- source code becomes 17.280001 in assembly
+		because we try to store 17.28 as a floating point number prior to emitting
+	[_] should be an error?
+		int a = 1.1;
 	[_] return 0/1/etc. from main?
 		exit syscall is easy, but not sure how to return an int to the OS
 			li $v0, 10
