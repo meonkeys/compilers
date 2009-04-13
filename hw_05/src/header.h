@@ -99,6 +99,11 @@ typedef struct var_ref_s
         char *type_name;
         Type_arr *arr_info;
     } var_ref_u;
+    union
+    {
+        int tmp_intval; /* Temporarily hold value until we can emit it in assembly */
+        float tmp_fval; /* or store it in the symbol table. */
+    } tmp_val_u;
 } var_ref;
 
 struct TypeList
@@ -111,12 +116,18 @@ typedef struct TypeList TypeList;
 typedef struct init_id_s
 {
     TYPE type;                  /*the type tells only if an array or not */
+    int assignment_during_initialization;
     /*we cannot have struct types here. */
     union
     {
         char *name;
         array_semantic *P_arr_s;
     } init_id_u;
+    union
+    {
+        int intval;
+        float fval;
+    } val_u;
 } init_id;
 
 /*explanations above in id_list structure*/
@@ -196,6 +207,11 @@ struct symtab
     struct symtab *back;
     int scope;
     int line;
+    union
+    {
+        int intval;
+        float fval;
+    } val_u;
 };
 
 typedef struct symtab symtab;
@@ -229,7 +245,8 @@ TYPE param_P (param * a, char *b);
 void put_read_ST ();
 TYPE check_return (int flag, TYPE type);
 void asm_out (char const *fmt, ...);
-void asm_emit_global_decl_list();
+void asm_emit_global_decls_start(void);
+void asm_emit_global_decl_list(var_decl *v);
 
 #endif
 

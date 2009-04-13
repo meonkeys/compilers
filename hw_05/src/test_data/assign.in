@@ -1,5 +1,8 @@
+int noval;
+int lid = 78, jar = 13, car = 1.1;
+float stag = 7, flag = 17.28;
+
 int main() {
-    int lid = 1, jar = 2;
     float cat = 5;
     return 0;
 }

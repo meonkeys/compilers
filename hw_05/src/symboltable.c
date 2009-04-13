@@ -81,6 +81,14 @@ insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef)
     symptr->line = linenumber;
     switch (type)
     {
+    case INT_:
+        if (NULL != P)
+            symptr->val_u.intval = ((init_id *)P)->val_u.intval;
+        break;
+    case FLOAT_:
+        if (NULL != P)
+            symptr->val_u.fval = ((init_id *)P)->val_u.fval;
+        break;
     case ARR_:
         symptr->symtab_u.st_arr = P;
         break;

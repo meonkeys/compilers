@@ -613,7 +613,11 @@ decl_enter_ST (var_decl * a)
                             PII->init_id_u.P_arr_s->arr_info, 0);
             }
             else
-                chk_insert (PII->init_id_u.name, INT_, NULL, 0);
+            {
+                if (FLOAT_ == PII->type)
+                    PII->val_u.intval = PII->val_u.fval;
+                chk_insert (PII->init_id_u.name, INT_, PII, 0);
+            }
             break;
         case FLOAT_:
             if (PII->type == ARR_)
@@ -623,7 +627,11 @@ decl_enter_ST (var_decl * a)
                             PII->init_id_u.P_arr_s->arr_info, 0);
             }
             else
-                chk_insert (PII->init_id_u.name, FLOAT_, NULL, 0);
+            {
+                if (INT_ == PII->type)
+                    PII->val_u.fval = PII->val_u.intval;
+                chk_insert (PII->init_id_u.name, FLOAT_, PII, 0);
+            }
             break;
         case STR_VAR_:
         case STR_:
@@ -1050,20 +1058,41 @@ asm_out (char const *fmt, ...)
 }
 
 void
-asm_emit_global_decl_list() {
+asm_emit_global_decls_start (void) {
     asm_out(".data\n");
-    fprintf(stderr, "FIXME: asm_emit_global_decl_list unimplemented\n");
-    /* TODO: walk symbols in scope zero, emit global declarations */
+}
 
-    /* XXX - old code from trying to emit globals right in decl production. Delete. */
-    /*
-	if (v->type == INT_)
-		asm_out("\t_%s: .word\n", v->P_id_l->P_ini_i->init_id_u.name);
-	else if (v->type==FLOAT_)
-		asm_out("\t_%s: .float\n", v->P_id_l->P_ini_i->init_id_u.name);
-	else
-        fprintf(stderr, "ERROR: unhandled exception\n");
-    */
+void
+asm_emit_global_decl_list (var_decl *a) {
+    init_id *PII = NULL;
+    id_list *PIL = NULL;
+
+    assert(NULL != a);
+
+    PIL = a->P_id_l;
+    assert(NULL != PIL);
+
+    do {
+        PII = PIL->P_ini_i;
+        assert(NULL != PII);
+
+        if (INT_ == a->type) {
+            asm_out("\t%s: .word", PII->init_id_u.name);
+        } else if (FLOAT_ == a->type) {
+            asm_out("\t%s: .float", PII->init_id_u.name);
+        } else {
+            /* FIXME: asm_emit_global_decl_list only supports scalar values */
+        }
+
+        if (PII->assignment_during_initialization) {
+            if (INT_ == a->type)
+                asm_out (" %d\n", PII->val_u.intval);
+            else if (FLOAT_ == a->type)
+                asm_out (" %f\n", PII->val_u.fval);
+        } else {
+            asm_out("\n");
+        }
+    } while ((PIL = PIL->next));
 }
 
 

@@ -20,6 +20,7 @@ int STRUCT_P = 0;
 int IS_RETURN=0;
 int GLOBAL_ERROR = 0;
 int ISERROR=0;
+int GLOBAL_DECLS_STARTED=0;
 void VerifyMainCall();
 %}
 
@@ -105,18 +106,17 @@ void VerifyMainCall();
 /* ==== Grammar Section ==== */
 
 /* Productions */               /* Semantic actions */
-program		: {asm_out(
-			".text\n"
+program		: {
+		asm_out (".text\n"
 			"exit:\n"	/* allow "b exit" at any time to exit the program */
 			"\tli $v0, 10\n"
-			"\tsyscall\n");}
+			"\tsyscall\n"); }
 		global_decl_list {
 			if ($2==ERROR_ || GLOBAL_ERROR) {
 				printf("error:  Semantic Analysis failed due to errors\n");
 				yyerror("");
 			} else
 				VerifyMainCall();
-			asm_emit_global_decl_list();
 			}
 		;
 
@@ -220,7 +220,16 @@ decl_list	: decl_list decl{if($2==ERROR_)$$=$2;else $$=$1;}
 		;
 
 decl		: type_decl {$$=$1;}
-		| var_decl {$$=decl_enter_ST($1);}
+		| var_decl {
+			$$=decl_enter_ST($1);
+			if (scope == 0) {
+				if (!GLOBAL_DECLS_STARTED) {
+					asm_emit_global_decls_start ();
+					GLOBAL_DECLS_STARTED = 1;
+				}
+				asm_emit_global_decl_list($1);
+			}
+		}
 		;
 
 type_decl 	: TYPEDEF type id_list MK_SEMICOLON{
@@ -439,6 +448,7 @@ init_id_list	: init_id{
 
 init_id		: ID{
 			$$=Allocate(INIT_ID);
+			$$->assignment_during_initialization=0;
 			$$->init_id_u.name=$1;
 			$$->type=ZERO_;		/*type is not known at this point
 								so we give non error type here.
@@ -454,13 +464,14 @@ init_id		: ID{
 			$$->init_id_u.P_arr_s->arr_info->dim=$2->dim;
 			for (j=0; j< 10; j++)
 			{
-			$$->init_id_u.P_arr_s->arr_info->dim_limit[j] = $2->dim_limit[j];
+				$$->init_id_u.P_arr_s->arr_info->dim_limit[j] = $2->dim_limit[j];
 			}
 		}
 
 		/* assignment during variable initialization */
 		| ID OP_ASSIGN relop_expr{
 			$$=Allocate(INIT_ID);
+			$$->assignment_during_initialization=1;
 			if(STRUCT_DEC){
 				printf("error %d:assignment to variable %s in struct definition\n",linenumber,$1);
 				$$->type=ERROR_;
@@ -470,8 +481,13 @@ init_id		: ID{
 					printf("error %d: initialization of variable %s with expression of type %s\n",linenumber,$1,printtype($3->type));
 					$$->type=ERROR_;
 				}
-				else
-					$$->type=$3->type;/*this should be an int or float*/
+				else { /* handle int or float (only) */
+					$$->type=$3->type;
+					if ($$->type == INT_)
+						$$->val_u.intval = $3->tmp_val_u.tmp_intval;
+					else /* must be float */
+						$$->val_u.fval = $3->tmp_val_u.tmp_fval;
+				}
 			}
 			$$->init_id_u.name=$1;
 		}
@@ -733,10 +749,14 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 		}
 		| CONST{
 			$$=Allocate(VAR_REF);
-			if($1->const_type==INTEGERC)
+			if($1->const_type==INTEGERC) {
 				$$->type=INT_;
-			else if($1->const_type==FLOATC)
+				$$->tmp_val_u.tmp_intval=$1->const_u.intval;
+			}
+			else if($1->const_type==FLOATC) {
 				$$->type=FLOAT_;
+				$$->tmp_val_u.tmp_fval=$1->const_u.fval;
+			}
 			else if($1->const_type==STRINGC)
 				$$->type=STRING_;
 			else
