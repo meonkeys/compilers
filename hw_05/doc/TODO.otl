@@ -5,7 +5,7 @@
 	[_] Assignment statements
 		[_] init_id → ID OP_ASSIGN relop_expr
 			assignment during initialization
-			[_] globals
+			[X] globals
 				in RHS of decl → var_decl ?
 					decl is type TYPE
 					var_decl is type var_decl
@@ -26,6 +26,10 @@
 	[_] Read and Write function calls 
 		[_] read()
 		[_] write()
+[_] testing ideas
+	[_] automated testing of generated assembly code
+		[_] matches expected output
+		[_] executes in SPIM without throwing errors
 [_] required?
 	[_] floating point error in emitted assembly
 		17.28 in C-- source code becomes 17.280001 in assembly
