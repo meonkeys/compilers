@@ -15,6 +15,7 @@ symtab *hash_table[TABLE_SIZE];
 extern int scope;
 extern int STRUCT_DEC;
 extern int linenumber;
+extern int offset;
 
 int
 HASH (char *str)
@@ -79,6 +80,7 @@ insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef)
     symptr->type_when_def = TypeDef;
     symptr->lexeme = name;
     symptr->line = linenumber;
+    symptr->offset = offset;
     switch (type)
     {
     case INT_:

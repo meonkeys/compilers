@@ -14,6 +14,8 @@ extern int GLOBAL_ERROR;
 
 extern int linenumber;
 
+extern int offset;
+
 extern FILE *asm_out_fp;
 
 char *printarray[] =
@@ -582,7 +584,7 @@ chk_insert (char *a, TYPE b, void *c, IS_TYPE_DEF d)
 }
 
 
-
+/* FIXME: fix the offsets here, don't handle variable length records */
 TYPE
 decl_enter_ST (var_decl * a)
 {
@@ -618,6 +620,7 @@ decl_enter_ST (var_decl * a)
                     PII->val_u.intval = PII->val_u.fval;
                 chk_insert (PII->init_id_u.name, INT_, PII, 0);
             }
+            offset -=4;
             break;
         case FLOAT_:
             if (PII->type == ARR_)
@@ -632,6 +635,7 @@ decl_enter_ST (var_decl * a)
                     PII->val_u.fval = PII->val_u.intval;
                 chk_insert (PII->init_id_u.name, FLOAT_, PII, 0);
             }
+            offset -=4;
             break;
         case STR_VAR_:
         case STR_:
@@ -644,6 +648,7 @@ decl_enter_ST (var_decl * a)
             }
             else
                 chk_insert (PII->init_id_u.name, STR_VAR_, a->type_name, 0);
+            offset -=4;
             break;
         case ERROR_:
             ret = ERROR_;
@@ -844,6 +849,9 @@ func_enter_ST (TYPE a, char *b, param_list * c)
     }
 
     insert (b, FUNC_, PSF, 0);
+
+    asm_out("\n%s:\n", b);
+
     return ret;
 }
 
@@ -1095,6 +1103,44 @@ asm_emit_global_decl_list (var_decl *a) {
     } while ((PIL = PIL->next));
 }
 
+/*
+void
+set_param_list_offsets(param_list* p, int count){
+
+    int offset = 8;
+    for(int i = 0; i < count; i++, offset+=4){
+        p->PPAR.offset = 
+    }
+
+}
+*/
+
+void asm_emit_scoped_decl_list(var_decl* v){
+    init_id *PII = NULL;
+    id_list *PIL = NULL;
+
+    assert(NULL != v);
+
+    PIL = v->P_id_l;
+    assert(NULL != PIL);
+
+    do {
+        PII = PIL->P_ini_i;
+        assert(NULL != PII);
+
+        if(PII->assignment_during_initialization){
+            if (INT_ == v->type) {
+                asm_out("\tlui\t%d($fp), %d\n", PII->offset, PII->val_u.intval & 0xFFFF0000);
+                asm_out("\tori\t%d($fp), %d\n", PII->offset, PII->val_u.intval & 0x0000FFFF);
+            } else if (FLOAT_ == v->type) {
+                asm_out("\tlui\t%d($fp), %d\n", PII->offset, PII->val_u.intval & 0xFFFF0000);
+                asm_out("\tori\t%d($fp), %d\n", PII->offset, PII->val_u.intval & 0x0000FFFF);
+            } else {
+                /* FIXME: asm_emit_global_decl_list only supports scalar values */
+            }
+        }
+    } while ((PIL = PIL->next));
+}
 
 /*
 vim: expandtab shiftwidth=4 tabstop=4 smarttab

@@ -22,6 +22,9 @@ int GLOBAL_ERROR = 0;
 int ISERROR=0;
 int GLOBAL_DECLS_STARTED=0;
 void VerifyMainCall();
+
+/* Our additions */
+int offset = -4;
 %}
 
 %defines
@@ -128,17 +131,17 @@ global_decl	: decl_list function_decl{$$=(($1==ERROR_)||($2==ERROR_))?ERROR_:ZER
 		| function_decl{$$=$1;}
 		;
 
-function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST($1,$2,$5);func_return=$1;} MK_RPAREN MK_LBRACE block MK_RBRACE {delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>6==ERROR_)||($9==ERROR_))?ERROR_:ZERO_;}
+function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST($1,$2,$5);func_return=$1;} MK_RPAREN MK_LBRACE block MK_RBRACE {delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>6==ERROR_)||($9==ERROR_))?ERROR_:ZERO_; offset = -4;}
 
-		| struct_type ID MK_LPAREN {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;} param_list {func_enter_ST(STR_,$2,$5);func_return=ERROR_;}MK_RPAREN MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_;}
+		| struct_type ID MK_LPAREN {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;} param_list {func_enter_ST(STR_,$2,$5);func_return=ERROR_;}MK_RPAREN MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
 
-		| VOID ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST(VOID_,$2,$5);func_return=VOID_;}MK_RPAREN MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($9==ERROR_))?ERROR_:ZERO_;}
+		| VOID ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST(VOID_,$2,$5);func_return=VOID_;}MK_RPAREN MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($9==ERROR_))?ERROR_:ZERO_; offset = -4;}
 
-		| type ID MK_LPAREN   MK_RPAREN {$<Type>$=func_enter_ST($1,$2,NULL);func_return=$1;}MK_LBRACE{scope++;IS_RETURN=0;} block MK_RBRACE{delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>5==ERROR_)||($8==ERROR_))?ERROR_:ZERO_;}
+		| type ID MK_LPAREN   MK_RPAREN {$<Type>$=func_enter_ST($1,$2,NULL);func_return=$1;}MK_LBRACE{scope++;IS_RETURN=0;} block MK_RBRACE{delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>5==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; offset = -4;}
 
-		| struct_type ID MK_LPAREN  MK_RPAREN MK_LBRACE{printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;func_enter_ST(STR_,$2,NULL);func_return=ERROR_;} block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_;}
+		| struct_type ID MK_LPAREN  MK_RPAREN MK_LBRACE{printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;func_enter_ST(STR_,$2,NULL);func_return=ERROR_;} block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
 
-		| VOID ID MK_LPAREN  MK_RPAREN MK_LBRACE {scope++;IS_RETURN=0;$<Type>$=func_enter_ST(VOID_,$2,NULL);func_return=VOID_;}block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($7==ERROR_))?ERROR_:ZERO_;}
+		| VOID ID MK_LPAREN  MK_RPAREN MK_LBRACE {scope++;IS_RETURN=0;$<Type>$=func_enter_ST(VOID_,$2,NULL);func_return=VOID_;}block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($7==ERROR_))?ERROR_:ZERO_; offset = -4;}
 		;
 
 param_list	: param_list MK_COMMA  param{$$=MakeParamList($1,$3);}
@@ -228,6 +231,8 @@ decl		: type_decl {$$=$1;}
 					GLOBAL_DECLS_STARTED = 1;
 				}
 				asm_emit_global_decl_list($1);
+			}else{
+				asm_emit_scoped_decl_list($1);
 			}
 		}
 		;
@@ -483,10 +488,12 @@ init_id		: ID{
 				}
 				else { /* handle int or float (only) */
 					$$->type=$3->type;
-					if ($$->type == INT_)
+					if ($$->type == INT_){
 						$$->val_u.intval = $3->tmp_val_u.tmp_intval;
-					else /* must be float */
+					}
+					else /* must be float */{
 						$$->val_u.fval = $3->tmp_val_u.tmp_fval;
+					}
 				}
 			}
 			$$->init_id_u.name=$1;

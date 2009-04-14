@@ -117,6 +117,7 @@ typedef struct init_id_s
 {
     TYPE type;                  /*the type tells only if an array or not */
     int assignment_during_initialization;
+    int offset;
     /*we cannot have struct types here. */
     union
     {
@@ -164,6 +165,7 @@ typedef struct param_s
     TYPE type;                  /*type, could be basic type, array or error */
     TYPE arrtype;               /*if type is ARR_, this the type of array */
     int dim;                    /*if array number of dimensions */
+    int offset;                 /* needed for asm gen */
 } param;
 
 struct param_list
@@ -207,6 +209,7 @@ struct symtab
     struct symtab *back;
     int scope;
     int line;
+    int offset;
     union
     {
         int intval;
@@ -247,6 +250,7 @@ TYPE check_return (int flag, TYPE type);
 void asm_out (char const *fmt, ...);
 void asm_emit_global_decls_start(void);
 void asm_emit_global_decl_list(var_decl *v);
+void asm_emit_scoped_decl_list(var_decl* v);
 
 #endif
 
