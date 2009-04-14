@@ -219,7 +219,7 @@ struct symtab
 
 typedef struct symtab symtab;
 symtab *lookup (char *name);
-void insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef);
+symtab* insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef);
 int delete_scope (int scp);
 void *Allocate (ALL_TYPE);
 char *printtype (int x);
@@ -254,6 +254,11 @@ void asm_emit_scoped_decl_list(var_decl* v);
 
 
 int set_var_decl_list_offsets(var_decl* v, int offset);
+
+void gen_prologue(const char* name);
+void gen_epilogue(const char* name);
+
+int get_reg();
 #endif
 
 /*

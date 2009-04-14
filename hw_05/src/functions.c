@@ -18,6 +18,8 @@ extern int offset;
 
 extern FILE *asm_out_fp;
 
+int reg = 8;
+
 char *printarray[] =
     { "int", "float", "array", "struct", "function", "typedef", "void",
     "error type"
@@ -136,6 +138,8 @@ assign_ex (char *a, var_ref * b)
 TYPE
 stmt_assign_ex (var_ref * a, var_ref * b)
 {
+    symtab* ptrA = NULL;
+    /* symtab* ptrB = NULL; */
     if ((a->type == ERROR_) || (b->type == ERROR_))
         return ERROR_;
     if (a->type != b->type)
@@ -171,7 +175,35 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             return ERROR_;
             break;
         case INT_:
+            ptrA = lookup(a->name);
+            /*ptrB = lookup(b);*/
+
+            assert(NULL != ptrA);
+            /*assert(NULL != ptrB);*/
+
+            if(ptrA->scope > 0){
+                /* FIXME: needs a check for li vs lw */
+                int reg = get_reg();
+                asm_out("\tli\t $%d, %d\n", reg, b->tmp_val_u.tmp_intval);
+                asm_out("\tsw\t $%d, %d($fp)\n", reg, ptrA->offset);
+                reg--;
+            }else{
+                asm_out("\tla\tTODO: put label and value here");
+            }
+            break;
         case FLOAT_:
+            ptrA = lookup(a->name);
+            /*ptrB = lookup(b);*/
+
+            assert(NULL != ptrA);
+            /*assert(NULL != ptrB);*/
+
+            if(ptrA->scope > 0){
+                /* FIXME: needs a check for li vs lw */
+                asm_out("\tli\t ");
+            }else{
+                asm_out("\tla\tTODO: put label and value here");
+            }
             return ZERO_;
             break;
 
@@ -566,7 +598,7 @@ type_decl_enter_ST2 (char *a, id_list * b)
 }
 
 
-void
+symtab*
 chk_insert (char *a, TYPE b, void *c, IS_TYPE_DEF d)
 {
     symtab *PST;
@@ -578,18 +610,19 @@ chk_insert (char *a, TYPE b, void *c, IS_TYPE_DEF d)
              linenumber, a, PST->line);
         GLOBAL_ERROR = 1;
     }
-    else
-        insert (a, b, c, d);
-    return;
+    else{
+        PST = insert (a, b, c, d);
+    }
+    return PST;
 }
 
 
-/* FIXME: fix the offsets here, don't handle variable length records */
 TYPE
 decl_enter_ST (var_decl * a)
 {
     init_id *PII;
     id_list *PIL;
+    symtab* symptr = NULL;
     TYPE ret = ZERO_;
     PIL = a->P_id_l;
 
@@ -611,28 +644,30 @@ decl_enter_ST (var_decl * a)
             if (PII->type == ARR_)
             {
                 PII->init_id_u.P_arr_s->arr_info->arrtype = INT_;
-                chk_insert (PII->init_id_u.P_arr_s->name, ARR_,
+                symptr = chk_insert (PII->init_id_u.P_arr_s->name, ARR_,
                             PII->init_id_u.P_arr_s->arr_info, 0);
             }
             else
             {
                 if (FLOAT_ == PII->type)
                     PII->val_u.intval = PII->val_u.fval;
-                chk_insert (PII->init_id_u.name, INT_, PII, 0);
+                symptr = chk_insert (PII->init_id_u.name, INT_, PII, 0);
+                symptr->offset = PII->offset;
             }
             break;
         case FLOAT_:
             if (PII->type == ARR_)
             {
                 PII->init_id_u.P_arr_s->arr_info->arrtype = FLOAT_;
-                chk_insert (PII->init_id_u.P_arr_s->name, ARR_,
+                symptr = chk_insert (PII->init_id_u.P_arr_s->name, ARR_,
                             PII->init_id_u.P_arr_s->arr_info, 0);
             }
             else
             {
                 if (INT_ == PII->type)
                     PII->val_u.fval = PII->val_u.intval;
-                chk_insert (PII->init_id_u.name, FLOAT_, PII, 0);
+                symptr = chk_insert (PII->init_id_u.name, FLOAT_, PII, 0);
+                symptr->offset = PII->offset;
             }
             break;
         case STR_VAR_:
@@ -1141,16 +1176,51 @@ void asm_emit_scoped_decl_list(var_decl* v){
 
         if(PII->assignment_during_initialization){
             if (INT_ == v->type) {
-                asm_out("\tlui\t%d($fp), %d\n", PII->offset, PII->val_u.intval & 0xFFFF0000);
-                asm_out("\tori\t%d($fp), %d\n", PII->offset, PII->val_u.intval & 0x0000FFFF);
+                int reg = get_reg();
+                asm_out("\tli\t $%d, %d\n", reg, PII->val_u.intval);
+                asm_out("\tsw\t $%d, %d($fp)\n", reg, PII->offset);
+                reg--;
             } else if (FLOAT_ == v->type) {
-                asm_out("\tlui\t%d($fp), %d\n", PII->offset, PII->val_u.intval & 0xFFFF0000);
-                asm_out("\tori\t%d($fp), %d\n", PII->offset, PII->val_u.intval & 0x0000FFFF);
+                int reg = get_reg();
+                asm_out("\tli\t $%d, %d\n", reg, PII->val_u.intval);
+                asm_out("\tsw\t $%d, %d($fp)\n", reg, PII->offset);
+                reg--;
             } else {
                 /* FIXME: asm_emit_global_decl_list only supports scalar values */
             }
         }
     } while ((PIL = PIL->next));
+}
+
+void gen_prologue(const char* name){
+    asm_out("\tsw\t$ra, 0($sp)\n");
+    asm_out("\tsw\t$fp, -4($sp)\n");
+    asm_out("\tadd\t$fp, $sp, -4\n");
+    asm_out("\tadd\t$sp, $sp, -8\n");
+    asm_out("\tlw\t$2, _framesize_%s\n", name);
+    asm_out("\tsub\t$sp, $sp, $s\n\n");
+    asm_out("_begin_%s:\n", name);
+}
+
+void gen_epilogue(const char* name){
+    asm_out("\n_end_%s:\n", name);
+    asm_out("\tlw\t$ra, 4($fp)\n");
+    asm_out("\tadd\t$sp, $fp, 4\n");
+    asm_out("\tlw\t$fp, 0($fp)\n", name);
+
+    if(strcmp(name, "main") == 0){
+        asm_out("\tli\t$v0, 10");
+        asm_out("syscall");
+    }else{
+        asm_out("\tjr %ra\n");
+    }
+
+    asm_out("\n.data\n");
+    asm_out("\t_framesize_name: .word %d\n", 4); /* FIXME: I don't know what the actual value should be */
+}
+
+int get_reg(){
+  return reg++; 
 }
 
 /*

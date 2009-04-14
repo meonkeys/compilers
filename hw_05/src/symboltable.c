@@ -50,7 +50,7 @@ lookup (char *name)
 }
 
 
-void
+symtab*
 insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef)
 {
     int hash_key;
@@ -80,7 +80,6 @@ insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef)
     symptr->type_when_def = TypeDef;
     symptr->lexeme = name;
     symptr->line = linenumber;
-    symptr->offset = offset;
     switch (type)
     {
     case INT_:
@@ -122,6 +121,8 @@ insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef)
     default:
         break;
     }
+
+    return symptr;
 }
 
 
