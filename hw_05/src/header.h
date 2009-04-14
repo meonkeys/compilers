@@ -252,6 +252,8 @@ void asm_emit_global_decls_start(void);
 void asm_emit_global_decl_list(var_decl *v);
 void asm_emit_scoped_decl_list(var_decl* v);
 
+
+int set_var_decl_list_offsets(var_decl* v, int offset);
 #endif
 
 /*

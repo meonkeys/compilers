@@ -263,6 +263,9 @@ var_decl	: type init_id_list MK_SEMICOLON{
 			$$->P_id_l=$2;
 			$$->type=$1;
 			$$->type_name=NULL;
+			if(scope > 0){
+				offset = set_var_decl_list_offsets($$, offset);
+			}
 		}
 		| struct_type id_list MK_SEMICOLON{
 			$$=Allocate(VAR_DECL);

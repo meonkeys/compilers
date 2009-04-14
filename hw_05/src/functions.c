@@ -620,7 +620,6 @@ decl_enter_ST (var_decl * a)
                     PII->val_u.intval = PII->val_u.fval;
                 chk_insert (PII->init_id_u.name, INT_, PII, 0);
             }
-            offset -=4;
             break;
         case FLOAT_:
             if (PII->type == ARR_)
@@ -635,7 +634,6 @@ decl_enter_ST (var_decl * a)
                     PII->val_u.fval = PII->val_u.intval;
                 chk_insert (PII->init_id_u.name, FLOAT_, PII, 0);
             }
-            offset -=4;
             break;
         case STR_VAR_:
         case STR_:
@@ -648,7 +646,6 @@ decl_enter_ST (var_decl * a)
             }
             else
                 chk_insert (PII->init_id_u.name, STR_VAR_, a->type_name, 0);
-            offset -=4;
             break;
         case ERROR_:
             ret = ERROR_;
@@ -1103,17 +1100,31 @@ asm_emit_global_decl_list (var_decl *a) {
     } while ((PIL = PIL->next));
 }
 
-/*
-void
-set_param_list_offsets(param_list* p, int count){
+int
+set_var_decl_list_offsets(var_decl* v, int offset){
 
-    int offset = 8;
-    for(int i = 0; i < count; i++, offset+=4){
-        p->PPAR.offset = 
-    }
+    init_id *PII = NULL;
+    id_list *PIL = NULL;
 
+    assert(NULL != v);
+
+    PIL = v->P_id_l;
+    assert(NULL != PIL);
+
+    do {
+        PII = PIL->P_ini_i;
+        assert(NULL != PII);
+
+        if (INT_ == v->type || FLOAT_ == v->type) {
+            PII->offset = offset;
+            offset -= 4;
+        }else{
+            /* FIXME: Handle variable length structures */
+        }
+    } while ((PIL = PIL->next));
+
+    return offset;
 }
-*/
 
 void asm_emit_scoped_decl_list(var_decl* v){
     init_id *PII = NULL;
