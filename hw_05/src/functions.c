@@ -185,11 +185,13 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             if(ptrA->scope > 0){
                 /* FIXME: needs a check for li vs lw */
                 int reg = get_reg();
-                asm_out("\tli\t $%d, %d\n", reg, b->tmp_val_u.tmp_intval);
-                asm_out("\tsw\t $%d, %d($fp)\n", reg, ptrA->offset);
+                asm_out("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
+                asm_out("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
                 reg--;
             }else{
-                asm_out("\tla\tTODO: put label and value here");
+                int reg = get_reg();
+                asm_out("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
+                asm_out("\tsw\t$%d, %s\n", reg, a->name);
             }
             break;
         case FLOAT_:
@@ -201,9 +203,13 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
             if(ptrA->scope > 0){
                 /* FIXME: needs a check for li vs lw */
-                asm_out("\tli\t ");
+                int reg = get_reg();
+                asm_out("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
+                asm_out("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
             }else{
-                asm_out("\tla\tTODO: put label and value here");
+                int reg = get_reg();
+                asm_out("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
+                asm_out("\tsw\t$%d, %s\n", reg, a->name);
             }
             return ZERO_;
             break;
@@ -872,6 +878,7 @@ func_enter_ST (TYPE a, char *b, param_list * c)
         }
         c = c->next;
     }
+    param_offset = 4;
     PSF->params = i;
     switch (a)
     {
@@ -890,8 +897,6 @@ func_enter_ST (TYPE a, char *b, param_list * c)
     }
 
     insert (b, FUNC_, PSF, 0);
-
-    asm_out("\n%s:\n", b);
 
     return ret;
 }
@@ -1225,6 +1230,7 @@ void asm_emit_scoped_decl_list(var_decl* v){
 }
 
 void gen_prologue(const char* name){
+    asm_out("%s:\n", name);
     asm_out("\tsw\t$ra, 0($sp)\n");
     asm_out("\tsw\t$fp, -4($sp)\n");
     asm_out("\tadd\t$fp, $sp, -4\n");

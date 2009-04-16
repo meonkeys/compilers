@@ -152,7 +152,6 @@ typedef struct var_decl_s
                                    error messages; */
 } var_decl;
 
-
 struct def_list
 {
     var_decl *P_var_s;
