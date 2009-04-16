@@ -164,6 +164,7 @@ typedef struct def_list def_list;
 typedef struct param_s
 {
     TYPE type;                  /*type, could be basic type, array or error */
+    char* name;
     TYPE arrtype;               /*if type is ARR_, this the type of array */
     int dim;                    /*if array number of dimensions */
     int offset;                 /* needed for asm gen */

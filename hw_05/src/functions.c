@@ -845,6 +845,7 @@ func_enter_ST (TYPE a, char *b, param_list * c)
 {
     ST_func *PSF;
     symtab *PST;
+    symtab* param;
     TYPE ret = ZERO_;
     int i = 0;
     if ((PST = lookup (b)) != NULL)
@@ -860,8 +861,15 @@ func_enter_ST (TYPE a, char *b, param_list * c)
     while (c)
     {
         i++;
-        if (c->PPAR == NULL)
+        if (c->PPAR == NULL){
             ret = ERROR_;
+        }else{
+            param = lookup(c->PPAR->name);
+            if(NULL != param){
+                param->offset = param_offset;
+                param_offset += 4;
+            }
+        }
         c = c->next;
     }
     PSF->params = i;
@@ -1177,12 +1185,11 @@ void set_param_list_offsets(param_list* pl){
         assert(NULL != PPAR);
 
         if (INT_ == PPAR->type || FLOAT_ == PPAR->type) {
-            PPAR->offset = offset;
+            PPAR->offset = param_offset;
             param_offset += 4;
         }else{
             /* FIXME: Handle variable length structures */
         }
-
     }while((next = next->next));
 }
 
