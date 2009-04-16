@@ -15,6 +15,7 @@ extern int GLOBAL_ERROR;
 extern int linenumber;
 
 extern int offset;
+extern int param_offset;
 
 extern FILE *asm_out_fp;
 
@@ -616,7 +617,7 @@ chk_insert (char *a, TYPE b, void *c, IS_TYPE_DEF d)
     return PST;
 }
 
-
+/* FIXME: fix the offsets here, don't handle variable length records */
 TYPE
 decl_enter_ST (var_decl * a)
 {
@@ -1161,6 +1162,30 @@ set_var_decl_list_offsets(var_decl* v, int offset){
     return offset;
 }
 
+void set_param_list_offsets(param_list* pl){
+    
+    param *PPAR = NULL;
+    param_list *next = NULL;
+
+    assert(NULL != pl);
+
+    next = pl;
+    assert(NULL != next);
+
+    do{
+        PPAR = next->PPAR;
+        assert(NULL != PPAR);
+
+        if (INT_ == PPAR->type || FLOAT_ == PPAR->type) {
+            PPAR->offset = offset;
+            param_offset += 4;
+        }else{
+            /* FIXME: Handle variable length structures */
+        }
+
+    }while((next = next->next));
+}
+
 void asm_emit_scoped_decl_list(var_decl* v){
     init_id *PII = NULL;
     id_list *PIL = NULL;
@@ -1221,6 +1246,14 @@ void gen_epilogue(const char* name){
 
 int get_reg(){
   return reg++; 
+}
+
+int get_offset(char* name){
+    symtab* ptr = lookup(name);
+
+    assert(NULL != ptr);
+
+    return ptr->offset;
 }
 
 /*

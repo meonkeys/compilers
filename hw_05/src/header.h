@@ -94,6 +94,7 @@ typedef struct var_ref_s
 {
     TYPE type;
     char *name;
+    int place;
     union
     {
         char *type_name;
@@ -254,6 +255,7 @@ void asm_emit_scoped_decl_list(var_decl* v);
 
 
 int set_var_decl_list_offsets(var_decl* v, int offset);
+void set_param_list_offsets(param_list* pl);
 
 void gen_prologue(const char* name);
 void gen_epilogue(const char* name);
