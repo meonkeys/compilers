@@ -329,9 +329,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 {
                     asm_out ("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
                 }
+                ptrA->place = reg;
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
                 /* FIXME: need to free register */
-                reg--;
+                save_reg(reg);
             }
             else
             {
@@ -376,14 +377,16 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     /* FIXME: cant be li, needs to load from a static float in .data */
                     asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
                 }
+                ptrA->place = reg;
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
+                save_reg(reg);
             }
             else
             {
                 int reg = get_reg (b);
                 if (NULL != b->name)
                 {
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
+                    asm_out ("\tlw\t$%d, _%s\n", reg, ptrB->offset);
                 }
                 else if (0 == b->place)
                 {
