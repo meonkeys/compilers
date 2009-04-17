@@ -102,8 +102,8 @@ typedef struct var_ref_s
     } var_ref_u;
     union
     {
-        int tmp_intval; /* Temporarily hold value until we can emit it in assembly */
-        float tmp_fval; /* or store it in the symbol table. */
+        int tmp_intval;         /* Temporarily hold value until we can emit it in assembly */
+        float tmp_fval;         /* or store it in the symbol table. */
     } tmp_val_u;
 } var_ref;
 
@@ -163,7 +163,7 @@ typedef struct def_list def_list;
 typedef struct param_s
 {
     TYPE type;                  /*type, could be basic type, array or error */
-    char* name;
+    char *name;
     TYPE arrtype;               /*if type is ARR_, this the type of array */
     int dim;                    /*if array number of dimensions */
     int offset;                 /* needed for asm gen */
@@ -222,7 +222,7 @@ struct symtab
 
 typedef struct symtab symtab;
 symtab *lookup (char *name);
-symtab* insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef);
+symtab *insert (char *name, TYPE type, void *P, IS_TYPE_DEF TypeDef);
 int delete_scope (int scp);
 void *Allocate (ALL_TYPE);
 char *printtype (int x);
@@ -251,24 +251,24 @@ TYPE param_P (param * a, char *b);
 void put_read_ST ();
 TYPE check_return (int flag, TYPE type);
 void asm_out (char const *fmt, ...);
-void asm_emit_global_decls_start(void);
-void asm_emit_global_decl_list(var_decl *v);
-void asm_emit_scoped_decl_list(var_decl* v);
+void asm_emit_global_decls_start (void);
+void asm_emit_global_decl_list (var_decl * v);
+void asm_emit_scoped_decl_list (var_decl * v);
 
-int asm_emit_expr(var_ref* a, var_ref* b, int opval);
-int asm_emit_term(var_ref* a, var_ref* b, int opval);
+int asm_emit_expr (var_ref * a, var_ref * b, int opval);
+int asm_emit_term (var_ref * a, var_ref * b, int opval);
 
-int set_var_decl_list_offsets(var_decl* v, int offset);
-void set_param_list_offsets(param_list* pl);
+int set_var_decl_list_offsets (var_decl * v, int offset);
+void set_param_list_offsets (param_list * pl);
 
-void gen_prologue(const char* name);
-void gen_epilogue(const char* name);
+void gen_prologue (const char *name);
+void gen_epilogue (const char *name);
 
-int get_reg(var_ref* vr);
-int get_result_reg();
+int get_reg (var_ref * vr);
+int get_result_reg ();
 
-void free_reg(int r);
-void save_reg(int r);
+void free_reg (int r);
+void save_reg (int r);
 #endif
 
 /*
