@@ -94,6 +94,7 @@ typedef struct var_ref_s
 {
     TYPE type;
     char *name;
+    int place;
     union
     {
         char *type_name;
@@ -151,7 +152,6 @@ typedef struct var_decl_s
                                    error messages; */
 } var_decl;
 
-
 struct def_list
 {
     var_decl *P_var_s;
@@ -163,6 +163,7 @@ typedef struct def_list def_list;
 typedef struct param_s
 {
     TYPE type;                  /*type, could be basic type, array or error */
+    char* name;
     TYPE arrtype;               /*if type is ARR_, this the type of array */
     int dim;                    /*if array number of dimensions */
     int offset;                 /* needed for asm gen */
@@ -209,6 +210,7 @@ struct symtab
     struct symtab *back;
     int scope;
     int line;
+    int place;
     int offset;
     union
     {
@@ -216,6 +218,7 @@ struct symtab
         float fval;
     } val_u;
 };
+
 
 typedef struct symtab symtab;
 symtab *lookup (char *name);
@@ -252,13 +255,20 @@ void asm_emit_global_decls_start(void);
 void asm_emit_global_decl_list(var_decl *v);
 void asm_emit_scoped_decl_list(var_decl* v);
 
+int asm_emit_expr(var_ref* a, var_ref* b, int opval);
+int asm_emit_term(var_ref* a, var_ref* b, int opval);
 
 int set_var_decl_list_offsets(var_decl* v, int offset);
+void set_param_list_offsets(param_list* pl);
 
 void gen_prologue(const char* name);
 void gen_epilogue(const char* name);
 
-int get_reg();
+int get_reg(var_ref* vr);
+int get_result_reg();
+
+void free_reg(int r);
+void save_reg(int r);
 #endif
 
 /*

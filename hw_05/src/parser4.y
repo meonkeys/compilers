@@ -25,6 +25,7 @@ void VerifyMainCall();
 
 /* Our additions */
 int offset = -4;
+int param_offset = 4;
 %}
 
 %defines
@@ -131,17 +132,17 @@ global_decl	: decl_list function_decl{$$=(($1==ERROR_)||($2==ERROR_))?ERROR_:ZER
 		| function_decl{$$=$1;}
 		;
 
-function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST($1,$2,$5);func_return=$1;} MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE {delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
+function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST($1,$2,$5);func_return=$1; } MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE {delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
 
-		| struct_type ID MK_LPAREN {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;} param_list {func_enter_ST(STR_,$2,$5);func_return=ERROR_;}MK_RPAREN MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
+		| struct_type ID MK_LPAREN {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;} param_list {func_enter_ST(STR_,$2,$5);func_return=ERROR_; }MK_RPAREN MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
 
-		| VOID ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST(VOID_,$2,$5);func_return=VOID_;}MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
+		| VOID ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST(VOID_,$2,$5);func_return=VOID_; ;}MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
 
 		| type ID MK_LPAREN   MK_RPAREN {$<Type>$=func_enter_ST($1,$2,NULL);func_return=$1; gen_prologue($2);}MK_LBRACE{scope++;IS_RETURN=0;} block MK_RBRACE{delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>5==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
 
-		| struct_type ID MK_LPAREN  MK_RPAREN MK_LBRACE{printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;func_enter_ST(STR_,$2,NULL);func_return=ERROR_;} block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
+		| struct_type ID MK_LPAREN  MK_RPAREN MK_LBRACE {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;func_enter_ST(STR_,$2,NULL);func_return=ERROR_;} block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
 
-		| VOID ID MK_LPAREN  MK_RPAREN {gen_prologue($2)} MK_LBRACE {scope++;IS_RETURN=0;$<Type>$=func_enter_ST(VOID_,$2,NULL);func_return=VOID_;}block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
+		| VOID ID MK_LPAREN MK_RPAREN {gen_prologue($2)} MK_LBRACE {scope++;IS_RETURN=0;$<Type>$=func_enter_ST(VOID_,$2,NULL);func_return=VOID_;} block MK_RBRACE {delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
 		;
 
 param_list	: param_list MK_COMMA  param{$$=MakeParamList($1,$3);}
@@ -151,6 +152,7 @@ param_list	: param_list MK_COMMA  param{$$=MakeParamList($1,$3);}
 param		: type ID{
 			param* PP;
 			PP=Allocate(PARAM);
+			PP->name = $2;
 			PP->type=$1;
 			if(param_P(PP,$2)==ERROR_)
 				$$=NULL;
@@ -690,7 +692,7 @@ nonempty_relop_expr_list	: nonempty_relop_expr_list MK_COMMA relop_expr{
 expr		: expr add_op term{
 			if($1->type==ERROR_||$3->type==ERROR_)
 				$1->type=ERROR_;
-			else if(($1->type!=INT_)&&($1->type!=FLOAT_)){/*printf("expr %s\n",printtype($1->type)); */
+			else if(($1->type!=INT_)&&($1->type!=FLOAT_)){
 				printf("error %d: operator %s applied to non basic expr (%s)\n",linenumber,($2==OP_PLUS)?"+":"-",$1->name);
 				$1->type=ERROR_;
 			}
@@ -698,8 +700,10 @@ expr		: expr add_op term{
 				printf("error %d: operator %s applied to non basic factor (%s)\n",linenumber,($2==OP_TIMES)?"*":"/",$3->name);
 				$1->type=ERROR_;
 			}
-			else
+			else{
 				$1->type=(($1->type==FLOAT_)||($3->type==FLOAT_))?FLOAT_:INT_;
+				$1->place = asm_emit_expr($1, $3, $2);
+			}
 			$$=$1;
 			$$->name=NULL;
 		}
@@ -722,8 +726,10 @@ term		: term mul_op factor{
 				printf("error %d: operator %s applied to non basic factor (%s)\n",linenumber,($2==OP_TIMES)?"*":"/",$3->name);
 				$1->type=ERROR_;
 			}
-			else
+			else{
 				$1->type=($1->type==FLOAT_||$3->type==FLOAT_)?FLOAT_:INT_;
+				$1->place = asm_emit_term($1, $3, $2);
+			}
 			$1->name=NULL;
 			$$=$1;
 		}
@@ -816,8 +822,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 		}
 
 
-		| var_ref {$$=$1;
-		}
+		| var_ref {$$=$1;}
 		| OP_MINUS var_ref{
 			if(($2->type!=INT_)&&($2->type!=FLOAT_)){
 				printf("error %d: operator Unary Minus applied to non Basic type %s\n",linenumber,$2->name);
@@ -868,6 +873,7 @@ var_ref		: ID{
 					PTA->arrtype=STP->symtab_u.st_arr->arrtype;
 					PTA->type_name=STP->symtab_u.st_arr->type_name;
 					$$->var_ref_u.arr_info=PTA;
+				$$->place = get_reg($$);
 				}
 			}
 		}
