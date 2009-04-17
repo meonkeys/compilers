@@ -17,10 +17,14 @@ typedef enum
 
 int reg_costs[REG_COUNT];
 
-int get_reg(var_ref* vr){
-    if(NULL == vr || 0 == vr->place){
-		int i;
+int
+get_reg (var_ref * vr)
+{
+    if (NULL == vr || 0 == vr->place)
+    {
+        int i;
         /* grab the first free one */
+<<<<<<< HEAD:hw_05/src/registers.c
 		for(i = 8; i < 16; i++){
 			if(reg_costs[i] == 0){
 				reg_costs[i] = 1;
@@ -39,22 +43,51 @@ int get_reg(var_ref* vr){
 
 		/* TODO: handle the spill case! */
 		return 8;
+=======
+        for (i = 8; i < 16; i++)
+        {
+            if (reg_costs[i] == 0)
+            {
+                reg_costs[i] = 1;
+                return i;
+            }
+        }
+
+        /* no free ones, grab the first saved one */
+        for (i = 8; i < 16; i++)
+        {
+            if (reg_costs[i] == 1)
+            {
+                return i;
+            }
+        }
+
+        /* TODO: handle the spill case! */
+        return 8;
+>>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/registers.c
     }
-    else{
+    else
+    {
         return vr->place;
     }
 }
 
-int get_result_reg(){
+int
+get_result_reg ()
+{
     return reg++;
 }
 
-void free_reg(int r){
-	reg_costs[r] = 0;
+void
+free_reg (int r)
+{
+    reg_costs[r] = 0;
 }
 
-void save_reg(int r){
-	reg_costs[r] = 2;
+void
+save_reg (int r)
+{
+    reg_costs[r] = 2;
 }
 
 /*
