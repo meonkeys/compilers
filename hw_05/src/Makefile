@@ -12,7 +12,7 @@ unit: main
 	@bash unit_test.sh $(TEST_DATA_DIR)
 
 # build a parser that prints trace output to stderr
-trace: main.c parser4_debug.o lexer4.o functions.o symboltable.o
+trace: main.c parser4_debug.o lexer4.o functions.o symboltable.o registers.o
 	$(CC) $(CFLAGS) -DYYDEBUG=1 -o $@ $^
 
 parser4_debug.o: y.tab.c
@@ -28,7 +28,7 @@ valgrind: main
 pretty:
 	indent -bli0 -nut -i4 *.c *.h
 
-main: main.c parser4.o lexer4.o functions.o symboltable.o
+main: main.c parser4.o lexer4.o functions.o symboltable.o registers.o
 
 .PHONY: distclean clean tools unit valgrind
 
