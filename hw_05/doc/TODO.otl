@@ -10,6 +10,7 @@
 					decl is type TYPE
 					var_decl is type var_decl
 			[_] locals
+				[_] handle type conversion
 		[_] stmt → var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			assignment statement (only used for locals)
 		[_] assign_expr → ID OP_ASSIGN relop_expr
@@ -23,6 +24,8 @@
 		[_] while
 		[_] if-then-else
 	[_] Parameterless procedure calls
+		[_] current "return from main" (system exit) places "syscall" on same line
+			better idea: jump to "exit" label, that's what it is for
 	[_] Read and Write function calls 
 		[_] read()
 		[_] write()
