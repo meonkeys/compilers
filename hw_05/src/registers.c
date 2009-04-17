@@ -24,26 +24,7 @@ get_reg (var_ref * vr)
     {
         int i;
         /* grab the first free one */
-<<<<<<< HEAD:hw_05/src/registers.c
-		for(i = 8; i < 16; i++){
-			if(reg_costs[i] == 0){
-				reg_costs[i] = 1;
-				vr->place = i;
-				return i;
-			}
-		}
 
-		/* no free ones, grab the first saved one */
-		for(i = 8; i < 16; i++){
-			if(reg_costs[i] == 1){
-				vr->place = i;
-				return i;
-			}
-		}
-
-		/* TODO: handle the spill case! */
-		return 8;
-=======
         for (i = 8; i < 16; i++)
         {
             if (reg_costs[i] == 0)
@@ -64,7 +45,6 @@ get_reg (var_ref * vr)
 
         /* TODO: handle the spill case! */
         return 8;
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/registers.c
     }
     else
     {

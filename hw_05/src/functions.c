@@ -167,12 +167,6 @@ assign_ex (char *a, var_ref * b)
                     if (0 == b->place)
                     {
                         /*  FIXME: I don't think this is right */
-<<<<<<< HEAD:hw_05/src/functions.c
-                        if(ptrB->scope > 0){
-                            asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
-                        }else if(0 == ptrB->place){
-                            asm_out("\tlw\t$%d, _%s\n", reg, b->name);
-=======
                         if (ptrB->scope > 0)
                         {
                             asm_out ("\tlw\t$%d, %d($fp)\n", reg,
@@ -181,7 +175,6 @@ assign_ex (char *a, var_ref * b)
                         else
                         {
                             asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
                         }
                     }
                 }
@@ -323,13 +316,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 if (NULL != b->name)
                 {
                     /*  FIXME: I don't think this is right */
-<<<<<<< HEAD:hw_05/src/functions.c
-                    asm_out("\tassigning %s\n", a->name);
-                    if(ptrB->scope > 0){
-                        asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
-                    }else{
-                        asm_out("\tlw\t$%d, _%s\n", reg, b->name);
-=======
                     if (ptrB->scope > 0)
                     {
                         asm_out ("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
@@ -337,17 +323,8 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     else
                     {
                         asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
                     }
                 }
-<<<<<<< HEAD:hw_05/src/functions.c
-                ptrA->place = reg;
-                asm_out("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
-                save_reg(reg);
-            }else{
-                int reg = get_reg(b);
-                if(NULL != b->name){
-=======
                 else if (0 == b->place)
                 {
                     asm_out ("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
@@ -361,7 +338,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 int reg = get_reg (b);
                 if (NULL != b->name)
                 {
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
                     /*  FIXME: I don't think this is right */
                     if (ptrB->scope > 0)
                     {
@@ -376,13 +352,9 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 {
                     asm_out ("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
                 }
-<<<<<<< HEAD:hw_05/src/functions.c
                 ptrA->place = reg;
                 asm_out("\tsw\t$%d, _%s\n", reg, a->name);
                 save_reg(reg);
-=======
-                asm_out ("\tsw\t$%d, _%s\n", reg, a->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
             break;
         case FLOAT_:
@@ -396,23 +368,11 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 assert (NULL != ptrB);
             }
 
-<<<<<<< HEAD:hw_05/src/functions.c
             if(ptrA->scope > 0){
                 int reg = get_reg(b);
                 if(NULL != b->name){
                     asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
                 }else if(0 == b-> place){
-=======
-            if (ptrA->scope > 0)
-            {
-                int reg = get_reg (b);
-                if (NULL != b->name)
-                {
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
-                }
-                else if (0 == b->place)
-                {
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
                     /* FIXME: cant be li, needs to load from a static float in .data */
                     asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
                 }
@@ -425,29 +385,14 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 {
                     asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
                 }
-<<<<<<< HEAD:hw_05/src/functions.c
-                ptrA->place = reg;
-                asm_out("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
-                save_reg(reg);
-            }else{
-                int reg = get_reg(b);
-                if(NULL != b->name){
-                    asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
-                }else if(0 == b->place){
-=======
                 else if (0 == b->place)
                 {
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
                     /* FIXME: cant be li, needs to load from a static float in .data */
                     asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
                 }
-<<<<<<< HEAD:hw_05/src/functions.c
                 ptrA->place = reg;
                 asm_out("\tsw\t$%d, _%s\n", reg, a->name);
                 save_reg(reg);
-=======
-                asm_out ("\tsw\t$%d, _%s\n", reg, a->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
             return ZERO_;
             break;
@@ -904,12 +849,8 @@ decl_enter_ST (var_decl * a)
             {
                 PII->init_id_u.P_arr_s->arr_info->arrtype = INT_;
                 symptr = chk_insert (PII->init_id_u.P_arr_s->name, ARR_,
-<<<<<<< HEAD:hw_05/src/functions.c
                             PII->init_id_u.P_arr_s->arr_info, 0);
                 symptr->offset = PII->offset;
-=======
-                                     PII->init_id_u.P_arr_s->arr_info, 0);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
             else
             {
@@ -923,12 +864,8 @@ decl_enter_ST (var_decl * a)
             {
                 PII->init_id_u.P_arr_s->arr_info->arrtype = FLOAT_;
                 symptr = chk_insert (PII->init_id_u.P_arr_s->name, ARR_,
-<<<<<<< HEAD:hw_05/src/functions.c
                             PII->init_id_u.P_arr_s->arr_info, 0);
                 symptr->offset = PII->offset;
-=======
-                                     PII->init_id_u.P_arr_s->arr_info, 0);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
             else
             {
@@ -1440,18 +1377,11 @@ set_var_decl_list_offsets (var_decl * v, int offset)
     PIL = v->P_id_l;
     assert (NULL != PIL);
 
-<<<<<<< HEAD:hw_05/src/functions.c
-    /* reverse_id_list(PIL, &PIL);*/
-
-    do {
-=======
     do
     {
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
         PII = PIL->P_ini_i;
         assert (NULL != PII);
 
-<<<<<<< HEAD:hw_05/src/functions.c
         if (INT_ == v->type || FLOAT_ == v->type) {
             /*
             PII->offset = offset;
@@ -1471,17 +1401,6 @@ set_var_decl_list_offsets (var_decl * v, int offset)
             PII->offset = offset;
             offset -= 4;
         }else if(STR_VAR_ == v->type){
-
-=======
-        if (INT_ == v->type || FLOAT_ == v->type)
-        {
-            PII->offset = offset;
-            offset -= 4;
-        }
-        else
-        {
-            /* FIXME: Handle variable length structures */
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
         }
     }
     while ((PIL = PIL->next));
@@ -1551,12 +1470,6 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             assert (NULL != ptrA);
 
             /*  FIXME: I don't think this is right */
-<<<<<<< HEAD:hw_05/src/functions.c
-            if(ptrA->scope > 0 && 0 == ptrA->place){
-                asm_out("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
-            }else{
-                asm_out("\tlw\t$%d, _%s\n", regA, a->name);
-=======
             if (ptrA->scope > 0)
             {
                 asm_out ("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
@@ -1564,7 +1477,6 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             else
             {
                 asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
         }
         else
@@ -1579,12 +1491,6 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             assert (NULL != ptrB);
 
             /*  FIXME: I don't think this is right */
-<<<<<<< HEAD:hw_05/src/functions.c
-            if(ptrB->scope > 0 && 0 == ptrB->place){
-                asm_out("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
-            }else{
-                asm_out("\tlw\t$%d, _%s\n", regB, b->name);
-=======
             if (ptrB->scope > 0)
             {
                 asm_out ("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
@@ -1592,7 +1498,6 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             else
             {
                 asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
         }
         else
@@ -1609,20 +1514,10 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             assert (NULL != ptrA);
 
             /*  FIXME: I don't think this is right */
-<<<<<<< HEAD:hw_05/src/functions.c
             if(ptrA->scope > 0){
                 asm_out("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
             }else if(0 == ptrA->place){
                 asm_out("\tlw\t$%d, _%s\n", regA, a->name);
-=======
-            if (ptrA->scope > 0)
-            {
-                asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
-            }
-            else
-            {
-                asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
         }
         else
@@ -1637,20 +1532,10 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             assert (NULL != ptrB);
 
             /*  FIXME: I don't think this is right */
-<<<<<<< HEAD:hw_05/src/functions.c
             if(ptrB->scope > 0){
                 asm_out("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
             }else if(0 == ptrA->place){
                 asm_out("\tlw\t$%d, _%s\n", regB, b->name);
-=======
-            if (ptrB->scope > 0)
-            {
-                asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
-            }
-            else
-            {
-                asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
         }
         else
@@ -1740,20 +1625,10 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             assert (NULL != ptrA);
 
             /*  FIXME: I don't think this is right */
-<<<<<<< HEAD:hw_05/src/functions.c
             if(ptrA->scope > 0){
                 asm_out("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
             }else{
                 asm_out("\tlw\t$%d, _%s\n", regA, a->name);
-=======
-            if (ptrA->scope > 0)
-            {
-                asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
-            }
-            else
-            {
-                asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
             }
         }
         else
@@ -1770,20 +1645,10 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
                 assert (NULL != ptrB);
 
                 /*  FIXME: I don't think this is right */
-<<<<<<< HEAD:hw_05/src/functions.c
                 if(ptrB->scope > 0){
                     asm_out("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
                 }else{
                     asm_out("\tlw\t$%d, _%s\n", regB, b->name);
-=======
-                if (ptrB->scope > 0)
-                {
-                    asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
-                }
-                else
-                {
-                    asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/functions.c
                 }
             }
             else

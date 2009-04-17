@@ -258,16 +258,11 @@ void asm_emit_scoped_decl_list (var_decl * v);
 int asm_emit_expr (var_ref * a, var_ref * b, int opval);
 int asm_emit_term (var_ref * a, var_ref * b, int opval);
 
-<<<<<<< HEAD:hw_05/src/header.h
 int set_var_decl_list_offsets(var_decl* v, int offset);
 void set_param_list_offsets(param_list* pl);
 int set_var_decl_offset(var_decl* v);
 
 id_list* reverse_id_list(id_list* p);
-=======
-int set_var_decl_list_offsets (var_decl * v, int offset);
-void set_param_list_offsets (param_list * pl);
->>>>>>> dd9164472f5c5fa85478232c71e7984e2cf06d50:hw_05/src/header.h
 
 void gen_prologue (const char *name);
 void gen_epilogue (const char *name);
