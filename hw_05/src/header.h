@@ -260,6 +260,9 @@ int asm_emit_term(var_ref* a, var_ref* b, int opval);
 
 int set_var_decl_list_offsets(var_decl* v, int offset);
 void set_param_list_offsets(param_list* pl);
+int set_var_decl_offset(var_decl* v);
+
+id_list* reverse_id_list(id_list* p);
 
 void gen_prologue(const char* name);
 void gen_epilogue(const char* name);

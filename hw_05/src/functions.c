@@ -140,7 +140,7 @@ assign_ex (char *a, var_ref * b)
                         /*  FIXME: I don't think this is right */
                         if(ptrB->scope > 0){
                             asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
-                        }else{
+                        }else if(0 == ptrB->place){
                             asm_out("\tlw\t$%d, _%s\n", reg, b->name);
                         }
                     }
@@ -258,6 +258,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 int reg = get_reg(b);
                 if(NULL != b->name){
                     /*  FIXME: I don't think this is right */
+                    asm_out("\tassigning %s\n", a->name);
                     if(ptrB->scope > 0){
                         asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
                     }else{
@@ -266,9 +267,9 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }else if(0 == b->place){
                     asm_out("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
                 }
+                ptrA->place = reg;
                 asm_out("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
-                /* FIXME: need to free register */
-                reg--;
+                save_reg(reg);
             }else{
                 int reg = get_reg(b);
                 if(NULL != b->name){
@@ -281,7 +282,9 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }else if(0 == b->place){
                     asm_out("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
                 }
+                ptrA->place = reg;
                 asm_out("\tsw\t$%d, _%s\n", reg, a->name);
+                save_reg(reg);
             }
             break;
         case FLOAT_:
@@ -297,21 +300,25 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             if(ptrA->scope > 0){
                 int reg = get_reg(b);
                 if(NULL != b->name){
-                    asm_out("\tlw\t$%d, _%s\n", reg, b->name);
+                    asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
                 }else if(0 == b-> place){
                     /* FIXME: cant be li, needs to load from a static float in .data */
                     asm_out("\tlw\t$%d, _%s\n", reg, b->name);
                 }
+                ptrA->place = reg;
                 asm_out("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
+                save_reg(reg);
             }else{
                 int reg = get_reg(b);
                 if(NULL != b->name){
-                    asm_out("\tlw\t$%d, _%s\n", reg, b->name);
-                }else if(0 == b-> place){
+                    asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
+                }else if(0 == b->place){
                     /* FIXME: cant be li, needs to load from a static float in .data */
                     asm_out("\tlw\t$%d, _%s\n", reg, b->name);
                 }
+                ptrA->place = reg;
                 asm_out("\tsw\t$%d, _%s\n", reg, a->name);
+                save_reg(reg);
             }
             return ZERO_;
             break;
@@ -637,6 +644,19 @@ if_user_name (char *x)
     return 1;
 }
 
+id_list* reverse_id_list(id_list* p)
+{
+   id_list* pr = NULL;
+   while (p != NULL)
+   {
+      id_list* tmp = p->next;
+      p->next = pr;
+      pr = p;
+      p = tmp;
+   }
+   return pr;
+}
+
 TYPE
 type_decl_enter_ST1 (int a, id_list * b)
 {
@@ -755,6 +775,7 @@ decl_enter_ST (var_decl * a)
                 PII->init_id_u.P_arr_s->arr_info->arrtype = INT_;
                 symptr = chk_insert (PII->init_id_u.P_arr_s->name, ARR_,
                             PII->init_id_u.P_arr_s->arr_info, 0);
+                symptr->offset = PII->offset;
             }
             else
             {
@@ -770,6 +791,7 @@ decl_enter_ST (var_decl * a)
                 PII->init_id_u.P_arr_s->arr_info->arrtype = FLOAT_;
                 symptr = chk_insert (PII->init_id_u.P_arr_s->name, ARR_,
                             PII->init_id_u.P_arr_s->arr_info, 0);
+                symptr->offset = PII->offset;
             }
             else
             {
@@ -1256,21 +1278,39 @@ set_var_decl_list_offsets(var_decl* v, int offset){
 
     init_id *PII = NULL;
     id_list *PIL = NULL;
+    int i = 0;
 
     assert(NULL != v);
 
     PIL = v->P_id_l;
     assert(NULL != PIL);
 
+    /* reverse_id_list(PIL, &PIL);*/
+
     do {
         PII = PIL->P_ini_i;
         assert(NULL != PII);
 
         if (INT_ == v->type || FLOAT_ == v->type) {
+            /*
             PII->offset = offset;
             offset -= 4;
-        }else{
-            /* FIXME: Handle variable length structures */
+            */
+            if(ARR_ == PII->type){
+                offset += 4; /* to remove prior -4 */
+                /* FIXME: Handle variable length structures */
+                /* FIXME: going to need something trickier for multi dimensional */
+                for(i = 0; i < PII->init_id_u.P_arr_s->arr_info->dim; i++){
+                    offset -= (4 * PII->init_id_u.P_arr_s->arr_info->dim_limit[i]);
+                }
+            }
+            else{
+                    /* need to multiply by the size of the struct */
+            }
+            PII->offset = offset;
+            offset -= 4;
+        }else if(STR_VAR_ == v->type){
+
         }
     } while ((PIL = PIL->next));
 
@@ -1325,7 +1365,7 @@ int asm_emit_expr(var_ref* a, var_ref* b, int opval){
             assert(NULL != ptrA);
             
             /*  FIXME: I don't think this is right */
-            if(ptrA->scope > 0){
+            if(ptrA->scope > 0 && 0 == ptrA->place){
                 asm_out("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
             }else{
                 asm_out("\tlw\t$%d, _%s\n", regA, a->name);
@@ -1340,7 +1380,7 @@ int asm_emit_expr(var_ref* a, var_ref* b, int opval){
             assert(NULL != ptrB);
             
             /*  FIXME: I don't think this is right */
-            if(ptrB->scope > 0){
+            if(ptrB->scope > 0 && 0 == ptrB->place){
                 asm_out("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
             }else{
                 asm_out("\tlw\t$%d, _%s\n", regB, b->name);
@@ -1356,8 +1396,8 @@ int asm_emit_expr(var_ref* a, var_ref* b, int opval){
             
             /*  FIXME: I don't think this is right */
             if(ptrA->scope > 0){
-                asm_out("\tlw\t$%d, _%s\n", regA, a->name);
-            }else{
+                asm_out("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
+            }else if(0 == ptrA->place){
                 asm_out("\tlw\t$%d, _%s\n", regA, a->name);
             }
         }else{
@@ -1371,8 +1411,8 @@ int asm_emit_expr(var_ref* a, var_ref* b, int opval){
             
             /*  FIXME: I don't think this is right */
             if(ptrB->scope > 0){
-                asm_out("\tlw\t$%d, _%s\n", regB, b->name);
-            }else{
+                asm_out("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
+            }else if(0 == ptrA->place){
                 asm_out("\tlw\t$%d, _%s\n", regB, b->name);
             }
         }else{
@@ -1440,7 +1480,7 @@ int asm_emit_term(var_ref* a, var_ref* b, int opval){
             
             /*  FIXME: I don't think this is right */
             if(ptrA->scope > 0){
-                asm_out("\tlw\t$%d, _%s\n", regA, a->name);
+                asm_out("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
             }else{
                 asm_out("\tlw\t$%d, _%s\n", regA, a->name);
             }
@@ -1456,7 +1496,7 @@ int asm_emit_term(var_ref* a, var_ref* b, int opval){
                 
                 /*  FIXME: I don't think this is right */
                 if(ptrB->scope > 0){
-                    asm_out("\tlw\t$%d, _%s\n", regB, b->name);
+                    asm_out("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
                 }else{
                     asm_out("\tlw\t$%d, _%s\n", regB, b->name);
                 }
@@ -1505,25 +1545,19 @@ void gen_epilogue(const char* name){
     asm_out("\t_framesize_name: .word %d\n", 4); /* FIXME: I don't know what the actual value should be */
 }
 
-/*
-int get_reg(var_ref* vr){
-    if(NULL == vr || 0 == vr->place){
-        return reg++;
-    }
-    else{
-        return vr->place;
-    }
-}
-
-int get_result_reg(){
-    return reg++;
-}
-*/
+void set_offset(symtab* st);
 
 int get_offset(char* name){
     symtab* ptr = lookup(name);
 
     assert(NULL != ptr);
+
+    if(INT_ == ptr->type){
+        return ptr->offset;
+
+    }else if(ARR_ == ptr->type){
+
+    }
 
     return ptr->offset;
 }

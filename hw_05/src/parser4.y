@@ -262,7 +262,7 @@ type_decl 	: TYPEDEF type id_list MK_SEMICOLON{
 var_decl	: type init_id_list MK_SEMICOLON{
 			$$=Allocate(VAR_DECL);
 			$$->linnum=linenumber;
-			$$->P_id_l=$2;
+			$$->P_id_l = reverse_id_list($2); /* we need to reverse the list because it's built backwards */
 			$$->type=$1;
 			$$->type_name=NULL;
 			if(scope > 0){

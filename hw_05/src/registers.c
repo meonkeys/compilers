@@ -11,6 +11,8 @@ typedef enum
 
 
 /* FIXME: What type to put here? */
+/* TODO: use whatever the container is to hold some sort of 
+ * association between records and registers */
 /* regtable[REG_COUNT];*/
 
 int reg_costs[REG_COUNT];
@@ -22,6 +24,7 @@ int get_reg(var_ref* vr){
 		for(i = 8; i < 16; i++){
 			if(reg_costs[i] == 0){
 				reg_costs[i] = 1;
+				vr->place = i;
 				return i;
 			}
 		}
@@ -29,6 +32,7 @@ int get_reg(var_ref* vr){
 		/* no free ones, grab the first saved one */
 		for(i = 8; i < 16; i++){
 			if(reg_costs[i] == 1){
+				vr->place = i;
 				return i;
 			}
 		}
