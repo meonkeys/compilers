@@ -36,7 +36,7 @@ clean:
 	$(RM) main trace *.tab.{c,h} lexer4.{c,h} *.o *~ y.output lex.yy.c y.tab.c
 
 tools:
-	cscope -bR
+	# cscope -bR
 	ctags -R
 
 # "clean enough for source distribution"
