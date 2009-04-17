@@ -188,7 +188,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 asm_out("\tsw\t $%d, %d($fp)\n", reg, ptrA->offset);
                 reg--;
             }else{
-                asm_out("\tla\tTODO: put label and value here");
+                asm_out("\tla\tTODO: put label and value here\n");
             }
             break;
         case FLOAT_:
@@ -200,9 +200,9 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
             if(ptrA->scope > 0){
                 /* FIXME: needs a check for li vs lw */
-                asm_out("\tli\t ");
+                asm_out("\tli\t \n");
             }else{
-                asm_out("\tla\tTODO: put label and value here");
+                asm_out("\tla\tTODO: put label and value here\n");
             }
             return ZERO_;
             break;
@@ -1117,9 +1117,9 @@ asm_emit_global_decl_list (var_decl *a) {
         assert(NULL != PII);
 
         if (INT_ == a->type) {
-            asm_out("\t%s: .word", PII->init_id_u.name);
+            asm_out("\t_%s: .word", PII->init_id_u.name);
         } else if (FLOAT_ == a->type) {
-            asm_out("\t%s: .float", PII->init_id_u.name);
+            asm_out("\t_%s: .float", PII->init_id_u.name);
         } else {
             /* FIXME: asm_emit_global_decl_list only supports scalar values */
         }
@@ -1130,7 +1130,9 @@ asm_emit_global_decl_list (var_decl *a) {
             else if (FLOAT_ == a->type)
                 asm_out (" %f\n", PII->val_u.fval);
         } else {
-            asm_out("\n");
+            /* If no value is specified, _always_ initialize static data to
+             * zero (as recommended by Dr. Hsu) */
+            asm_out(" 0\n");
         }
     } while ((PIL = PIL->next));
 }
