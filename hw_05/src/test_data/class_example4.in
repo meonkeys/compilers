@@ -1,0 +1,14 @@
+void function(int a, float b){
+	int i, j, k;
+	float d[10], e;
+
+	i = a;
+	j = a;
+	k = a;
+		
+	e = d[1];
+}
+
+void main(){
+	int a;
+}
