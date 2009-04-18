@@ -643,9 +643,7 @@ test            : assign_expr{$$=$1;}
                 ;
 
 		/* assignment in initializer of "for loop" control expression */
-assign_expr     : ID OP_ASSIGN relop_expr
-			{
-			    $$=assign_ex($1,$3);}
+assign_expr     : ID OP_ASSIGN relop_expr {$$=assign_ex($1,$3);}
                 | relop_expr{$$=$1;}
 
 
