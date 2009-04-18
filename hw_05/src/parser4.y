@@ -709,8 +709,7 @@ expr		: expr add_op term{
 			$$=$1;
 			$$->name=NULL;
 		}
-		| term{$$=$1;
-		}
+		| term{$$=$1;}
 		;
 
 add_op		: OP_PLUS{$$=OP_PLUS;}
@@ -735,8 +734,7 @@ term		: term mul_op factor{
 			$1->name=NULL;
 			$$=$1;
 		}
-		| factor {$$=$1;
-		}
+		| factor {$$=$1;}
 		;
 
 mul_op		: OP_TIMES{$$=OP_TIMES;}
@@ -862,8 +860,9 @@ var_ref		: ID{
 				$$->type=STP->type;
 				$$->name=$1;
 
-				if($$->type==STR_VAR_)
+				if($$->type==STR_VAR_){
 					$$->var_ref_u.type_name=STP->symtab_u.type_name;
+				}
 
 /*we need do to this beacuse not all arrays are found inside the symbol table*/
 /*not sure if needed*/
@@ -883,38 +882,44 @@ var_ref		: ID{
 			if($1->type==ERROR_)
 				$$=$1;
 			else{
-			if($1->type!=ARR_){
-				symtab *STP;
-				STP=lookup($1->name);
+				if($1->type!=ARR_){
+					symtab *STP;
+					STP=lookup($1->name);
 
-				if((STP)&&(STP->type==ARR_))
-					printf("error %d: array %s has only %d dimension(s)\n",linenumber,$1->name,STP->symtab_u.st_arr->dim);
-				else
-					printf("error %d: variable not an array %s\n", linenumber,$1->name);
-				$1->type=ERROR_;
-				GLOBAL_ERROR=1;
-			}
-			else if(($2->type!=ERROR_)&&($2->type!=INT_)){
-				printf("error %d: dimension is not an integer in array variable %s\n",linenumber,$1->name);
-				$1->type=ERROR_;
-				GLOBAL_ERROR=1;
-			}
-			else{
-				int i;
-				i=--$1->var_ref_u.arr_info->dim;
-
-				if(i==0){
-
-					/*we have reached the variable in the array*/
-
-					$1->type=$1->var_ref_u.arr_info->arrtype;
-					if($1->type==STR_){
-						$1->type=STR_VAR_;
-						$1->var_ref_u.type_name=$1->var_ref_u.arr_info->type_name;
-					}
+					if((STP)&&(STP->type==ARR_))
+						printf("error %d: array %s has only %d dimension(s)\n",linenumber,$1->name,STP->symtab_u.st_arr->dim);
+					else
+						printf("error %d: variable not an array %s\n", linenumber,$1->name);
+					$1->type=ERROR_;
+					GLOBAL_ERROR=1;
 				}
-				else
-					;
+				else if(($2->type!=ERROR_)&&($2->type!=INT_)){
+					printf("error %d: dimension is not an integer in array variable %s\n",linenumber,$1->name);
+					$1->type=ERROR_;
+					GLOBAL_ERROR=1;
+				}
+				else{
+					int i;
+					/*
+					fprintf(stderr, "var_ref tmp_intval = %d\n", $2->tmp_val_u.tmp_intval);
+					fprintf(stderr, "setting arr[%d] to %d\n", $1->var_ref_u.arr_info->dim, $2->tmp_val_u.tmp_intval);
+					*/
+					$1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim - 1] = $2->tmp_val_u.tmp_intval;
+					fprintf(stderr, "arr[%d] is %d\n", $1->var_ref_u.arr_info->dim - 1, $1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim]);
+					i=--$1->var_ref_u.arr_info->dim;
+
+					if(i==0){
+
+						/*we have reached the variable in the array*/
+
+						$1->type=$1->var_ref_u.arr_info->arrtype;
+						if($1->type==STR_){
+							$1->type=STR_VAR_;
+							$1->var_ref_u.type_name=$1->var_ref_u.arr_info->type_name;
+						}
+					}
+					else
+						;
 			}
 			$$=$1;
 			}

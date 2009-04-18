@@ -285,6 +285,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
     else
         switch (a->type)
         {
+        int offsetA = 0;
+        int offsetB = 0;
+        int arr_offset = 0;
+
         case STR_VAR_:
             if (a->var_ref_u.type_name != b->var_ref_u.type_name)
             {
@@ -309,6 +313,12 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
+                /*
+                fprintf(stderr, "PTRB lexeme: %s\n", ptrB->lexeme);
+                if(ARR_ == ptrB->type){
+                    fprintf(stderr, "%s: num dims %d", b->name, ptrB->symtab_u.st_arr->dim);
+                }
+                */
             }
 
             if (ptrA->scope > 0)
@@ -362,18 +372,26 @@ stmt_assign_ex (var_ref * a, var_ref * b)
         case FLOAT_:
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
+            offsetA  = ptrA->offset;
 
             /* if it's null it's a constant */
             if (NULL != b->name)
             {
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
+                if(ARR_ == ptrB->type){
+                    fprintf(stderr, "%s: num dims %d\n", b->name, ptrB->symtab_u.st_arr->dim);
+                    fprintf(stderr, "\tdim access %d\n", b->var_ref_u.arr_info->dim_limit[0]);
+                    /* FIXME: Only 1 d right now */
+                    arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
+                }
+                offsetB = ptrB->offset + arr_offset;
             }
 
             if(ptrA->scope > 0){
                 int reg = get_reg(b);
                 if(NULL != b->name){
-                    asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
+                    asm_out("\tlw\t$%d, %d($fp)\n", reg, offsetB);
                 }else if(0 == b-> place){
                     /* FIXME: cant be li, needs to load from a static float in .data */
                     asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
@@ -387,7 +405,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 int reg = get_reg (b);
                 if (NULL != b->name)
                 {
-                    asm_out ("\tlw\t$%d, _%s\n", reg, ptrB->offset);
+                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
                 }
                 else if (0 == b->place)
                 {

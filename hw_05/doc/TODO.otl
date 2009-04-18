@@ -42,7 +42,7 @@
 				need a global heap pointer?
 		[_] return from procedure
 	[_] Read and Write function calls 
-		[_] read()
+		[X] read()
 		[X] write()
 [_] testing ideas
 	[_] automated testing of generated assembly code
