@@ -4,18 +4,21 @@
 [_] required
 	[_] Assignment statements
 		[_] init_id → ID OP_ASSIGN relop_expr
-			assignment during initialization
+			[X] assignment during initialization
+			[_] arrays
 			[X] globals
 				in RHS of decl → var_decl ?
 					decl is type TYPE
 					var_decl is type var_decl
 			[_] locals
-				[_] ints
+				[X] ints
 				[_] floats
-					need to define all float constants in .data sections
 				[X] handle type conversion
 					float/int constants converted appropriately
 					see autocast
+			[_] floats
+					need to define all float constants in .data sections
+					prepend '_' + funcName + '_' + varName
 		[_] stmt → var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			assignment statement (only used for locals)
 		[_] assign_expr → ID OP_ASSIGN relop_expr
@@ -23,7 +26,7 @@
 	[_] Arithmetic expressions
 		[_] plus, minus, multiply, divide
 			[_] use real instructions
-			[_] create asm_emit_factor?
+			[_] create asm_emit_factor() ?
 		[_] equality?
 		[_] greater-than, less-than?
 		[_] unary minus (negation)?
@@ -33,6 +36,11 @@
 	[_] Parameterless procedure calls
 		[_] current "return from main" (system exit) places "syscall" on same line
 			better idea: jump to "exit" label, that's what it is for
+		[_] prologue
+			[_] save s0-s7
+				somewhere on the heap?
+				need a global heap pointer?
+		[_] return from procedure
 	[_] Read and Write function calls 
 		[_] read()
 		[_] write()
