@@ -558,8 +558,9 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			else
 				$$=(($5==ERROR_)||($7==ERROR_))?ERROR_:ZERO_;
 		}
-		|/* FUNCTION CALL */
-		 ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON{
+
+		/* function call */
+		|ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON{
 			var_ref *PVR;
 			if ((strcmp($1,"write") == 0) ||
 			   (strcmp($1,"WRITE") == 0)) {

@@ -106,9 +106,6 @@ autocast (TYPE type, init_id * PII)
 var_ref *
 assign_ex (char *a, var_ref * b)
 {
-    symtab *ptrA = NULL;
-    symtab *ptrB = NULL;
-
     symtab *PST;
 
     if ((PST = lookup (a)) == NULL)
@@ -158,101 +155,7 @@ assign_ex (char *a, var_ref * b)
             b->type = ERROR_;
             break;
         case INT_:
-            ptrA = lookup (a);
-            assert (NULL != ptrA);
-
-            if (ptrA->scope > 0)
-            {
-                int reg = get_reg (b);
-                if (NULL != b->name)
-                {
-                    if (0 == b->place)
-                    {
-                        /*  FIXME: I don't think this is right */
-                        if (ptrB->scope > 0)
-                        {
-                            asm_out ("\tlw\t$%d, %d($fp)\n", reg,
-                                     ptrB->offset);
-                        }
-                        else
-                        {
-                            asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
-                        }
-                    }
-                }
-                else
-                {
-                    asm_out ("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
-                }
-                asm_out ("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
-                /* FIXME: need to free register */
-                reg--;
-            }
-            else
-            {
-                int reg = get_reg (b);
-                if (NULL != b->name)
-                {
-                    if (0 == b->place)
-                    {
-                        /*  FIXME: I don't think this is right */
-                        if (ptrB->scope > 0)
-                        {
-                            asm_out ("\tlw\t$%d, %d($fp)\n", reg,
-                                     ptrB->offset);
-                        }
-                        else
-                        {
-                            asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
-                        }
-                    }
-                }
-                else
-                {
-                    asm_out ("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
-                }
-                asm_out ("\tsw\t$%d, _%s\n", reg, a);
-            }
-            break;
         case FLOAT_:
-            ptrA = lookup (a);
-            assert (NULL != ptrA);
-
-            /* if it's null it's a constant */
-            if (NULL != b->name)
-            {
-                ptrB = lookup (b->name);
-                assert (NULL != ptrB);
-            }
-
-            if (ptrA->scope > 0)
-            {
-                int reg = get_reg (b);
-                if (NULL != b->name)
-                {
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
-                }
-                else
-                {
-                    /* FIXME: cant be li, needs to load from a static float in .data */
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
-                }
-                asm_out ("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
-            }
-            else
-            {
-                int reg = get_reg (b);
-                if (NULL != b->name)
-                {
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
-                }
-                else
-                {
-                    /* FIXME: cant be li, needs to load from a static float in .data */
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
-                }
-                asm_out ("\tsw\t$%d, _%s\n", reg, a);
-            }
             break;
         default:
             printf ("CHECKER ERROR: unknown types, line %d\n", linenumber);
