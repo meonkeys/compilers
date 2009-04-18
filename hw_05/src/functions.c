@@ -288,6 +288,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             int offsetA = 0;
             int offsetB = 0;
             int arr_offset = 0;
+            int reg;
 
         case STR_VAR_:
             if (a->var_ref_u.type_name != b->var_ref_u.type_name)
@@ -307,29 +308,33 @@ stmt_assign_ex (var_ref * a, var_ref * b)
         case INT_:
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
+            offsetA = ptrA->offset;
+            reg = get_reg(b);
 
             /* if it's null it's a constant */
             if (NULL != b->name)
             {
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
-                /*
-                   fprintf(stderr, "PTRB lexeme: %s\n", ptrB->lexeme);
-                   if(ARR_ == ptrB->type){
-                   fprintf(stderr, "%s: num dims %d", b->name, ptrB->symtab_u.st_arr->dim);
-                   }
-                 */
+                if (ARR_ == ptrB->type)
+                {
+                    fprintf(stderr, "NO NO NO\n");
+                    /* FIXME: Only 1 d right now */
+                    arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
+                }else{
+                    arr_offset = 0;
+                }
+                offsetB = ptrB->offset + arr_offset;
             }
 
             if (ptrA->scope > 0)
             {
-                int reg = get_reg (b);
                 if (NULL != b->name)
                 {
                     /*  FIXME: I don't think this is right */
                     if (ptrB->scope > 0)
                     {
-                        asm_out ("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
+                        asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB);
                     }
                     else
                     {
@@ -341,19 +346,17 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     asm_out ("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
                 }
                 ptrA->place = reg;
-                asm_out ("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
-                /* FIXME: need to free register */
-                save_reg (reg);
+                asm_out ("\tsw\t$%d, %d($fp)\n", reg, offsetA);
+                ns_reg (reg);
             }
             else
             {
-                int reg = get_reg (b);
                 if (NULL != b->name)
                 {
                     /*  FIXME: I don't think this is right */
                     if (ptrB->scope > 0)
                     {
-                        asm_out ("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
+                        asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB);
                     }
                     else
                     {
@@ -366,13 +369,14 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 ptrA->place = reg;
                 asm_out ("\tsw\t$%d, _%s\n", reg, a->name);
-                save_reg (reg);
+                ns_reg (reg);
             }
             break;
         case FLOAT_:
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
             offsetA = ptrA->offset;
+            reg = get_reg(b);
 
             /* if it's null it's a constant */
             if (NULL != b->name)
@@ -381,10 +385,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 assert (NULL != ptrB);
                 if (ARR_ == ptrB->type)
                 {
-                    /*
-                       fprintf(stderr, "%s: num dims %d\n", b->name, ptrB->symtab_u.st_arr->dim);
-                       fprintf(stderr, "\tdim access %d\n", b->var_ref_u.arr_info->dim_limit[0]);
-                     */
                     /* FIXME: Only 1 d right now */
                     arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
                 }
@@ -393,7 +393,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
             if (ptrA->scope > 0)
             {
-                int reg = get_reg (b);
                 if (NULL != b->name)
                 {
                     asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB);
@@ -405,11 +404,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 ptrA->place = reg;
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
-                save_reg (reg);
+                ns_reg (reg);
             }
             else
             {
-                int reg = get_reg (b);
                 if (NULL != b->name)
                 {
                     asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
@@ -421,7 +419,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 ptrA->place = reg;
                 asm_out ("\tsw\t$%d, _%s\n", reg, a->name);
-                save_reg (reg);
+                ns_reg (reg);
             }
             return ZERO_;
             break;
@@ -1110,7 +1108,7 @@ func_enter_ST (TYPE a, char *b, param_list * c)
         }
         c = c->next;
     }
-    param_offset = 4;
+    param_offset = 8;
     PSF->params = i;
     switch (a)
     {
@@ -1615,6 +1613,8 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, regA, regB);
     }
 
+    free_reg(regA);
+    free_reg(regB);
     save_reg (res_reg);
     return res_reg;
 }
@@ -1735,6 +1735,8 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
         asm_out ("\tdiv\t$%d, $%d, $%d\n", res_reg, regA, regB);
     }
 
+    free_reg(regA);
+    free_reg(regB);
     save_reg (res_reg);
     return res_reg;
 }

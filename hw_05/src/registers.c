@@ -65,6 +65,11 @@ free_reg (int r)
 }
 
 void
+ns_reg(int r){
+    reg_costs[r] = 1;
+}
+
+void
 save_reg (int r)
 {
     reg_costs[r] = 2;

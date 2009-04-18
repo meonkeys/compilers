@@ -280,6 +280,7 @@ int get_reg (var_ref * vr);
 int get_result_reg ();
 
 void free_reg (int r);
+void ns_reg(int r);
 void save_reg (int r);
 #endif
 
