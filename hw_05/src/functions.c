@@ -118,11 +118,12 @@ assign_ex (char *a, var_ref * b)
         GLOBAL_ERROR = 1;
         return b;
     }
+
     if ((PST->type == ERROR_) || (b->type == ERROR_))
     {
-        b->type = ERROR_;
         return b;
     }
+
     if (PST->type != b->type)
     {
         if ((PST->type == INT_ || PST->type == FLOAT_)
@@ -309,7 +310,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
             offsetA = ptrA->offset;
-            reg = get_reg(b);
+            reg = get_reg (b);
 
             /* if it's null it's a constant */
             if (NULL != b->name)
@@ -318,10 +319,12 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 assert (NULL != ptrB);
                 if (ARR_ == ptrB->type)
                 {
-                    fprintf(stderr, "NO NO NO\n");
+                    fprintf (stderr, "NO NO NO\n");
                     /* FIXME: Only 1 d right now */
                     arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
-                }else{
+                }
+                else
+                {
                     arr_offset = 0;
                 }
                 offsetB = ptrB->offset + arr_offset;
@@ -376,7 +379,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
             offsetA = ptrA->offset;
-            reg = get_reg(b);
+            reg = get_reg (b);
 
             /* if it's null it's a constant */
             if (NULL != b->name)
@@ -1613,8 +1616,8 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, regA, regB);
     }
 
-    free_reg(regA);
-    free_reg(regB);
+    free_reg (regA);
+    free_reg (regB);
     save_reg (res_reg);
     return res_reg;
 }
@@ -1735,8 +1738,8 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
         asm_out ("\tdiv\t$%d, $%d, $%d\n", res_reg, regA, regB);
     }
 
-    free_reg(regA);
-    free_reg(regB);
+    free_reg (regA);
+    free_reg (regB);
     save_reg (res_reg);
     return res_reg;
 }
@@ -1805,7 +1808,7 @@ gen_epilogue (const char *name)
     if (strcmp (name, "main") == 0)
     {
         asm_out ("\tli\t$v0, 10\n");
-		asm_out ("\tsyscall\n");
+        asm_out ("\tsyscall\n");
     }
     else
     {
@@ -1845,14 +1848,17 @@ gen_control_start (int test_label_num)
 }
 
 void
-gen_control_test (var_ref *a, int exit_label_num)
+gen_control_test (var_ref * a, int exit_label_num)
 {
-    if (NULL == a->name) {
-        int reg = get_reg(a);
+    if (NULL == a->name)
+    {
+        int reg = get_reg (a);
         asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
-    } else {
-        asm_out ("\tbeqz\t$%d, _Lexit%d\n", get_reg(a), exit_label_num);
+    }
+    else
+    {
+        asm_out ("\tbeqz\t$%d, _Lexit%d\n", get_reg (a), exit_label_num);
     }
 }
 

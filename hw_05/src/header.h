@@ -273,14 +273,14 @@ void gen_epilogue (const char *name);
 
 /* start/continue of while, if-else, for */
 void gen_control_start (int test_label_num);
-void gen_control_test (var_ref *a, int exit_label_num);
+void gen_control_test (var_ref * a, int exit_label_num);
 void gen_control_iterate (int test_label_num, int exit_label_num);
 
 int get_reg (var_ref * vr);
 int get_result_reg ();
 
 void free_reg (int r);
-void ns_reg(int r);
+void ns_reg (int r);
 void save_reg (int r);
 #endif
 

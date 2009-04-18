@@ -65,7 +65,8 @@ free_reg (int r)
 }
 
 void
-ns_reg(int r){
+ns_reg (int r)
+{
     reg_costs[r] = 1;
 }
 
