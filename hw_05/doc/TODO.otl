@@ -10,13 +10,20 @@
 					decl is type TYPE
 					var_decl is type var_decl
 			[_] locals
-				[_] handle type conversion
+				[_] ints
+				[_] floats
+					need to define all float constants in .data sections
+				[X] handle type conversion
+					float/int constants converted appropriately
+					see autocast
 		[_] stmt → var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			assignment statement (only used for locals)
 		[_] assign_expr → ID OP_ASSIGN relop_expr
 			assignment in initializer of "for loop" control expression
 	[_] Arithmetic expressions
 		[_] plus, minus, multiply, divide
+			[_] use real instructions
+			[_] create asm_emit_factor?
 		[_] equality?
 		[_] greater-than, less-than?
 		[_] unary minus (negation)?
