@@ -18,9 +18,13 @@ extern int linenumber;
 extern int offset;
 extern int param_offset;
 
+extern char* frame_data;
+
 extern FILE *asm_out_fp;
 
 extern int reg;
+
+int cur_const_val;
 
 char *printarray[] =
     { "int", "float", "array", "struct", "function", "typedef", "void",
@@ -318,7 +322,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 assert (NULL != ptrB);
                 if (ARR_ == ptrB->type)
                 {
-                    fprintf(stderr, "NO NO NO\n");
                     /* FIXME: Only 1 d right now */
                     arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
                 }else{
@@ -1814,6 +1817,11 @@ gen_epilogue (const char *name)
 
     asm_out ("\n.data\n");
     asm_out ("\t_framesize_%s: .word %d\n", name, abs (offset) - 4);    /* -4 to remove prior +4 */
+    if(NULL != frame_data){
+        asm_out (frame_data);
+        free(frame_data);
+        frame_data = NULL;
+    }
 }
 
 int
@@ -1859,6 +1867,21 @@ gen_control_iterate (int test_label_num, int exit_label_num)
 {
     asm_out ("\tj\t_Test%d\n", test_label_num);
     asm_out ("_Lexit%d:\n", exit_label_num);
+}
+
+void
+frame_data_out(char const* fmt, ...){
+
+    va_list ap;
+    assert (NULL != fmt);
+    va_start (ap, fmt);
+    if(frame_data == NULL){
+        frame_data = malloc(sizeof(char) * 128);
+    }else{
+        frame_data = realloc(frame_data, strlen(frame_data) + 128);
+    }
+    vsprintf (frame_data, fmt, ap);
+    frame_data = realloc(frame_data, strlen(frame_data));
 }
 
 /*

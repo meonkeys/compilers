@@ -279,6 +279,8 @@ void gen_control_iterate (int test_label_num, int exit_label_num);
 int get_reg (var_ref * vr);
 int get_result_reg ();
 
+void frame_data_out(char const* fmt, ...);
+
 void free_reg (int r);
 void ns_reg(int r);
 void save_reg (int r);
