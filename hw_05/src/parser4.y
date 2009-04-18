@@ -115,13 +115,8 @@ int LABEL_NUM=0;
 /* ==== Grammar Section ==== */
 
 /* Productions */               /* Semantic actions */
-program		: {
-		asm_out (".text\n"
-			"exit:\n"	/* allow "b exit" at any time to exit the program */
-			"\tli $v0, 10\n"
-			"\tsyscall\n"); }
-		global_decl_list {
-			if ($2==ERROR_ || GLOBAL_ERROR) {
+program		: global_decl_list {
+			if ($1==ERROR_ || GLOBAL_ERROR) {
 				printf("error:  Semantic Analysis failed due to errors\n");
 				yyerror("");
 			} else
