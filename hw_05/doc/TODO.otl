@@ -45,12 +45,6 @@
 				need a global heap pointer?
 		[_] return from procedure
 	[_] Read and Write function calls 
-		[_] read() (read an int)
-		[_] write()
-			[_] int
-			[_] float
-			[_] string
-		[_] ?? fread() (read a float -- not mentioned in assignment description)
 	[_] comments identifying program statements for generated assembly code lines
 [_] testing ideas
 	[_] automated testing of generated assembly code

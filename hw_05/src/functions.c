@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include <header.h>
 #include <y.tab.h>
@@ -284,6 +285,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
     else
         switch (a->type)
         {
+        int offsetA = 0;
+        int offsetB = 0;
+        int arr_offset = 0;
+
         case STR_VAR_:
             if (a->var_ref_u.type_name != b->var_ref_u.type_name)
             {
@@ -308,6 +313,12 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
+                /*
+                fprintf(stderr, "PTRB lexeme: %s\n", ptrB->lexeme);
+                if(ARR_ == ptrB->type){
+                    fprintf(stderr, "%s: num dims %d", b->name, ptrB->symtab_u.st_arr->dim);
+                }
+                */
             }
 
             if (ptrA->scope > 0)
@@ -361,18 +372,28 @@ stmt_assign_ex (var_ref * a, var_ref * b)
         case FLOAT_:
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
+            offsetA  = ptrA->offset;
 
             /* if it's null it's a constant */
             if (NULL != b->name)
             {
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
+                if(ARR_ == ptrB->type){
+                    /*
+                    fprintf(stderr, "%s: num dims %d\n", b->name, ptrB->symtab_u.st_arr->dim);
+                    fprintf(stderr, "\tdim access %d\n", b->var_ref_u.arr_info->dim_limit[0]);
+                    */
+                    /* FIXME: Only 1 d right now */
+                    arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
+                }
+                offsetB = ptrB->offset + arr_offset;
             }
 
             if(ptrA->scope > 0){
                 int reg = get_reg(b);
                 if(NULL != b->name){
-                    asm_out("\tlw\t$%d, %d($fp)\n", reg, ptrB->offset);
+                    asm_out("\tlw\t$%d, %d($fp)\n", reg, offsetB);
                 }else if(0 == b-> place){
                     /* FIXME: cant be li, needs to load from a static float in .data */
                     asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
@@ -386,12 +407,12 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 int reg = get_reg (b);
                 if (NULL != b->name)
                 {
-                    asm_out ("\tlw\t$%d, _%s\n", reg, ptrB->offset);
+                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
                 }
                 else if (0 == b->place)
                 {
                     /* FIXME: cant be li, needs to load from a static float in .data */
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
+                    asm_out ("\tlw\t$f%d, _%s\n", reg, b->name);
                 }
                 ptrA->place = reg;
                 asm_out("\tsw\t$%d, _%s\n", reg, a->name);
@@ -1073,6 +1094,7 @@ func_enter_ST (TYPE a, char *b, param_list * c)
         }
         else
         {
+            /* FIXME: handle arrays and structs */
             param = lookup (c->PPAR->name);
             if (NULL != param)
             {
@@ -1106,7 +1128,11 @@ func_enter_ST (TYPE a, char *b, param_list * c)
 }
 
 
-
+/*
+ * Here is where we save caller registers
+ * as well as set up jump routines and such 
+ * for calling a function
+ */
 var_ref *
 check_function (char *a, TypeList * b)
 {
@@ -1147,6 +1173,17 @@ check_function (char *a, TypeList * b)
                 a);
         PVR->type = ERROR_;
         GLOBAL_ERROR = 1;
+    }
+    else if(0 == strcmp(a, "read")){
+        asm_emit_read();
+        PVR->place = 2;
+        PVR->type = INT_;
+    }
+    else if(0 == strcmp(a, "fread")){
+
+        asm_emit_fread();
+        PVR->place = 0;
+        PVR->type= FLOAT_;
     }
     else
     {
@@ -1664,15 +1701,46 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
     /* FIXME: use actual opcodes */
     if (OP_TIMES == opval)
     {
-        asm_out ("\tMULT\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, regA, regB);
     }
     else if (OP_DIVIDE == opval)
     {
-        asm_out ("\tDIV\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        asm_out ("\tdiv\t$%d, $%d, $%d\n", res_reg, regA, regB);
     }
 
     save_reg (res_reg);
     return res_reg;
+}
+
+void
+asm_emit_write(TypeList* idl){
+    if(INT_ == idl->P_var_r->type){
+        asm_out("\tli\t$v0, 1\n");
+        asm_out("\tlw\t$r8, %d($fp)\n", idl->P_var_r->place);
+        asm_out("\tmove\t$a0, $r8\n");
+    }else if(FLOAT_ == idl->P_var_r->type){
+        asm_out("\tli\t$v0, 2\n");
+        asm_out("\tlw\t$r8, %d($fp)\n", idl->P_var_r->place);
+        asm_out("\tmove\t$f12, $r8\n"); /* Maybe not $f12? */
+    }else{ /* string */
+        asm_out("\tli\t$v0, 4\n");
+        /* this might require scope? */
+        asm_out("\tla\t$r8, _%s\n", idl->P_var_r->name);
+        asm_out("\tmove\t$a0, $r8\n");
+    }
+    asm_out("\tsyscall\n");
+}
+
+void
+asm_emit_read(){
+    asm_out("\tli\t$v0, 5\n");
+    asm_out("\tsyscall\n");
+}
+
+void
+asm_emit_fread(){
+    asm_out("\tli\t$v0, 6\n");
+    asm_out("\tsyscall\n");
 }
 
 void
@@ -1695,7 +1763,7 @@ gen_epilogue (const char *name)
     asm_out ("\n_end_%s:\n", name);
     asm_out ("\tlw\t$ra, 4($fp)\n");
     asm_out ("\tadd\t$sp, $fp, 4\n");
-    asm_out ("\tlw\t$fp, 0($fp)\n", name);      /* FIXME: what? */
+    asm_out ("\tlw\t$fp, 0($fp)\n");
 
     if (strcmp (name, "main") == 0)
     {
@@ -1707,7 +1775,7 @@ gen_epilogue (const char *name)
     }
 
     asm_out ("\n.data\n");
-    asm_out ("\t_framesize_name: .word %d\n", 4);       /* FIXME: I don't know what the actual value should be */
+    asm_out ("\t_framesize_%s: .word %d\n", name, abs(offset)-4); /* -4 to remove prior +4 */
 }
 
 void set_offset(symtab* st);
