@@ -105,6 +105,7 @@ typedef struct var_ref_s
     {
         int tmp_intval;         /* Temporarily hold value until we can emit it in assembly */
         float tmp_fval;         /* or store it in the symbol table. */
+        char* tmp_str;
     } tmp_val_u;
 } var_ref;
 
@@ -280,6 +281,8 @@ void gen_control_exit (int exit_label_num);
 
 int get_reg (var_ref * vr);
 int get_result_reg ();
+
+void frame_data_out(char const* fmt, ...);
 
 void free_reg (int r);
 void ns_reg (int r);

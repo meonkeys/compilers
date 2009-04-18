@@ -1,0 +1,53 @@
+/* TestCase 10: Recursive procedure call */ 
+
+int result;
+int num;
+
+int fact()
+{
+  int localnum;
+	
+  localnum = num; 
+  if (localnum == 1)
+    {
+      return localnum;
+    }
+  else
+    {
+      num = num - 1;
+      return ( localnum * fact( ) );
+    }
+}
+
+void main()
+{
+  
+  write("Enter a number:");
+  num = read();
+
+  if (num > 1)
+    {
+      result = fact();
+    }
+  else
+    {
+      result = 1;
+    }
+  write("The factorial is ");
+  write(result);
+
+}
+
+/*
+
+Expected result: for n = 5 is 120
+
+*/
+
+
+
+
+
+
+
+

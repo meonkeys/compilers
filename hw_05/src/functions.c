@@ -18,9 +18,13 @@ extern int linenumber;
 extern int offset;
 extern int param_offset;
 
+extern char* frame_data;
+
 extern FILE *asm_out_fp;
 
 extern int reg;
+
+int cur_const_val;
 
 char *printarray[] =
     { "int", "float", "array", "struct", "function", "typedef", "void",
@@ -222,7 +226,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 assert (NULL != ptrB);
                 if (ARR_ == ptrB->type)
                 {
-                    fprintf (stderr, "NO NO NO\n");
                     /* FIXME: Only 1 d right now */
                     arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
                 }
@@ -1663,11 +1666,13 @@ asm_emit_write (TypeList * idl)
         asm_out ("\tmove\t$f12, $r8\n");        /* Maybe not $f12? */
     }
     else
-    {                           /* string */
+    {/* string */
         asm_out ("\tli\t$v0, 4\n");
         /* this might require scope? */
-        asm_out ("\tla\t$r8, _%s\n", idl->P_var_r->name);
-        asm_out ("\tmove\t$a0, $r8\n");
+        frame_data_out("\t_sConst%d:\t.asciiz %s\t", cur_const_val, idl->P_var_r->tmp_val_u.tmp_str);
+        asm_out ("\tla\t$r8, _sConst%d\n", cur_const_val);
+        cur_const_val++;
+        /* asm_out ("\tmove\t$a0, $r8\n");*/ /* his example doesn't move */
     }
     asm_out ("\tsyscall\n");
 }
@@ -1720,9 +1725,12 @@ gen_epilogue (const char *name)
 
     asm_out ("\n.data\n");
     asm_out ("\t_framesize_%s: .word %d\n", name, abs (offset) - 4);    /* -4 to remove prior +4 */
+    if(NULL != frame_data){
+        asm_out (frame_data);
+        free(frame_data);
+        frame_data = NULL;
+    }
 }
-
-void set_offset (symtab * st);
 
 int
 get_offset (char *name)
@@ -1778,6 +1786,21 @@ void
 gen_control_exit (int exit_label_num)
 {
     asm_out ("_Lexit%d:\n", exit_label_num);
+}
+
+void
+frame_data_out(char const* fmt, ...){
+
+    va_list ap;
+    assert (NULL != fmt);
+    va_start (ap, fmt);
+    if(frame_data == NULL){
+        frame_data = malloc(sizeof(char) * 128);
+    }else{
+        frame_data = realloc(frame_data, strlen(frame_data) + 128);
+    }
+    vsprintf (frame_data, fmt, ap);
+    frame_data = realloc(frame_data, strlen(frame_data));
 }
 
 /*
