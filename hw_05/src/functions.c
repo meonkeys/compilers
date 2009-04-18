@@ -1485,15 +1485,15 @@ asm_emit_scoped_decl_list (var_decl * v)
             if (INT_ == v->type)
             {
                 int reg = get_result_reg ();
-                asm_out ("\tli\t $%d, %d\n", reg, PII->val_u.intval);
-                asm_out ("\tsw\t $%d, %d($fp)\n", reg, PII->offset);
+                asm_out ("\tli\t$%d, %d\n", reg, PII->val_u.intval);
+                asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
                 reg--;
             }
             else if (FLOAT_ == v->type)
             {
                 int reg = get_result_reg (v);
-                asm_out ("\tli\t $%d, %f\n", reg, PII->val_u.fval);
-                asm_out ("\tsw\t $%d, %d($fp)\n", reg, PII->offset);
+                asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval);
+                asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
                 reg--;
             }
             else
