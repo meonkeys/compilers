@@ -1815,8 +1815,6 @@ gen_epilogue (const char *name)
     asm_out ("\t_framesize_%s: .word %d\n", name, abs (offset) - 4);    /* -4 to remove prior +4 */
 }
 
-void set_offset (symtab * st);
-
 int
 get_offset (char *name)
 {
