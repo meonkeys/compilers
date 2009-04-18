@@ -905,7 +905,6 @@ var_ref		: ID{
 					fprintf(stderr, "setting arr[%d] to %d\n", $1->var_ref_u.arr_info->dim, $2->tmp_val_u.tmp_intval);
 					*/
 					$1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim - 1] = $2->tmp_val_u.tmp_intval;
-					fprintf(stderr, "arr[%d] is %d\n", $1->var_ref_u.arr_info->dim - 1, $1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim]);
 					i=--$1->var_ref_u.arr_info->dim;
 
 					if(i==0){
