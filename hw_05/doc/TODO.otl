@@ -44,7 +44,9 @@
 				somewhere on the heap?
 				need a global heap pointer?
 		[_] return from procedure
-	[_] Read and Write function calls 
+	[X] Read and Write function calls 
+	[X] register spillage
+	[_] provided test cases
 	[_] comments identifying program statements for generated assembly code lines
 [_] testing ideas
 	[_] automated testing of generated assembly code

@@ -1753,9 +1753,12 @@ gen_control_start (int test_label_num)
 void
 gen_control_test (var_ref * a, int exit_label_num)
 {
+    int reg = get_reg (a);
+    a->place = reg;
+    /* fprintf (stderr, "%p %s %d\n", (void*)a, a->name, a->place); */
+
     if (NULL == a->name)
     {
-        int reg = get_reg (a);
         asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
     }
@@ -1766,9 +1769,14 @@ gen_control_test (var_ref * a, int exit_label_num)
 }
 
 void
-gen_control_iterate (int test_label_num, int exit_label_num)
+gen_control_iterate (int test_label_num)
 {
     asm_out ("\tj\t_Test%d\n", test_label_num);
+}
+
+void
+gen_control_exit (int exit_label_num)
+{
     asm_out ("_Lexit%d:\n", exit_label_num);
 }
 

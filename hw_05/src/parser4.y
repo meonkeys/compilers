@@ -42,6 +42,7 @@ int LABEL_NUM=0;
 	char *lexeme;
 	struct CON_Type_s *const1;
 	int intval;
+	int label_num;
 	int Type;
 	char * xst;
 	struct MyArrInfo *arr_info;
@@ -515,17 +516,16 @@ stmt_list	: stmt_list stmt{
 		;
 
 stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;}
-		| WHILE MK_LPAREN {gen_control_start(++LABEL_NUM)} test {
-			if(($4->type!=INT_)&&($4->type!=FLOAT_)){
+		| WHILE MK_LPAREN test {
+			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
 				printf("error %d: condition not a basic type in while statement\n",linenumber);
-			} else {
-				gen_control_test($4, LABEL_NUM);
 			}
 		}MK_RPAREN stmt{
-			if($7==ERROR_) {
-				$$=$7;
+			if($6==ERROR_) {
+				$$=$6;
 			} else {
-				gen_control_iterate(LABEL_NUM, LABEL_NUM);
+				gen_control_iterate($3->label_num);
+				gen_control_exit($3->label_num);
 			}
 		}
 	        | FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
@@ -546,17 +546,23 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
 				printf("error %d: condition not a basic type in if statement\n",linenumber);
 				$$=ERROR_;
-			}
-			else
+			} else {
 				$$=$5;
+				gen_control_exit ($3->label_num);
+			}
 		}
 		| IF MK_LPAREN test MK_RPAREN stmt ELSE stmt{
 			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
 				printf("error %d: condition not a basic type in if statement\n",linenumber);
 				$$=ERROR_;
+			} else {
+				if (($5==ERROR_)||($7==ERROR_)) {
+					$$=ERROR_;
+				} else {
+					$$=ZERO_;
+					gen_control_exit ($3->label_num);
+				}
 			}
-			else
-				$$=(($5==ERROR_)||($7==ERROR_))?ERROR_:ZERO_;
 		}
 
 		/* function call */
@@ -638,7 +644,14 @@ nonempty_assign_expr_list        : nonempty_assign_expr_list MK_COMMA assign_exp
                 | assign_expr{$$=$1->type;}
 		;
 
-test            : assign_expr{$$=$1;}
+test            : {
+			$<label_num>$=++LABEL_NUM;
+			gen_control_start ($<label_num>$);
+		} assign_expr {
+			gen_control_test ($2, $<label_num>1);
+			$$=$2;
+			$$->label_num = $<label_num>1;
+		}
                 ;
 
 		/* assignment in initializer of "for loop" control expression */
