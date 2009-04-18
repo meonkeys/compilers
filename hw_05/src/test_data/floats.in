@@ -1,0 +1,4 @@
+void main(){
+	float lid;
+	lid = 1.602;
+}

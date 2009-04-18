@@ -323,10 +323,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 assert (NULL != ptrB);
                 if (ARR_ == ptrB->type)
                 {
-<<<<<<< HEAD:hw_05/src/functions.c
-=======
-                    fprintf (stderr, "NO NO NO\n");
->>>>>>> 3cff84656cc16c470a6e4aca25b008804b2b1ec2:hw_05/src/functions.c
                     /* FIXME: Only 1 d right now */
                     arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
                 }
