@@ -20,12 +20,17 @@ int STRUCT_P = 0;
 int IS_RETURN=0;
 int GLOBAL_ERROR = 0;
 int ISERROR=0;
-int GLOBAL_DECLS_STARTED=0;
 void VerifyMainCall();
 
 /* Our additions */
 int offset = -4;
 int param_offset = 8;
+int GLOBAL_DECLS_STARTED=0;
+/* FIXME: this is only a temporary way to handle unique label creation for
+while and if-else control structures (and for loops, in the next assignment).
+We'll need a stack to handle nested control structures (see 5161Class16.pdf).
+*/
+int LABEL_NUM=0;
 %}
 
 %defines
@@ -515,11 +520,18 @@ stmt_list	: stmt_list stmt{
 		;
 
 stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;}
-		| WHILE MK_LPAREN test {
-			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
+		| WHILE MK_LPAREN {gen_control_start(++LABEL_NUM)} test {
+			if(($4->type!=INT_)&&($4->type!=FLOAT_)){
 				printf("error %d: condition not a basic type in while statement\n",linenumber);
-			}}MK_RPAREN stmt{
-				if($6==ERROR_) $$=$6;
+			} else {
+				gen_control_test($4, LABEL_NUM);
+			}
+		}MK_RPAREN stmt{
+			if($7==ERROR_) {
+				$$=$7;
+			} else {
+				gen_control_iterate(LABEL_NUM, LABEL_NUM);
+			}
 		}
 	        | FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
 		{
