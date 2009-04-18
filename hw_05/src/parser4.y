@@ -25,7 +25,7 @@ void VerifyMainCall();
 
 /* Our additions */
 int offset = -4;
-int param_offset = 4;
+int param_offset = 8;
 %}
 
 %defines
@@ -132,17 +132,17 @@ global_decl	: decl_list function_decl{$$=(($1==ERROR_)||($2==ERROR_))?ERROR_:ZER
 		| function_decl{$$=$1;}
 		;
 
-function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST($1,$2,$5);func_return=$1; } MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE {delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
+function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST($1,$2,$5);func_return=$1; } MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE {delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
 
 		| struct_type ID MK_LPAREN {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;} param_list {func_enter_ST(STR_,$2,$5);func_return=ERROR_; }MK_RPAREN MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
 
-		| VOID ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST(VOID_,$2,$5);func_return=VOID_; ;}MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
+		| VOID ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST(VOID_,$2,$5);func_return=VOID_; ;}MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
 
-		| type ID MK_LPAREN   MK_RPAREN {$<Type>$=func_enter_ST($1,$2,NULL);func_return=$1; gen_prologue($2);}MK_LBRACE{scope++;IS_RETURN=0;} block MK_RBRACE{delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>5==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
+		| type ID MK_LPAREN   MK_RPAREN {$<Type>$=func_enter_ST($1,$2,NULL);func_return=$1; gen_prologue($2);}MK_LBRACE{scope++;IS_RETURN=0;} block MK_RBRACE{delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>5==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
 
 		| struct_type ID MK_LPAREN  MK_RPAREN MK_LBRACE {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;func_enter_ST(STR_,$2,NULL);func_return=ERROR_;} block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
 
-		| VOID ID MK_LPAREN MK_RPAREN {gen_prologue($2)} MK_LBRACE {scope++;IS_RETURN=0;$<Type>$=func_enter_ST(VOID_,$2,NULL);func_return=VOID_;} block MK_RBRACE {delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; offset = -4; gen_epilogue($2);}
+		| VOID ID MK_LPAREN MK_RPAREN {gen_prologue($2)} MK_LBRACE {scope++;IS_RETURN=0;$<Type>$=func_enter_ST(VOID_,$2,NULL);func_return=VOID_;} block MK_RBRACE {delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
 		;
 
 param_list	: param_list MK_COMMA  param{$$=MakeParamList($1,$3);}
@@ -551,27 +551,29 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			else
 				$$=(($5==ERROR_)||($7==ERROR_))?ERROR_:ZERO_;
 		}
-		| ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON{
+		|/* FUNCTION CALL */
+		 ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON{
 			var_ref *PVR;
 			if ((strcmp($1,"write") == 0) ||
 			   (strcmp($1,"WRITE") == 0)) {
-			if($3==NULL){
-				printf("error %d: too few arguments to function write\n",linenumber);
-				$$=ERROR_;
-			}
-			if ($3->next !=NULL) {
-				printf("error %d: too many arguments to function write\n",linenumber);
-				$$=ERROR_;
-			}
-			else if($3->P_var_r->type!=INT_
-			&& $3->P_var_r->type!=FLOAT_
-			&& $3->P_var_r->type!=STRING_){
-				printf("error %d: wrong type of argument %s to write\n",linenumber,printtype($3->P_var_r->type));
-				$$=ERROR_;
-			}
-			else
-				$$=ZERO_;
-
+				if($3==NULL){
+					printf("error %d: too few arguments to function write\n",linenumber);
+					$$=ERROR_;
+				}
+				if ($3->next !=NULL) {
+					printf("error %d: too many arguments to function write\n",linenumber);
+					$$=ERROR_;
+				}
+				else if($3->P_var_r->type!=INT_
+				&& $3->P_var_r->type!=FLOAT_
+				&& $3->P_var_r->type!=STRING_){
+					printf("error %d: wrong type of argument %s to write\n",linenumber,printtype($3->P_var_r->type));
+					$$=ERROR_;
+				}
+				else{
+					asm_emit_write($3);
+					$$=ZERO_;
+				}
 			}
 			else {
 			PVR=check_function($1,$3);

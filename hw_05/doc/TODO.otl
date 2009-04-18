@@ -28,7 +28,7 @@
 			better idea: jump to "exit" label, that's what it is for
 	[_] Read and Write function calls 
 		[_] read()
-		[_] write()
+		[X] write()
 [_] testing ideas
 	[_] automated testing of generated assembly code
 		[_] matches expected output
