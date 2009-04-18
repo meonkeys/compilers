@@ -1753,7 +1753,7 @@ gen_prologue (const char *name)
     asm_out ("\tadd\t$fp, $sp, -4\n");
     asm_out ("\tadd\t$sp, $sp, -8\n");
     asm_out ("\tlw\t$2, _framesize_%s\n", name);
-    asm_out ("\tsub\t$sp, $sp, $s\n\n");
+    asm_out ("\tsub\t$sp, $sp, $2\n\n");
     asm_out ("_begin_%s:\n", name);
 }
 
@@ -1767,7 +1767,8 @@ gen_epilogue (const char *name)
 
     if (strcmp (name, "main") == 0)
     {
-        asm_out ("\tj\texit\n");
+        asm_out ("\tli\t$v0, 10\n");
+		asm_out ("\tsyscall\n");
     }
     else
     {
