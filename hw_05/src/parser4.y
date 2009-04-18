@@ -781,8 +781,10 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 				$$->type=FLOAT_;
 				$$->tmp_val_u.tmp_fval=$1->const_u.fval;
 			}
-			else if($1->const_type==STRINGC)
+			else if($1->const_type==STRINGC){
 				$$->type=STRING_;
+				$$->tmp_val_u.tmp_str = $1->const_u.sc;
+			}
 			else
 				$$->type=ERROR_;
 			$$->name=NULL;

@@ -1666,11 +1666,13 @@ asm_emit_write (TypeList * idl)
         asm_out ("\tmove\t$f12, $r8\n");        /* Maybe not $f12? */
     }
     else
-    {                           /* string */
+    {/* string */
         asm_out ("\tli\t$v0, 4\n");
         /* this might require scope? */
-        asm_out ("\tla\t$r8, _%s\n", idl->P_var_r->name);
-        asm_out ("\tmove\t$a0, $r8\n");
+        frame_data_out("\t_sConst%d:\t.asciiz %s\t", cur_const_val, idl->P_var_r->tmp_val_u.tmp_str);
+        asm_out ("\tla\t$r8, _sConst%d\n", cur_const_val);
+        cur_const_val++;
+        /* asm_out ("\tmove\t$a0, $r8\n");*/ /* his example doesn't move */
     }
     asm_out ("\tsyscall\n");
 }
