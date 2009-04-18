@@ -16,9 +16,12 @@
 				[X] handle type conversion
 					float/int constants converted appropriately
 					see autocast
-			[_] floats
-					need to define all float constants in .data sections
-					prepend '_' + funcName + '_' + varName
+			[_] scoped storage of constants
+					need to define all float and string constants in .data sections
+					globals (scope == 0)
+						prepend '_' + varName
+					locals (scope > 0)
+						prepend '_' + funcName + '_' + varName
 		[_] stmt → var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			assignment statement (only used for locals)
 		[_] assign_expr → ID OP_ASSIGN relop_expr
@@ -42,8 +45,13 @@
 				need a global heap pointer?
 		[_] return from procedure
 	[_] Read and Write function calls 
-		[_] read()
+		[_] read() (read an int)
 		[_] write()
+			[_] int
+			[_] float
+			[_] string
+		[_] ?? fread() (read a float -- not mentioned in assignment description)
+	[_] comments identifying program statements for generated assembly code lines
 [_] testing ideas
 	[_] automated testing of generated assembly code
 		[_] matches expected output

@@ -1729,6 +1729,31 @@ get_offset (char *name)
     return ptr->offset;
 }
 
+void
+gen_control_start (int test_label_num)
+{
+    asm_out ("_Test%d:\n", test_label_num);
+}
+
+void
+gen_control_test (var_ref *a, int exit_label_num)
+{
+    if (NULL == a->name) {
+        int reg = get_reg(a);
+        asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
+        asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
+    } else {
+        asm_out ("\tbeqz\t$%d, _Lexit%d\n", get_reg(a), exit_label_num);
+    }
+}
+
+void
+gen_control_iterate (int test_label_num, int exit_label_num)
+{
+    asm_out ("\tj\t_Test%d\n", test_label_num);
+    asm_out ("_Lexit%d:\n", exit_label_num);
+}
+
 /*
 vim: expandtab shiftwidth=4 tabstop=4 smarttab
 */
