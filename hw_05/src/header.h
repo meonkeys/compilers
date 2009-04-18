@@ -258,15 +258,15 @@ void asm_emit_scoped_decl_list (var_decl * v);
 int asm_emit_expr (var_ref * a, var_ref * b, int opval);
 int asm_emit_term (var_ref * a, var_ref * b, int opval);
 
-void asm_emit_write(TypeList* idl);
-void asm_emit_read();
-void asm_emit_fread();
+void asm_emit_write (TypeList * idl);
+void asm_emit_read ();
+void asm_emit_fread ();
 
-int set_var_decl_list_offsets(var_decl* v, int offset);
-void set_param_list_offsets(param_list* pl);
-int set_var_decl_offset(var_decl* v);
+int set_var_decl_list_offsets (var_decl * v, int offset);
+void set_param_list_offsets (param_list * pl);
+int set_var_decl_offset (var_decl * v);
 
-id_list* reverse_id_list(id_list* p);
+id_list *reverse_id_list (id_list * p);
 
 void gen_prologue (const char *name);
 void gen_epilogue (const char *name);
@@ -280,6 +280,7 @@ int get_reg (var_ref * vr);
 int get_result_reg ();
 
 void free_reg (int r);
+void ns_reg(int r);
 void save_reg (int r);
 #endif
 
