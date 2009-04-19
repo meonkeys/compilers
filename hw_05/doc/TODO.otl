@@ -43,6 +43,7 @@
 			[_] save s0-s7
 				somewhere on the heap?
 				need a global heap pointer?
+			[_] should the prologue for main() be different?
 		[_] return from procedure
 	[X] Read and Write function calls 
 	[X] register spillage
