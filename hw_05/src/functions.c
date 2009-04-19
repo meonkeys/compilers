@@ -1453,7 +1453,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            if(0 == a->place){
+            if(0 >= a->place || 32 < a->place){
                 asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
             }else{
                 regA = a->place;
