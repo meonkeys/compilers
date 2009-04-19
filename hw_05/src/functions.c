@@ -303,11 +303,11 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 /* constant */
                 if (NULL != b->name)
                 {
-                    asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB);
-                    /*
-                    asm_out ("\tlw\t$%d, _%s_%d\n", reg, b->name, cur_const_val);
-                    frame_data_out();
-                    */
+                    /*asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB);*/
+                    
+                    asm_out ("\tla\t$%d, _%s_%d\n", reg, b->name, cur_const_val);
+                    frame_data_out("\t_%s_%d: .float %f\n", b->name, cur_const_val, b->tmp_val_u.tmp_fval);
+                    cur_const_val++;
                 }
                 else if (0 == b->place)
                 {
@@ -322,7 +322,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 if (NULL != b->name)
                 {
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
+                    /* asm_out ("\tlw\t$%d, _%s\n", reg, b->name); */
+                    asm_out ("\tla\t$%d, _%s_%d\n", reg, b->name, cur_const_val);
+                    frame_data_out("\t_%s_%d: .float %f\n", b->name, cur_const_val, b->tmp_val_u.tmp_fval);
+                    cur_const_val++;
                 }
                 else if (0 == b->place)
                 {
@@ -505,8 +508,6 @@ check_duplicate (def_list * a)
 
     return addtreeflag;
 }
-
-
 
 /*return 0 on error else return 1*/
 /* 0 means no entry added to symbol table*/
@@ -739,7 +740,6 @@ type_decl_enter_ST2 (char *a, id_list * b)
         while ((b = b->next));
     return ret_type;
 }
-
 
 symtab *
 chk_insert (char *a, TYPE b, void *c, IS_TYPE_DEF d)
@@ -1656,17 +1656,35 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
 void
 asm_emit_write (TypeList * idl)
 {
+    symtab* symptr = NULL;
+    if(NULL != idl->P_var_r->name){
+        symptr = lookup(idl->P_var_r->name);
+    }
     if (INT_ == idl->P_var_r->type)
     {
         asm_out ("\tli\t$v0, 1\n");
-        asm_out ("\tlw\t$a0, %d($fp)\n", idl->P_var_r->place);
-        /* asm_out ("\tmove\t$a0, $t0\n");*/ /* his example doesn't move */ 
+        if(NULL != symptr){
+            if(symptr->scope > 0){
+                asm_out ("\tlw\t$a0, %d($fp)\n", symptr->offset);
+            }else{
+                asm_out ("\tla\t$a0, _%s\n", idl->P_var_r->name);
+            }
+        }
+        else{
+            /* FIXME: I don't think this is right */
+            asm_out ("\tlw\t$a0, %d($fp)\n", idl->P_var_r->place);
+        }
     }
     else if (FLOAT_ == idl->P_var_r->type)
     {
         asm_out ("\tli\t$v0, 2\n");
-        asm_out ("\tlw\t$a0, %d($fp)\n", idl->P_var_r->place);
-        /* asm_out ("\tmove\t$f12, $t0\n");*/ /* his example doesn't move */        /* Maybe not $f12? */
+        if(NULL != symptr){
+            asm_out ("\tlw\t$a0, %d($fp)\n", symptr->offset);
+        }
+        else{
+            /* FIXME: I don't think this is right either */
+            asm_out ("\tlw\t$a0, %d($fp)\n", idl->P_var_r->place);
+        }
     }
     else
     {/* string */
@@ -1675,7 +1693,6 @@ asm_emit_write (TypeList * idl)
         frame_data_out("\t_sConst%d: .asciiz %s\n", cur_const_val, idl->P_var_r->tmp_val_u.tmp_str);
         asm_out ("\tla\t$a0, _sConst%d\n", cur_const_val);
         cur_const_val++;
-        /* asm_out ("\tmove\t$a0, $t0\n");*/ /* his example doesn't move */
     }
     asm_out ("\tsyscall\n");
 }
@@ -1847,9 +1864,10 @@ frame_data_out(char const* fmt, ...){
     if(frame_data == NULL){
         frame_data = malloc(sizeof(char) * 128);
     }else{
-        frame_data = realloc(frame_data, strlen(frame_data) + 128);
+        frame_data = realloc(frame_data, strlen(frame_data) + sizeof(char)*128);
     }
-    vsprintf (frame_data, fmt, ap);
+    vsprintf (&(frame_data[strlen(frame_data)]), fmt, ap);
+    /* This removes extra allocated memory */
     frame_data = realloc(frame_data, strlen(frame_data));
 }
 

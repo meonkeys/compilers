@@ -54,7 +54,7 @@ get_reg (var_ref * vr)
         /* The spill case!  We return the stack pointer */
         return 29;
     }
-    else if(NULL != vr)
+    else if(NULL != vr && vr->place < 32 && vr->place > 0)
     {
         return vr->place;
     }else{ /* this should never happen */
