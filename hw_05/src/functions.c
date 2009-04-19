@@ -1761,18 +1761,21 @@ gen_control_start (int test_label_num)
 void
 gen_control_test (var_ref * a, int exit_label_num)
 {
+    /*
     int reg = get_reg (a);
     a->place = reg;
-    /* fprintf (stderr, "%p %s %d\n", (void*)a, a->name, a->place); */
+    */
+    fprintf (stderr, "scope: %d\n", scope);
+    fprintf (stderr, "\tvar '%s' is at place %d\n", a->name, a->place);
 
     if (NULL == a->name)
     {
-        asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
-        asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
+        asm_out ("\tli\t$%d, %d\n", a->place, a->tmp_val_u.tmp_intval);
+        asm_out ("\tbeqz\t$%d, _Lexit%d\n", a->place, exit_label_num);
     }
     else
     {
-        asm_out ("\tbeqz\t$%d, _Lexit%d\n", get_reg (a), exit_label_num);
+        asm_out ("\tbeqz\t$%d, _Lexit%d\n", a->place, exit_label_num);
     }
 }
 
