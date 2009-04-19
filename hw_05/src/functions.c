@@ -1417,6 +1417,146 @@ asm_emit_scoped_decl_list (var_decl * v)
 
 /* Return value is the register holding the result of the expr */
 int
+asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
+{
+    int regA = get_reg (a);
+    int regB = -9999;
+    int res_reg;
+
+    symtab *ptrA = NULL;
+    symtab *ptrB = NULL;
+
+    if (NULL == b)
+    {
+        res_reg = regA;
+    } else {
+        res_reg = get_result_reg ();
+    }
+
+    /* TODO: the parser enforces identical typing? */
+    if (INT_ == a->type)
+    {
+        if (NULL != a->name)
+        {
+            ptrA = lookup (a->name);
+            assert (NULL != ptrA);
+
+            /*  FIXME: I don't think this is right */
+            if (ptrA->scope > 0)
+            {
+                asm_out ("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
+            }
+            else
+            {
+                asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
+            }
+        }
+        else
+        {
+            if(0 == a->place){
+                asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
+            }else{
+                regA = a->place;
+            }
+        }
+
+        /* if b is null, this is an expr-to-relop_factor reduction */
+        if (NULL != b) {
+            /* if name is null, b is a constant */
+            if (NULL != b->name)
+            {
+                ptrB = lookup (b->name);
+                assert (NULL != ptrB);
+
+                /*  FIXME: I don't think this is right */
+                if (ptrB->scope > 0)
+                {
+                    asm_out ("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
+                }
+                else
+                {
+                    asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
+                }
+            }
+            else
+            {
+                if(0 == b->place){
+                    asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
+                }else{
+                    regB = b->place;
+                }
+            }
+        }
+
+    }
+    else
+    {                           /* FLOAT_ */
+        if (NULL != a->name)
+        {
+            ptrA = lookup (a->name);
+            assert (NULL != ptrA);
+
+            /*  FIXME: I don't think this is right */
+            if (ptrA->scope > 0)
+            {
+                asm_out ("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
+            }
+            else if (0 == ptrA->place)
+            {
+                asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
+            }
+        }
+        else
+        {
+            asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
+        }
+
+        /* if b is null, this is an expr-to-relop_factor reduction */
+        if (NULL != b) {
+            /* if name is null, b is a constant */
+            if (NULL != b->name)
+            {
+                ptrB = lookup (b->name);
+                assert (NULL != ptrB);
+
+                /*  FIXME: I don't think this is right */
+                if (ptrB->scope > 0)
+                {
+                    asm_out ("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
+                }
+                else if (0 == ptrA->place)
+                {
+                    asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
+                }
+            }
+            else
+            {
+                asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
+            }
+        }
+    }
+
+    /* TODO: emit asm for comparisons */
+#if 0
+    if (OP_GE == opval)
+    {
+        asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, regA, regB);
+    }
+    else if (OP_LE == opval)
+    {
+        asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, regA, regB);
+    }
+#endif
+
+    free_reg (regA);
+    if (-9999 != regB) free_reg (regB);
+    save_reg (res_reg);
+
+    return res_reg;
+}
+
+/* Return value is the register holding the result of the expr */
+int
 asm_emit_expr (var_ref * a, var_ref * b, int opval)
 {
 
@@ -1853,6 +1993,12 @@ gen_control_test (var_ref * a, int exit_label_num)
             assert(0);
         }
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
+    }
+    else if (a->place > 0)
+    {
+        int testreg = get_reg (NULL);
+        asm_out ("\tmove\t$%d, $%d\n", testreg, a->place);
+        asm_out ("\tbeqz\t$%d, _Lexit%d\n", testreg, exit_label_num);
     }
     else
     {
