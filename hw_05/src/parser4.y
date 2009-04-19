@@ -809,9 +809,16 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 			if($2->const_type!=INTEGERC && $2->const_type!=FLOATC){
 				printf("error %d: operator Unary Minus applied to non Basic constant\n",linenumber);
 				$$->type=ERROR_;
+			} else {
+				if ($2->const_type==INTEGERC) {
+					$$->type = INT_;
+					$$->tmp_val_u.tmp_intval = -($2->const_u.intval);
+				} else {
+					$$->type = FLOAT_;
+					$$->tmp_val_u.tmp_fval = -($2->const_u.fval);
+				}
+				$$->name=NULL;
 			}
-			$$->type=($2->const_type==INTEGERC)?INT_:FLOAT_;
-			$$->name=NULL;
 		}
 		| OP_NOT CONST{
 			$$=Allocate(VAR_REF);
