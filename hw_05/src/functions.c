@@ -309,10 +309,14 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     frame_data_out("\t_%s_%d: .float %f\n", b->name, cur_const_val, b->tmp_val_u.tmp_fval);
                     cur_const_val++;
                 }
-                else if (0 == b->place)
+                else if (0 <= b->place && 32 > b->place)
                 {
-                    /* FIXME: cant be li, needs to load from a static float in .data */
-                    asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
+                    /* 
+                     * if 0 <= place < 32, then it was stored in $fN 
+                     * so we need to store from $fN
+                     */
+                    /*asm_out ("\tlw\t$%d, $f%d\n", reg, b->place);*/
+                    asm_out("\tmfc1\t$%d, $f%d\n", reg, b->place);
                 }
                 ptrA->place = reg;
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
@@ -1655,7 +1659,10 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
+            /*asm_out ("\tlw\t$%d, _%s\n", regB, b->name);*/
+            asm_out ("\tlw\t$%d, _f_%d\n", regB, cur_const_val);
+            frame_data_out("\t_f_%d: .float %f\n", cur_const_val, b->tmp_val_u.tmp_fval);
+            cur_const_val++;
         }
     }
 
@@ -1786,7 +1793,10 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
+                /*asm_out ("\tlw\t$%d, _%s\n", regB, b->name);*/
+                asm_out ("\tlw\t$%d, _f_%d\n", regB, cur_const_val);
+                frame_data_out("\t_f_%d: .float %f\n", cur_const_val, b->tmp_val_u.tmp_fval);
+                cur_const_val++;
             }
         }
     }
