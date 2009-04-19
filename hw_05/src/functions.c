@@ -1726,8 +1726,8 @@ gen_prologue (const char *name)
     asm_out ("\tsw\t$fp, -4($sp)\n");
     asm_out ("\tadd\t$fp, $sp, -4\n");
     asm_out ("\tadd\t$sp, $sp, -8\n");
-    asm_out ("\tlw\t$2, _framesize_%s\n", name);
-    asm_out ("\tsub\t$sp, $sp, $2\n");
+    asm_out ("\tlw\t$v0, _framesize_%s\n", name);
+    asm_out ("\tsub\t$sp, $sp, $v0\n");
 
     /* save $s0-7 */
     if(0 != strcmp(name, "main")){
