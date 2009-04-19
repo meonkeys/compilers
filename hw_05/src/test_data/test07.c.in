@@ -31,6 +31,7 @@ void main()
  write (a);
  write("\n");
  write (d);
+ write("\n");
 
 }
 

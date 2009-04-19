@@ -30,6 +30,13 @@ do
     simpleExpectedExecutionOutput=$testBase.out2
     if [ -e $testDir/$simpleExpectedExecutionOutput ]
     then
+        if [ $testBase == "test07.c" ]
+        then
+            exitCode=1
+            failures=$(($failures + 1))
+            echo "FAIL: TEST07 HANGS, SKIPPING."
+            continue
+        fi
         actualExecutionOutput=$tmpdir/spimout
         rm -f $actualExecutionOutput
         expectedExecutionOutput=$tmpdir/expected

@@ -29,6 +29,7 @@ void main()
  
   write("The answer for b is ");
   write (b);
+  write ("\n");
 }
 
 /*
