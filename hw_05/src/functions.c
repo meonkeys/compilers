@@ -1571,7 +1571,14 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
+            if(0 == a->place){
+                asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
+            }else{
+                regA = a->place;
+                if(a->place == regB){
+                    regB = get_reg(b);
+                }
+            }
         }
 
         if (regB != regA)
@@ -1594,7 +1601,11 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
+                if(0 == b->place){
+                    asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
+                }else{
+                    regB = b->place;
+                }
             }
         }
     }

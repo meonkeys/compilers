@@ -20,7 +20,7 @@ int reg_costs[REG_COUNT];
 int
 get_reg (var_ref * vr)
 {
-    if (NULL == vr || 0 == vr->place)
+    if (NULL == vr || 0 >= vr->place || 32 <= vr->place)
     {
         int i;
         /* grab the first free one */
@@ -56,6 +56,7 @@ get_reg (var_ref * vr)
     }
     else if(NULL != vr && vr->place < 32 && vr->place > 0)
     {
+        reg_costs[vr->place] = 1; /* I think this is the right cost to set */
         return vr->place;
     }else{ /* this should never happen */
         return 8;
