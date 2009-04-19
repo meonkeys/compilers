@@ -1707,7 +1707,7 @@ gen_prologue (const char *name)
     /* save $s0-7 */
     for(i = 0; i < 8; i++){
         asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
-        asm_out("\tsw\t$s%d, $sp, 4\n\n", i);
+        asm_out("\tsw\t$s%d, ($sp)\n\n", i);
     }
 
     asm_out ("_begin_%s:\n", name);
@@ -1721,7 +1721,7 @@ gen_epilogue (const char *name)
 
     /* restore $s0-7 in reverse order (due to stack) */
     for(i = 7; i >= 0; i--){
-        asm_out("\tlw\t$s%d, $sp\t#pop $s%d\n", i, i);
+        asm_out("\tlw\t$s%d, ($sp)\t#pop $s%d\n", i, i);
         asm_out("\tadd\t$sp, $sp, 4\n", i);
     }
 
@@ -1736,7 +1736,7 @@ gen_epilogue (const char *name)
     }
     else
     {
-        asm_out ("\tjr %ra\n");
+        asm_out ("\tjr $ra\n");
     }
 
     asm_out ("\n.data\n");
