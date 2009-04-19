@@ -3,3 +3,13 @@ To create a new unit test that will automatically be found and run by
 1. Create a file ending with ".in" in this directory with C-- source.
    Failing tests start with "bad_" by convention.
 2. Create a corresponding ".out" file containing the expected parser output.
+
+To test execution:
+1. Create a file ending with ".out2" containing execution output (minus the
+   version information header output by SPIM).
+2. If read() is called, create a file ending with ".stdin" containing
+   content to be sent to standard input.
+
+NOTE: These are end-to-end tests which use the filesystem. True "unit" tests
+would generally test individual functions or methods, so these are technically
+"integration", "acceptance" or "smoke" tests.

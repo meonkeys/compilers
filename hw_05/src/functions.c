@@ -347,9 +347,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
     return ZERO_;
 }
 
-
-
-
 TYPE
 check_relop_ex_lst (TypeList * a)
 {
@@ -610,7 +607,6 @@ struct_type_P (char *a, def_list * b)
     insert (a, STR_, ret, 0);
     return 1;
 }
-
 
 char *buffer;
 int tempnumber = 0;
@@ -911,7 +907,6 @@ search (char *a, char *b)
     return PSS1;
 }
 
-
 TYPE
 param_P (param * a, char *b)
 {
@@ -982,7 +977,6 @@ MakeParamList (param_list * a, param * b)
     return d;
 }
 
-
 TYPE
 func_enter_ST (TYPE a, char *b, param_list * c)
 {
@@ -1042,7 +1036,6 @@ func_enter_ST (TYPE a, char *b, param_list * c)
 
     return ret;
 }
-
 
 /*
  * Here is where we save caller registers
@@ -1537,16 +1530,17 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     }
 
     /* TODO: emit asm for comparisons */
-#if 0
-    if (OP_GE == opval)
+
+    if (OP_GT == opval)
     {
-        asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        /* Flipping operands to slt is equivilent to GE */
+        asm_out ("\tslt\t$%d, $%d, $%d\n", res_reg, regB, regA);
     }
-    else if (OP_LE == opval)
+    else if (OP_LT == opval)
     {
-        asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        asm_out ("\tslt\t$%d, $%d, $%d\n", res_reg, regA, regB);
     }
-#endif
+
 
     free_reg (regA);
     if (-9999 != regB) free_reg (regB);
@@ -1994,7 +1988,7 @@ gen_control_test (var_ref * a, int exit_label_num)
         }
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
     }
-    else if (a->place > 0)
+    else if (a->place > 0 && a->place < 32)
     {
         int testreg = get_reg (NULL);
         asm_out ("\tmove\t$%d, $%d\n", testreg, a->place);

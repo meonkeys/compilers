@@ -683,8 +683,11 @@ relop_factor	: expr{$$=$1;}
 				printf("error %d: relational operators applied to expression of non basic type\n",linenumber);
 				$1->type=ERROR_;
 			}
-			else
+			else{
 				$1->type=INT_;
+				fprintf(stderr, "arg1: %d\targ2: %d\n", $1->tmp_val_u.tmp_intval, $3->tmp_val_u.tmp_intval);
+				$1->place = asm_emit_relop_factor($1, $3, $2);
+			}
 			$$=$1;
 		}
 		;
