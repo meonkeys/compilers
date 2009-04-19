@@ -1458,7 +1458,6 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
             /* if name is null, b is a constant */
             if (NULL != b->name)
             {
-                fprintf(stderr, "b->name: %s\n", b->name);
                 regB = get_reg(b);
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
