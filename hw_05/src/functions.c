@@ -1524,7 +1524,6 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
     }
 
-    /* FIXME: use actual opcodes */
     if (OP_PLUS == opval)
     {
         asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, regA, regB);
