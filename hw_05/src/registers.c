@@ -63,7 +63,7 @@ get_reg (var_ref * vr)
 }
 
 int
-get_result_reg ()
+get_result_reg (void)
 {
     return reg++;
 }

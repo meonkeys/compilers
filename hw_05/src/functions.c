@@ -1397,7 +1397,7 @@ asm_emit_scoped_decl_list (var_decl * v)
             }
             else if (FLOAT_ == v->type)
             {
-                int reg = get_result_reg (v);
+                int reg = get_result_reg ();
                 asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval);
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
                 reg--;
@@ -1781,8 +1781,10 @@ gen_control_test (var_ref * a, int exit_label_num)
     int reg = get_reg (a);
     a->place = reg;
     */
+#if 0
     fprintf (stderr, "scope: %d\n", scope);
     fprintf (stderr, "\tvar '%s' is at place %d\n", a->name, a->place);
+#endif
 
     if (NULL == a->name)
     {
