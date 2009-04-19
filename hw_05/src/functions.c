@@ -1656,21 +1656,21 @@ asm_emit_write (TypeList * idl)
     if (INT_ == idl->P_var_r->type)
     {
         asm_out ("\tli\t$v0, 1\n");
-        asm_out ("\tlw\t$t0, %d($fp)\n", idl->P_var_r->place);
-        asm_out ("\tmove\t$a0, $t0\n");
+        asm_out ("\tlw\t$a0, %d($fp)\n", idl->P_var_r->place);
+        /* asm_out ("\tmove\t$a0, $t0\n");*/ /* his example doesn't move */ 
     }
     else if (FLOAT_ == idl->P_var_r->type)
     {
         asm_out ("\tli\t$v0, 2\n");
-        asm_out ("\tlw\t$t0, %d($fp)\n", idl->P_var_r->place);
-        asm_out ("\tmove\t$f12, $t0\n");        /* Maybe not $f12? */
+        asm_out ("\tlw\t$a0, %d($fp)\n", idl->P_var_r->place);
+        /* asm_out ("\tmove\t$f12, $t0\n");*/ /* his example doesn't move */        /* Maybe not $f12? */
     }
     else
     {/* string */
         asm_out ("\tli\t$v0, 4\n");
         /* this might require scope? */
         frame_data_out("\t_sConst%d: .asciiz %s\n", cur_const_val, idl->P_var_r->tmp_val_u.tmp_str);
-        asm_out ("\tla\t$t0, _sConst%d\n", cur_const_val);
+        asm_out ("\tla\t$a0, _sConst%d\n", cur_const_val);
         cur_const_val++;
         /* asm_out ("\tmove\t$a0, $t0\n");*/ /* his example doesn't move */
     }
