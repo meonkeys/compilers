@@ -234,7 +234,7 @@ id_list *Merge_Id_List (id_list * y, char *x);
 id_list *Id_List_Array (id_list * a, char *b, ArrayInfo * c);
 def_list *def_list_P (def_list * a, var_decl * b);
 int struct_type_P (char *a, def_list * b);
-char *get_temp_name ();
+char *get_temp_name (void);
 char *new_name (char *a);
 int if_user_name (char *x);
 TYPE type_decl_enter_ST1 (int a, id_list * b);
@@ -247,7 +247,7 @@ var_ref *check_function (char *a, TypeList * b);
 TYPE func_enter_ST (TYPE a, char *b, param_list * c);
 param_list *MakeParamList (param_list * a, param * b);
 TYPE param_P (param * a, char *b);
-void put_read_ST ();
+void put_read_ST (void);
 TYPE check_return (int flag, TYPE type);
 void asm_out (char const *fmt, ...);
 void asm_emit_global_decls_start (void);
@@ -258,8 +258,8 @@ int asm_emit_expr (var_ref * a, var_ref * b, int opval);
 int asm_emit_term (var_ref * a, var_ref * b, int opval);
 
 void asm_emit_write (TypeList * idl);
-void asm_emit_read ();
-void asm_emit_fread ();
+void asm_emit_read (void);
+void asm_emit_fread (void);
 
 int set_var_decl_list_offsets (var_decl * v, int offset);
 void set_param_list_offsets (param_list * pl);
@@ -277,7 +277,7 @@ void gen_control_iterate (int test_label_num);
 void gen_control_exit (int exit_label_num);
 
 int get_reg (var_ref * vr);
-int get_result_reg ();
+int get_result_reg (void);
 
 void frame_data_out(char const* fmt, ...);
 

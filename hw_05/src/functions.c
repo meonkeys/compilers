@@ -1402,11 +1402,16 @@ asm_emit_scoped_decl_list (var_decl * v)
             }
             else if (FLOAT_ == v->type)
             {
+<<<<<<< HEAD:hw_05/src/functions.c
                 int reg = get_result_reg (v);
                 /* asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval); */
                 asm_out ("\tlw\t$%d, %s%d\n", reg, PII->init_id_u.name, cur_const_val);
                 frame_data_out("\t%s%d:\t%f\n", PII->init_id_u.name, cur_const_val, PII->val_u.fval);
                 cur_const_val++;
+=======
+                int reg = get_result_reg ();
+                asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval);
+>>>>>>> 5a52db5ccf7c0eac4701708348526e338a1d7efa:hw_05/src/functions.c
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
                 reg--;
             }
@@ -1801,16 +1806,32 @@ gen_control_test (var_ref * a, int exit_label_num)
     int reg = get_reg (a);
     a->place = reg;
     */
+#if 0
     fprintf (stderr, "scope: %d\n", scope);
     fprintf (stderr, "\tvar '%s' is at place %d\n", a->name, a->place);
+#endif
 
     if (NULL == a->name)
     {
-        asm_out ("\tli\t$%d, %d\n", a->place, a->tmp_val_u.tmp_intval);
-        asm_out ("\tbeqz\t$%d, _Lexit%d\n", a->place, exit_label_num);
+        int reg = get_reg (NULL);
+        switch (a->type)
+        {
+        case INT_:
+            asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
+            break;
+        case FLOAT_:
+            frame_data_out("\t_sConst%d: .float %f\n", cur_const_val, a->tmp_val_u.tmp_fval);
+            asm_out ("\tla\t$%d, _sConst%d\n", reg, cur_const_val);
+            cur_const_val++;
+            break;
+        default:
+            assert(0);
+        }
+        asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
     }
     else
     {
+        asm_out ("\tli\t$%d, %d\n", a->place, a->tmp_val_u.tmp_intval);
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", a->place, exit_label_num);
     }
 }
