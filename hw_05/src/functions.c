@@ -323,7 +323,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 if (NULL != b->name)
                 {
                     /* asm_out ("\tlw\t$%d, _%s\n", reg, b->name); */
-                    asm_out ("\tla\t$%d, _%s_%d\n", reg, b->name, cur_const_val);
+                    asm_out ("\tlw\t$%d, _%s_%d\n", reg, b->name, cur_const_val);
                     frame_data_out("\t_%s_%d: .float %f\n", b->name, cur_const_val, b->tmp_val_u.tmp_fval);
                     cur_const_val++;
                 }
@@ -1709,6 +1709,7 @@ asm_emit_write (TypeList * idl)
         asm_out ("\tli\t$v0, 4\n");
         /* this might require scope? */
         frame_data_out("\t_sConst%d: .asciiz %s\n", cur_const_val, idl->P_var_r->tmp_val_u.tmp_str);
+        fprintf(stderr, "frame data tmp_str: %s\n", idl->P_var_r->tmp_val_u.tmp_str);
         asm_out ("\tla\t$a0, _sConst%d\n", cur_const_val);
         cur_const_val++;
     }
@@ -1886,7 +1887,7 @@ frame_data_out(char const* fmt, ...){
     }
     vsprintf (&(frame_data[strlen(frame_data)]), fmt, ap);
     /* This removes extra allocated memory */
-    frame_data = realloc(frame_data, strlen(frame_data));
+    frame_data = realloc(frame_data, strlen(frame_data)+1);
 }
 
 /*

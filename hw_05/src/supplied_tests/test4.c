@@ -17,6 +17,7 @@ void main()
    }
  write("The answer is ");
  write(b);
+ write("\n");
 }
 
 /*
