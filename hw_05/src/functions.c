@@ -1694,6 +1694,7 @@ asm_emit_fread ()
 void
 gen_prologue (const char *name)
 {
+    int i;
     asm_out (".text\n");
     asm_out ("%s:\n", name);
     asm_out ("\tsw\t$ra, 0($sp)\n");
@@ -1702,13 +1703,28 @@ gen_prologue (const char *name)
     asm_out ("\tadd\t$sp, $sp, -8\n");
     asm_out ("\tlw\t$v0, _framesize_%s\n", name);
     asm_out ("\tsub\t$sp, $sp, $v0\n\n");
+
+    /* save $s0-7 */
+    for(i = 0; i < 8; i++){
+        asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
+        asm_out("\tsw\t$s%d, $sp, 4\n", i);
+    }
+
     asm_out ("_begin_%s:\n", name);
 }
 
 void
 gen_epilogue (const char *name)
 {
+    int i;
     asm_out ("\n_end_%s:\n", name);
+
+    /* restore $s0-7 in reverse order (due to stack) */
+    for(i = 7; i >= 0; i--){
+        asm_out("\tlw\t$s%d, $sp\t#pop $s%d\n", i, i);
+        asm_out("\tadd\t$sp, $sp, 4\n", i);
+    }
+
     asm_out ("\tlw\t$ra, 4($fp)\n");
     asm_out ("\tadd\t$sp, $fp, 4\n");
     asm_out ("\tlw\t$fp, 0($fp)\n");
