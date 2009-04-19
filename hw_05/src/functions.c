@@ -302,9 +302,14 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
             if (ptrA->scope > 0)
             {
+                /* constant */
                 if (NULL != b->name)
                 {
                     asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB);
+                    /*
+                    asm_out ("\tlw\t$%d, _%s_%d\n", reg, b->name, cur_const_val);
+                    frame_data_out();
+                    */
                 }
                 else if (0 == b->place)
                 {
@@ -1398,7 +1403,10 @@ asm_emit_scoped_decl_list (var_decl * v)
             else if (FLOAT_ == v->type)
             {
                 int reg = get_result_reg (v);
-                asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval);
+                /* asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval); */
+                asm_out ("\tlw\t$%d, %s%d\n", reg, PII->init_id_u.name, cur_const_val);
+                frame_data_out("\t%s%d:\t%f\n", PII->init_id_u.name, cur_const_val, PII->val_u.fval);
+                cur_const_val++;
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
                 reg--;
             }
@@ -1697,18 +1705,27 @@ gen_prologue (const char *name)
     int i;
     asm_out (".text\n");
     asm_out ("%s:\n", name);
-    asm_out ("\tsw\t$ra, 0($sp)\n");
+
+    /*
+    asm_out ("\tsub\t$sp, $sp, 4\n");
+    */
+    asm_out ("\tsw\t$ra, ($sp)\n");
+
     asm_out ("\tsw\t$fp, -4($sp)\n");
     asm_out ("\tadd\t$fp, $sp, -4\n");
     asm_out ("\tadd\t$sp, $sp, -8\n");
-    asm_out ("\tlw\t$v0, _framesize_%s\n", name);
-    asm_out ("\tsub\t$sp, $sp, $v0\n");
+    asm_out ("\tlw\t$2, _framesize_%s\n", name);
+    asm_out ("\tsub\t$sp, $sp, $2\n");
 
     /* save $s0-7 */
-    for(i = 0; i < 8; i++){
-        asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
-        asm_out("\tsw\t$s%d, ($sp)\n\n", i);
+    if(0 != strcmp(name, "main")){
+        for(i = 0; i < 8; i++){
+            asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
+            asm_out("\tsw\t$s%d, ($sp)\n", i);
+        }
     }
+
+    asm_out("\n");
 
     asm_out ("_begin_%s:\n", name);
 }
@@ -1720,9 +1737,11 @@ gen_epilogue (const char *name)
     asm_out ("\n_end_%s:\n", name);
 
     /* restore $s0-7 in reverse order (due to stack) */
-    for(i = 7; i >= 0; i--){
-        asm_out("\tlw\t$s%d, ($sp)\t#pop $s%d\n", i, i);
-        asm_out("\tadd\t$sp, $sp, 4\n", i);
+    if(0 != strcmp(name, "main")){
+        for(i = 7; i >= 0; i--){
+            asm_out("\tlw\t$s%d, ($sp)\t#pop $s%d\n", i, i);
+            asm_out("\tadd\t$sp, $sp, 4\n", i);
+        }
     }
 
     asm_out ("\tlw\t$ra, 4($fp)\n");
@@ -1737,6 +1756,7 @@ gen_epilogue (const char *name)
     else
     {
         asm_out ("\tjr $ra\n");
+        asm_out("\tnop\n");
     }
 
     asm_out ("\n.data\n");

@@ -593,6 +593,8 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			}
 			else {
 			PVR=check_function($1,$3);
+			/* TODO: save caller registers $t range iirc */
+			asm_out("\tjal\t%s", $1);
 			$$=PVR->type;
 			}
 		}

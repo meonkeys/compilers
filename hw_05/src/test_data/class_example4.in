@@ -10,5 +10,8 @@ void function(int a, float b){
 }
 
 void main(){
-	int a;
+	int a = 5;
+	float f = 1.5;
+	
+	function(a, f);
 }
