@@ -1447,7 +1447,11 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
+            if(0 == a->place){
+                asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
+            }else{
+                regA = a->place;
+            }
         }
 
         /* if it's null it's a constant */
@@ -1468,7 +1472,11 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
+            if(0 == b->place){
+                asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
+            }else{
+                regB = b->place;
+            }
         }
 
     }
@@ -1667,7 +1675,7 @@ asm_emit_write (TypeList * idl)
             if(symptr->scope > 0){
                 asm_out ("\tlw\t$a0, %d($fp)\n", symptr->offset);
             }else{
-                asm_out ("\tla\t$a0, _%s\n", idl->P_var_r->name);
+                asm_out ("\tlw\t$a0, _%s\n", idl->P_var_r->name);
             }
         }
         else{
