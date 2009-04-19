@@ -1393,14 +1393,12 @@ asm_emit_scoped_decl_list (var_decl * v)
                 int reg = get_result_reg ();
                 asm_out ("\tli\t$%d, %d\n", reg, PII->val_u.intval);
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
-                reg--;
             }
             else if (FLOAT_ == v->type)
             {
                 int reg = get_result_reg ();
                 asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval);
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
-                reg--;
             }
             else
             {
@@ -1707,7 +1705,7 @@ gen_prologue (const char *name)
     /* save $s0-7 */
     for(i = 0; i < 8; i++){
         asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
-        asm_out("\tsw\t$s%d, ($sp)\n\n", i);
+        asm_out("\tsw\t$s%d, ($sp)\n", i);
     }
 
     asm_out ("_begin_%s:\n", name);
