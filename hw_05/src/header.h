@@ -277,6 +277,8 @@ void gen_control_test (var_ref * a, int exit_label_num);
 void gen_control_iterate (int test_label_num);
 void gen_control_exit (int exit_label_num);
 
+void eval_relop_expr(var_ref* a, var_ref b, int op);
+
 int get_reg (var_ref * vr);
 int get_result_reg (void);
 
