@@ -674,7 +674,6 @@ relop_term	: relop_factor{$$=$1;}
 relop_factor	: expr{
 			$$=$1;
 			$$->place = asm_emit_relop_factor($1, NULL, 0);
-			$$->tmp_val_u.tmp_intval = 6;
 		}
 		| expr rel_op expr{
 			if(($1->type==ERROR_)||($3->type==ERROR_))
