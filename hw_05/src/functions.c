@@ -1709,7 +1709,6 @@ asm_emit_write (TypeList * idl)
         asm_out ("\tli\t$v0, 4\n");
         /* this might require scope? */
         frame_data_out("\t_sConst%d: .asciiz %s\n", cur_const_val, idl->P_var_r->tmp_val_u.tmp_str);
-        fprintf(stderr, "frame data tmp_str: %s\n", idl->P_var_r->tmp_val_u.tmp_str);
         asm_out ("\tla\t$a0, _sConst%d\n", cur_const_val);
         cur_const_val++;
     }

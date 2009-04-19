@@ -7,6 +7,14 @@ void main()
  b = read();
  c = read();
 
+ write("b: ");
+ write(b);
+ write("\n");
+
+ write("c: ");
+ write(c);
+ write("\n");
+
  if (b > c) 
    {
      b = b+c;
