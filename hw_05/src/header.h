@@ -256,6 +256,7 @@ void asm_emit_scoped_decl_list (var_decl * v);
 
 int asm_emit_expr (var_ref * a, var_ref * b, int opval);
 int asm_emit_term (var_ref * a, var_ref * b, int opval);
+int asm_emit_relop_factor (var_ref * a, var_ref * b, int opval);
 
 void asm_emit_write (TypeList * idl);
 void asm_emit_read (void);
