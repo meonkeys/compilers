@@ -1551,10 +1551,6 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
     symtab *ptrA = NULL;
     symtab *ptrB = NULL;
 
-    fprintf(stderr, "init got areg: %d\n", regA);
-    fprintf(stderr, "init got breg: %d\n", regB);
-    fprintf(stderr, "init got resreg: %d\n", res_reg);
-
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {

@@ -56,12 +56,9 @@ get_reg (var_ref * vr)
     }
     else if(NULL != vr && vr->place < 32 && vr->place > 0)
     {
-        fprintf(stderr, "returning place: %d\n", vr->place);
         reg_costs[vr->place] = 1; /* I think this is the right cost to set */
         return vr->place;
     }else{ /* this should never happen */
-        fprintf(stderr, "did this happen?\n");
-        fprintf(stderr, "vr: %p\tvr->place: %d\n", (void*)vr, vr->place);
         return 8;
     }
 }
