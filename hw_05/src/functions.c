@@ -22,8 +22,6 @@ extern char* frame_data;
 
 extern FILE *asm_out_fp;
 
-extern int reg;
-
 int cur_const_val;
 
 char *printarray[] =
@@ -1640,7 +1638,6 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
         }
     }
 
-    /* FIXME: use actual opcodes */
     if (OP_TIMES == opval)
     {
         asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, regA, regB);
