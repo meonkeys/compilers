@@ -1716,17 +1716,11 @@ gen_prologue (const char *name)
     asm_out ("\tsub\t$sp, $sp, $2\n");
 
     /* save $s0-7 */
-<<<<<<< HEAD:hw_05/src/functions.c
     if(0 != strcmp(name, "main")){
         for(i = 0; i < 8; i++){
             asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
             asm_out("\tsw\t$s%d, ($sp)\n", i);
         }
-=======
-    for(i = 0; i < 8; i++){
-        asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
-        asm_out("\tsw\t$s%d, ($sp)\n", i);
->>>>>>> 63ab68199db06a74c5cd9c252e93d0590624ff19:hw_05/src/functions.c
     }
 
     asm_out("\n");
