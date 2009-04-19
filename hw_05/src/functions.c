@@ -1458,6 +1458,8 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
             /* if name is null, b is a constant */
             if (NULL != b->name)
             {
+                fprintf(stderr, "b->name: %s\n", b->name);
+                regB = get_reg(b);
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
 
@@ -1473,7 +1475,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                if(0 == b->place){
+                if(0 >= b->place || 32 <= b->place){
                     asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
                 }else{
                     regB = b->place;
