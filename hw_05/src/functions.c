@@ -1398,7 +1398,6 @@ asm_emit_scoped_decl_list (var_decl * v)
                 int reg = get_result_reg ();
                 asm_out ("\tli\t$%d, %d\n", reg, PII->val_u.intval);
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
-                reg--;
             }
             else if (FLOAT_ == v->type)
             {
@@ -1408,7 +1407,6 @@ asm_emit_scoped_decl_list (var_decl * v)
                 frame_data_out("\t%s%d:\t%f\n", PII->init_id_u.name, cur_const_val, PII->val_u.fval);
                 cur_const_val++;
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
-                reg--;
             }
             else
             {
@@ -1718,11 +1716,17 @@ gen_prologue (const char *name)
     asm_out ("\tsub\t$sp, $sp, $2\n");
 
     /* save $s0-7 */
+<<<<<<< HEAD:hw_05/src/functions.c
     if(0 != strcmp(name, "main")){
         for(i = 0; i < 8; i++){
             asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
             asm_out("\tsw\t$s%d, ($sp)\n", i);
         }
+=======
+    for(i = 0; i < 8; i++){
+        asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
+        asm_out("\tsw\t$s%d, ($sp)\n", i);
+>>>>>>> 63ab68199db06a74c5cd9c252e93d0590624ff19:hw_05/src/functions.c
     }
 
     asm_out("\n");
