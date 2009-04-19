@@ -652,8 +652,12 @@ test            : {
 			$<label_num>$=++LABEL_NUM;
 			gen_control_start ($<label_num>$);
 		} assign_expr {
-			gen_control_test ($2, $<label_num>1);
 			$$=$2;
+			if (0 == $$->place)
+			{
+				$$->place = asm_emit_relop_factor($2, NULL, 0);
+			}
+			gen_control_test ($2, $<label_num>1);
 			$$->label_num = $<label_num>1;
 		}
                 ;
@@ -671,10 +675,7 @@ relop_term	: relop_factor{$$=$1;}
 		| relop_term OP_AND relop_factor{ $$=relop_extm($1,OP_AND,$3);}
 		;
 
-relop_factor	: expr{
-			$$=$1;
-			$$->place = asm_emit_relop_factor($1, NULL, 0);
-		}
+relop_factor	: expr{$$=$1;}
 		| expr rel_op expr{
 			if(($1->type==ERROR_)||($3->type==ERROR_))
 				$1->type=ERROR_;
@@ -685,7 +686,6 @@ relop_factor	: expr{
 			else
 				$1->type=INT_;
 			$$=$1;
-			$$->place = asm_emit_relop_factor($1, $3, $2);
 		}
 		;
 
