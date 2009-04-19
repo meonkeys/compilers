@@ -1788,11 +1788,25 @@ gen_control_test (var_ref * a, int exit_label_num)
 
     if (NULL == a->name)
     {
-        asm_out ("\tli\t$%d, %d\n", a->place, a->tmp_val_u.tmp_intval);
-        asm_out ("\tbeqz\t$%d, _Lexit%d\n", a->place, exit_label_num);
+        int reg = get_reg (NULL);
+        switch (a->type)
+        {
+        case INT_:
+            asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
+            break;
+        case FLOAT_:
+            frame_data_out("\t_sConst%d: .float %f\n", cur_const_val, a->tmp_val_u.tmp_fval);
+            asm_out ("\tla\t$%d, _sConst%d\n", reg, cur_const_val);
+            cur_const_val++;
+            break;
+        default:
+            assert(0);
+        }
+        asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
     }
     else
     {
+        asm_out ("\tli\t$%d, %d\n", a->place, a->tmp_val_u.tmp_intval);
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", a->place, exit_label_num);
     }
 }
