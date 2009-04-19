@@ -43,12 +43,22 @@ get_reg (var_ref * vr)
             }
         }
 
-        /* TODO: handle the spill case! */
-        return 8;
+        for (i = 8; i < 16; i++)
+        {
+            if (reg_costs[i] == 2)
+            {
+                return i;
+            }
+        }
+
+        /* The spill case!  We return the stack pointer */
+        return 29;
     }
-    else
+    else if(NULL != vr)
     {
         return vr->place;
+    }else{ /* this should never happen */
+        return 8;
     }
 }
 

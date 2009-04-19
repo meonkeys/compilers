@@ -46,7 +46,6 @@ typedef struct
     char *name;
 } Type_String;
 
-
 struct Stringlist
 {
     char *name;
@@ -178,7 +177,6 @@ struct param_list
 };
 typedef struct param_list param_list;
 
-
 /*Symbol table entries for basic types, arrays, functions, and structs*/
 typedef Type_arr ST_arr;
 
@@ -220,7 +218,6 @@ struct symtab
         float fval;
     } val_u;
 };
-
 
 typedef struct symtab symtab;
 symtab *lookup (char *name);
