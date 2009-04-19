@@ -685,7 +685,6 @@ relop_factor	: expr{$$=$1;}
 			}
 			else{
 				$1->type=INT_;
-				fprintf(stderr, "arg1: %d\targ2: %d\n", $1->tmp_val_u.tmp_intval, $3->tmp_val_u.tmp_intval);
 				$1->place = asm_emit_relop_factor($1, $3, $2);
 			}
 			$$=$1;
