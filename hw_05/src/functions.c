@@ -1690,7 +1690,7 @@ asm_emit_write (TypeList * idl)
         }
         else{
             /* FIXME: I don't think this is right */
-            asm_out ("\tlw\t$a0, %d($fp)\n", idl->P_var_r->place);
+            asm_out ("\tmove\t$a0, $%d\n", idl->P_var_r->place);
         }
     }
     else if (FLOAT_ == idl->P_var_r->type)
@@ -1701,7 +1701,7 @@ asm_emit_write (TypeList * idl)
         }
         else{
             /* FIXME: I don't think this is right either */
-            asm_out ("\tlw\t$a0, %d($fp)\n", idl->P_var_r->place);
+            asm_out ("\tmove\t$a0, $%d\n", idl->P_var_r->place);
         }
     }
     else
