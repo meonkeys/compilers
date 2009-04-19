@@ -1402,16 +1402,11 @@ asm_emit_scoped_decl_list (var_decl * v)
             }
             else if (FLOAT_ == v->type)
             {
-<<<<<<< HEAD:hw_05/src/functions.c
-                int reg = get_result_reg (v);
+                int reg = get_result_reg ();
                 /* asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval); */
                 asm_out ("\tlw\t$%d, %s%d\n", reg, PII->init_id_u.name, cur_const_val);
                 frame_data_out("\t%s%d:\t%f\n", PII->init_id_u.name, cur_const_val, PII->val_u.fval);
                 cur_const_val++;
-=======
-                int reg = get_result_reg ();
-                asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval);
->>>>>>> 5a52db5ccf7c0eac4701708348526e338a1d7efa:hw_05/src/functions.c
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
                 reg--;
             }
