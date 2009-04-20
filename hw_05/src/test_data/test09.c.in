@@ -26,7 +26,7 @@ void main()
 
  write("The factorial is = ");
  write(result);
- 
+ write("\n");
 }
 
 /*
