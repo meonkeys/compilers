@@ -601,7 +601,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			else {
 			PVR=check_function($1,$3);
 			/* TODO: save caller registers $t range iirc */
-			asm_out("\tjal\t%s\n", $1);
+			asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
 			$$=PVR->type;
 			}
 		}
@@ -641,12 +641,12 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 					if(0 == $2->place && NULL != $2->name){
 						symtab* symptr = lookup($2->name);
 						assert(NULL != symptr);
-						asm_out("\tlw\t$v0, %d($fp)\n", symptr->offset);
+						asm_out("\tlw\t$v0, %d($fp)\t# line %d\n", symptr->offset, linenumber);
 					}else{
-						asm_out("\tmove\t$%d, $v0\n", $2->place);
+						asm_out("\tmove\t$%d, $v0\t# line %d\n", $2->place, linenumber);
 					}
 				}else if(FLOAT_ == $2->type){
-					asm_out("\tmov.s\t$f%d, $f0\n", $2->place);
+					asm_out("\tmov.s\t$f%d, $f0\t# line %d\n", $2->place, linenumber);
 				}
 				$$=ZERO_;
 			}
@@ -865,7 +865,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 			ID MK_LPAREN relop_expr_list MK_RPAREN{
 			$$=check_function($1,$3);
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
-				asm_out("\tjal\t%s\n", $1);
+				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
 				if(INT_ == $$->type){
 					$$->place = 2;
 				}else if(FLOAT_ == $$->type){
