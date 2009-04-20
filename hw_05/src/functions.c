@@ -1722,7 +1722,7 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         if(INT_ == a->type){
             asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, regA, regB);
         }else{
-            asm_out ("\tsub\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+            asm_out ("\tsub.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
         }
     }
 
