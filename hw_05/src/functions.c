@@ -1600,23 +1600,42 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         switch (opval)
         {
         case OP_GT:
+<<<<<<< HEAD:hw_05/src/functions.c
             /* Flipping operands to slt is equivilent to GE */
             asm_out ("\tslt\t$%d, $%d, $%d\n", res_reg, regB, regA);
+=======
+            asm_out ("\tsgt\t$%d, $%d, $%d\n", res_reg, regA, regB);
+            break;
+        case OP_GE:
+            asm_out ("\tsge\t$%d, $%d, $%d\n", res_reg, regA, regB);
+>>>>>>> 060248ee4acf3525d77f797e34f3da097f2e2949:hw_05/src/functions.c
             break;
         case OP_LT:
             asm_out ("\tslt\t$%d, $%d, $%d\n", res_reg, regA, regB);
             break;
+<<<<<<< HEAD:hw_05/src/functions.c
+=======
+        case OP_LE:
+            asm_out ("\tsle\t$%d, $%d, $%d\n", res_reg, regA, regB);
+            break;
+>>>>>>> 060248ee4acf3525d77f797e34f3da097f2e2949:hw_05/src/functions.c
         case OP_NE:
             asm_out ("\tsne\t$%d, $%d, $%d\n", res_reg, regA, regB);
             break;
         case OP_EQ:
             asm_out ("\tseq\t$%d, $%d, $%d\n", res_reg, regA, regB);
             break;
+<<<<<<< HEAD:hw_05/src/functions.c
 #if 0
         default:
             fprintf (stderr, "don't know how to handle relop: %d\n", opval);
             assert (0);
 #endif
+=======
+        default:
+            fprintf (stderr, "don't know how to handle relop: %d\n", opval);
+            assert (0);
+>>>>>>> 060248ee4acf3525d77f797e34f3da097f2e2949:hw_05/src/functions.c
         }
     }
 
