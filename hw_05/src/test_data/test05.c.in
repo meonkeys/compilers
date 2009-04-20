@@ -8,20 +8,11 @@ void main()
  c = fread();
 
  d = 1.1;
- write("d: ");
- write(d);
- write("\n");
 
  while( b < c)
  {
   d = d + b;
-  write("d: ");
-  write(d);
-  write("\n");
   c = c - 1.0;
-  write("c: ");
-  write(c);
-  write("\n");
  }
 
  write("The answer is ");
