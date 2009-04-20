@@ -15,6 +15,9 @@ void main()
 
   a = b;
   c = d/2;
+  write("c_orig: ");
+	  write(c);
+	  write("\n");
   
   while ( 1 < c) 
     {
@@ -23,6 +26,9 @@ void main()
       b = c;
       c = c - 1;
       d = d + a;
+	  write("c: ");
+	  write(c);
+	  write("\n");
     }
   b = b - 1;
  }

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <header.h>
+#include <assert.h>
 
 int yylex (void);
 void yyerror (char const *fmt, ...);
@@ -634,8 +635,21 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 						break;
 				}
 			}
-			else
+			else{
+				if(INT_ == $2->type){
+					asm_out("#fooooo\n");
+					if(0 == $2->place && NULL != $2->name){
+						symtab* symptr = lookup($2->name);
+						assert(NULL != symptr);
+						asm_out("\tlw\t$v0, %d($fp)\n", symptr->offset);
+					}else{
+						asm_out("\tmove\t$%d, $v0\n", $2->place);
+					}
+				}else if(FLOAT_ == $2->type){
+					asm_out("\tmov.s\t$f%d, $f0\n", $2->place);
+				}
 				$$=ZERO_;
+			}
 			IS_RETURN=1;
 		}
 		;
@@ -852,6 +866,12 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 			$$=check_function($1,$3);
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
 				asm_out("\tjal\t%s\n", $1);
+				if(INT_ == $$->type){
+					$$->place = 2;
+				}else if(FLOAT_ == $$->type){
+					$$->place = 0;
+				}
+				$$->is_return = 1;
 			}
 			
 		}

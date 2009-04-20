@@ -94,6 +94,7 @@ typedef struct var_ref_s
     TYPE type;
     char *name;
     int place;
+    int is_return;
     int label_num;
     union
     {

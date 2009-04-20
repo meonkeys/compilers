@@ -270,7 +270,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                         asm_out ("\tlw\t$%d, _%s\n", reg, b->name);
                     }
                 }
-                else if (0 == b->place)
+                else if(1 == b->is_return){
+                    asm_out("#FOOOOOOOOOOOOOOOOO\n");
+                    reg = b->place;
+                }else if (0 == b->place)
                 {
                     asm_out ("\tli\t$%d, %d\n", reg, b->tmp_val_u.tmp_intval);
                 }
@@ -1666,6 +1669,10 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             {
                 asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
             }
+            else if(1 == a->is_return){
+                    asm_out("#BAAAAAAAAAAAAAAARRRRRRRR\n");
+                    regA= a->place;
+            }
             else
             {
                 regA = a->place;
@@ -1694,7 +1701,10 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             {
                 asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
             }
-            else
+            else if(1 == b->is_return){
+                    asm_out("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
+                    regB= b->place;
+            }else
             {
                 regB = b->place;
             }
@@ -1712,6 +1722,10 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             if (ptrA->scope > 0)
             {
                 asm_out ("\tl.s\t$f%d, %d($fp)\n", regA, ptrA->offset);
+            }
+            else if(1 == b->is_return){
+                    asm_out("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
+                    regA= a->place;
             }
             else if (0 == ptrA->place)
             {
@@ -1733,6 +1747,10 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             if (ptrB->scope > 0)
             {
                 asm_out ("\tl.s\t$f%d, %d($fp)\n", regB, ptrB->offset);
+            }
+            else if(1 == b->is_return){
+                    asm_out("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
+                    regB= b->place;
             }
             else if (0 == ptrA->place)
             {
@@ -1803,6 +1821,10 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             {
                 asm_out ("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
             }
+            else if(1 == a->is_return){
+                    asm_out("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
+                    regA= a->place;
+            }
             else
             {
                 asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
@@ -1837,6 +1859,10 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
                 {
                     asm_out ("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
                 }
+                else if(1 == b->is_return){
+                    asm_out("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
+                    regB= b->place;
+            }
                 else
                 {
                     asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
@@ -1868,6 +1894,10 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             {
                 asm_out ("\tl.s\t$f%d, %d($fp)\n", regA, ptrA->offset);
             }
+            else if(1 == a->is_return){
+                    asm_out("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
+                    regA = a->place;
+            }
             else
             {
                 asm_out ("\tl.s\t$f%d, _%s\n", regA, a->name);
@@ -1890,6 +1920,10 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
                 if (ptrB->scope > 0)
                 {
                     asm_out ("\tl.s\t$f%d, %d($fp)\n", regB, ptrB->offset);
+                }
+                else if(1 == b->is_return){
+                    asm_out("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
+                    regB= b->place;
                 }
                 else
                 {
