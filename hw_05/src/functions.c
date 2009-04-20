@@ -2145,7 +2145,11 @@ gen_control_test (var_ref * a, int exit_label_num)
         switch (a->type)
         {
         case INT_:
-            asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
+            if(1 > a->place || 32 <= a->place){
+                asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
+            }else{
+                reg = a->place;
+            }
             break;
         case FLOAT_:
             frame_data_out ("\t_sConst%d: .float %f\n", cur_const_val,
