@@ -311,7 +311,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else if (0 <= b->place && 32 > b->place)
                 {
-                    fprintf(stderr, "line: %d b->tmp: %f\tb->place: %d\n", linenumber, b->tmp_val_u.tmp_fval, b->place);
+                    /*fprintf(stderr, "line: %d b->tmp: %f\tb->place: %d\n", linenumber, b->tmp_val_u.tmp_fval, b->place);*/
                     /* 
                      * if 0 <= place < 32, then it was stored in $fN 
                      * so we need to store from $fN
