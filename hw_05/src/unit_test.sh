@@ -37,13 +37,6 @@ do
             echo "FAIL: TEST07 HANGS, SKIPPING."
             continue
         fi
-        if [ $testBase == "test11.c" ]
-        then
-            exitCode=1
-            failures=$(($failures + 1))
-            echo "FAIL: TEST11 HANGS, SKIPPING."
-            continue
-        fi
         actualExecutionOutput=$tmpdir/spimout
         rm -f $actualExecutionOutput
         expectedExecutionOutput=$tmpdir/expected
