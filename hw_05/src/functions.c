@@ -722,8 +722,8 @@ type_decl_enter_ST1 (int a, id_list * b)
     {
         name =
             (b->P_ini_i->type ==
-             ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->
-            P_ini_i->init_id_u.name;
+             ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->P_ini_i->
+            init_id_u.name;
         if ((entry = lookup (name)))
             if ((entry) && (entry->scope >= scope))
             {
@@ -764,8 +764,8 @@ type_decl_enter_ST2 (char *a, id_list * b)
         {
             name =
                 (b->P_ini_i->type ==
-                 ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->
-                P_ini_i->init_id_u.name;
+                 ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->P_ini_i->
+                init_id_u.name;
             if (b->P_ini_i->type == ARR_)
             {
                 b->P_ini_i->init_id_u.P_arr_s->arr_info->arrtype = STR_;
@@ -932,8 +932,8 @@ search (char *a, char *b)
             if (!strcmp (c, PSS1->struct_semantic_u.str_info.str_var_name))
             {
                 if (((PST1 =
-                      lookup (PSS1->struct_semantic_u.
-                              str_info.struct_type_name)) == NULL)
+                      lookup (PSS1->struct_semantic_u.str_info.
+                              struct_type_name)) == NULL)
                     || (PST1->scope > scope))
                     return NULL;
                 else
@@ -1712,9 +1712,9 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
                 asm_out ("\tli\t$%d, %d\t# line %d\n", regA,
                          a->tmp_val_u.tmp_intval, linenumber);
             }
-            else if(1 == a->is_return)
+            else if (1 == a->is_return)
             {
-                    regA= a->place;
+                regA = a->place;
             }
             else
             {
