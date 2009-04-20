@@ -1,6 +1,8 @@
 #ifndef HEADER_H
 #define HEADER_H
 
+#define REG_COUNT 32
+
 /* Constant Types */
 typedef enum
 { INTEGERC, FLOATC, STRINGC } C_type;

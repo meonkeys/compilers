@@ -324,11 +324,11 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                                     b->tmp_val_u.tmp_fval, linenumber);
                     cur_const_val++;
                 }
-                else if (0 <= b->place && 32 > b->place)
+                else if (0 <= b->place && REG_COUNT > b->place)
                 {
                     /*fprintf(stderr, "line: %d b->tmp: %f\tb->place: %d\n", linenumber, b->tmp_val_u.tmp_fval, b->place); */
                     /* 
-                     * if 0 <= place < 32, then it was stored in $fN 
+                     * if 0 <= place < REG_COUNT, then it was stored in $fN 
                      * so we need to store from $fN
                      */
                     if (0.0 == b->tmp_val_u.tmp_fval && b->place == 0)
@@ -1527,7 +1527,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            if (0 >= a->place || 32 < a->place)
+            if (0 >= a->place || REG_COUNT < a->place)
             {
                 asm_out ("\tli\t$%d, %d\t# line %d\n", regA,
                          a->tmp_val_u.tmp_intval, linenumber);
@@ -1561,7 +1561,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                if (1 > b->place || 32 <= b->place)
+                if (1 > b->place || REG_COUNT <= b->place)
                 {
                     asm_out ("\tli\t$%d, %d\t# line %d\n", regB,
                              b->tmp_val_u.tmp_intval, linenumber);
@@ -2231,7 +2231,7 @@ gen_control_test (var_ref * a, int exit_label_num)
         }
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
     }
-    else if (a->place > 0 && a->place < 32)     /* FIXME: this is a bad way to check if place is initialized */
+    else if (a->place > 0 && a->place < REG_COUNT)     /* FIXME: this is a bad way to check if place is initialized */
     {
         int testreg = get_reg (NULL);
         asm_out ("\tmove\t$%d, $%d\t# line %d\n", testreg, a->place,

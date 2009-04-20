@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <header.h>
 
-#define REG_COUNT 32
-
 int reg = 8;
 
 typedef enum
@@ -20,7 +18,7 @@ int reg_costs[REG_COUNT];
 int
 get_reg (var_ref * vr)
 {
-    if (NULL == vr || 0 >= vr->place || 32 <= vr->place)
+    if (NULL == vr || 0 >= vr->place || REG_COUNT <= vr->place)
     {
         int i;
         /* grab the first free one */
@@ -54,7 +52,7 @@ get_reg (var_ref * vr)
         /* The spill case!  We return the stack pointer */
         return 29;
     }
-    else if (NULL != vr && vr->place < 32 && vr->place > 0)
+    else if (NULL != vr && vr->place < REG_COUNT && vr->place > 0)
     {
         reg_costs[vr->place] = 1;       /* I think this is the right cost to set */
         return vr->place;
