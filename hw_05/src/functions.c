@@ -305,21 +305,31 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 {
                     /*asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB);*/
                     
-                    asm_out ("\tla\t$%d, _%s_%d\n", reg, b->name, cur_const_val);
+                    asm_out ("\tl.s\t$f%d, _%s_%d\n", reg, b->name, cur_const_val);
                     frame_data_out("\t_%s_%d: .float %f\n", b->name, cur_const_val, b->tmp_val_u.tmp_fval);
                     cur_const_val++;
                 }
                 else if (0 <= b->place && 32 > b->place)
                 {
+                    fprintf(stderr, "line: %d b->tmp: %f\tb->place: %d\n", linenumber, b->tmp_val_u.tmp_fval, b->place);
                     /* 
                      * if 0 <= place < 32, then it was stored in $fN 
                      * so we need to store from $fN
                      */
-                    /*asm_out ("\tlw\t$%d, $f%d\n", reg, b->place);*/
-                    asm_out("\tmfc1\t$%d, $f%d\n", reg, b->place);
+                    if(0.0 == b->tmp_val_u.tmp_fval && b->place == 0){
+                        /* if tmp isn't set, it's a read */
+                        /*asm_out("\tmfc1\t$%d, $f%d\n", reg, b->place);*/
+                        reg = 0;
+                    }else if(0.0 != b->tmp_val_u.tmp_fval && b->place == 0){
+                        asm_out ("\tl.s\t$f%d, _f_%d\n", reg, cur_const_val);
+                        frame_data_out("\t_f_%d: .float %f\n", cur_const_val, b->tmp_val_u.tmp_fval);
+                        cur_const_val++;
+                    }else{
+                        reg = b->place;
+                    }
                 }
                 ptrA->place = reg;
-                asm_out ("\tsw\t$%d, %d($fp)\n", reg, ptrA->offset);
+                asm_out ("\ts.s\t$f%d, %d($fp)\n", reg, ptrA->offset);
                 ns_reg (reg);
             }
             else
@@ -327,17 +337,17 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 if (NULL != b->name)
                 {
                     /* asm_out ("\tlw\t$%d, _%s\n", reg, b->name); */
-                    asm_out ("\tlw\t$%d, _%s_%d\n", reg, b->name, cur_const_val);
+                    asm_out ("\tl.s\t$f%d, _%s_%d\n", reg, b->name, cur_const_val);
                     frame_data_out("\t_%s_%d: .float %f\n", b->name, cur_const_val, b->tmp_val_u.tmp_fval);
                     cur_const_val++;
                 }
                 else if (0 == b->place)
                 {
                     /* FIXME: cant be li, needs to load from a static float in .data */
-                    asm_out ("\tlw\t$f%d, _%s\n", reg, b->name);
+                    asm_out ("\tl.s\t$f%d, _%s\n", reg, b->name);
                 }
                 ptrA->place = reg;
-                asm_out ("\tsw\t$%d, _%s\n", reg, a->name);
+                asm_out ("\tsw\t$f%d, _%s\n", reg, a->name);
                 ns_reg (reg);
             }
             return ZERO_;
@@ -1304,15 +1314,23 @@ asm_emit_global_decl_list (var_decl * a)
 
         if (PII->assignment_during_initialization)
         {
-            if (INT_ == a->type)
-                asm_out (" %d\n", PII->val_u.intval);
-            else if (FLOAT_ == a->type)
-                asm_out (" %f\n", PII->val_u.fval);
+            if (INT_ == a->type){
+                    asm_out (" %d\n", PII->val_u.intval);
+            }
+            else if (FLOAT_ == a->type){
+                    asm_out (" %f\n", PII->val_u.fval);
+            }
         }
         else
         {
             /* If no value is specified, _always_ initialize static data to
              * zero (as recommended by Dr. Hsu) */
+            if (INT_ == a->type){
+                    PII->val_u.intval = 0;
+            }
+            else if (FLOAT_ == a->type){
+                    PII->val_u.fval = 0.0;
+            }
             asm_out (" 0\n");
         }
     }
@@ -1408,6 +1426,14 @@ asm_emit_scoped_decl_list (var_decl * v)
                 /* FIXME: asm_emit_global_decl_list only supports scalar values */
             }
         }
+        else{
+            if (INT_ == v->type){
+                    PII->val_u.intval = 0;
+            }
+            else if (FLOAT_ == v->type){
+                    PII->val_u.fval = 0.0;
+            }
+        }
     }
     while ((PIL = PIL->next));
 }
@@ -1478,7 +1504,9 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                if(0 >= b->place || 32 <= b->place){
+                fprintf(stderr, "b->place: %d\n", b->place);
+                if(1 > b->place || 32 <= b->place){
+                    regB = get_reg(b);
                     asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
                 }else{
                     regB = b->place;
@@ -1629,16 +1657,16 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             /*  FIXME: I don't think this is right */
             if (ptrA->scope > 0)
             {
-                asm_out ("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
+                asm_out ("\tl.s\t$f%d, %d($fp)\n", regA, ptrA->offset);
             }
             else if (0 == ptrA->place)
             {
-                asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
+                asm_out ("\tl.s\t$f%d, _%s\n", regA, a->name);
             }
         }
         else
         {
-            asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
+            asm_out ("\tl.s\t$f%d, _%s\n", regA, a->name);
         }
 
         /* if it's null it's a constant */
@@ -1650,17 +1678,17 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             /*  FIXME: I don't think this is right */
             if (ptrB->scope > 0)
             {
-                asm_out ("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
+                asm_out ("\tl.s\t$f%d, %d($fp)\n", regB, ptrB->offset);
             }
             else if (0 == ptrA->place)
             {
-                asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
+                asm_out ("\tl.s\t$f%d, _%s\n", regB, b->name);
             }
         }
         else
         {
             /*asm_out ("\tlw\t$%d, _%s\n", regB, b->name);*/
-            asm_out ("\tlw\t$%d, _f_%d\n", regB, cur_const_val);
+            asm_out ("\tl.s\t$f%d, _f_%d\n", regB, cur_const_val);
             frame_data_out("\t_f_%d: .float %f\n", cur_const_val, b->tmp_val_u.tmp_fval);
             cur_const_val++;
         }
@@ -1668,11 +1696,11 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
 
     if (OP_PLUS == opval)
     {
-        asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        asm_out ("\tadd.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
     }
     else if (OP_MINUS == opval)
     {
-        asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        asm_out ("\tsub.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
     }
 
     free_reg (regA);
@@ -1761,16 +1789,16 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             /*  FIXME: I don't think this is right */
             if (ptrA->scope > 0)
             {
-                asm_out ("\tlw\t$%d, %d($fp)\n", regA, ptrA->offset);
+                asm_out ("\tl.s\t$f%d, %d($fp)\n", regA, ptrA->offset);
             }
             else
             {
-                asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
+                asm_out ("\tl.s\t$f%d, _%s\n", regA, a->name);
             }
         }
         else
         {
-            asm_out ("\tlw\t$%d, _%s\n", regA, a->name);
+            asm_out ("\tl.s\t$f%d, _%s\n", regA, a->name);
         }
 
         if (regB != regA)
@@ -1784,17 +1812,17 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
                 /*  FIXME: I don't think this is right */
                 if (ptrB->scope > 0)
                 {
-                    asm_out ("\tlw\t$%d, %d($fp)\n", regB, ptrB->offset);
+                    asm_out ("\tl.s\t$f%d, %d($fp)\n", regB, ptrB->offset);
                 }
                 else
                 {
-                    asm_out ("\tlw\t$%d, _%s\n", regB, b->name);
+                    asm_out ("\tl.s\t$f%d, _%s\n", regB, b->name);
                 }
             }
             else
             {
                 /*asm_out ("\tlw\t$%d, _%s\n", regB, b->name);*/
-                asm_out ("\tlw\t$%d, _f_%d\n", regB, cur_const_val);
+                asm_out ("\tl.s\t$f%d, _f_%d\n", regB, cur_const_val);
                 frame_data_out("\t_f_%d: .float %f\n", cur_const_val, b->tmp_val_u.tmp_fval);
                 cur_const_val++;
             }
@@ -1803,11 +1831,11 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
 
     if (OP_TIMES == opval)
     {
-        asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        asm_out ("\tmul.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
     }
     else if (OP_DIVIDE == opval)
     {
-        asm_out ("\tdiv\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        asm_out ("\tdiv.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
     }
 
     free_reg (regA);
@@ -1842,11 +1870,11 @@ asm_emit_write (TypeList * idl)
     {
         asm_out ("\tli\t$v0, 2\n");
         if(NULL != symptr){
-            asm_out ("\tlw\t$a0, %d($fp)\n", symptr->offset);
+            asm_out ("\tl.s\t$f12, %d($fp)\n", symptr->offset);
         }
         else{
             /* FIXME: I don't think this is right either */
-            asm_out ("\tmove\t$a0, $%d\n", idl->P_var_r->place);
+            asm_out ("\tmove.s\t$f12, $%d\n", idl->P_var_r->place);
         }
     }
     else
