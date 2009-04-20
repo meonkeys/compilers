@@ -847,8 +847,13 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 				$$->type=INT_;
 			$$->name=NULL;
 		}
-		| ID MK_LPAREN relop_expr_list MK_RPAREN{
+		| /* FUNCTION CALL */
+			ID MK_LPAREN relop_expr_list MK_RPAREN{
 			$$=check_function($1,$3);
+			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
+				asm_out("\tjal\t%s\n", $1);
+			}
+			
 		}
 		| OP_MINUS ID MK_LPAREN relop_expr_list MK_RPAREN{
 			$$=check_function($2,$4);
