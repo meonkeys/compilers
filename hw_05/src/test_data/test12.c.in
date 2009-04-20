@@ -16,6 +16,7 @@ void main()
   e = 5.2;
   
   write(c);
+  write("\n");
 
   {
     int c;
