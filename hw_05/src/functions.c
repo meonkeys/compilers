@@ -1530,10 +1530,8 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                fprintf (stderr, "b->place: %d\n", b->place);
                 if (1 > b->place || 32 <= b->place)
                 {
-                    regB = get_reg (b);
                     asm_out ("\tli\t$%d, %d\n", regB,
                              b->tmp_val_u.tmp_intval);
                 }
