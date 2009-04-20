@@ -5,7 +5,7 @@ totalTests=0
 tmpdir=`mktemp -d`
 testDataDir=$1
 spim_output_head="SPIM Version 7.4 of January 1, 2009\nCopyright 1990-2004 by James R. Larus (larus@cs.wisc.edu).\nAll Rights Reserved.\nSee the file README for a full copyright notice.\nLoaded: /usr/lib/spim/exceptions.s"
-for t in `find $testDataDir -type f -name "*.in" | sort`
+for t in `find $testDataDir -type f -name "test*.in" | sort`
 do
     totalTests=$(($totalTests + 1))
     echo -n "$t ... "
