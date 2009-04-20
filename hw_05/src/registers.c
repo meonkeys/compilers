@@ -54,11 +54,13 @@ get_reg (var_ref * vr)
         /* The spill case!  We return the stack pointer */
         return 29;
     }
-    else if(NULL != vr && vr->place < 32 && vr->place > 0)
+    else if (NULL != vr && vr->place < 32 && vr->place > 0)
     {
-        reg_costs[vr->place] = 1; /* I think this is the right cost to set */
+        reg_costs[vr->place] = 1;       /* I think this is the right cost to set */
         return vr->place;
-    }else{ /* this should never happen */
+    }
+    else
+    {                           /* this should never happen */
         return 8;
     }
 }

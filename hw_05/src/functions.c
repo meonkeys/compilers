@@ -18,7 +18,7 @@ extern int linenumber;
 extern int offset;
 extern int param_offset;
 
-extern char* frame_data;
+extern char *frame_data;
 
 extern FILE *asm_out_fp;
 
@@ -303,28 +303,36 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 /* constant */
                 if (NULL != b->name)
                 {
-                    /*asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB);*/
-                    
-                    asm_out ("\tl.s\t$f%d, _%s_%d\n", reg, b->name, cur_const_val);
-                    frame_data_out("\t_%s_%d: .float %f\n", b->name, cur_const_val, b->tmp_val_u.tmp_fval);
+                    /*asm_out ("\tlw\t$%d, %d($fp)\n", reg, offsetB); */
+
+                    asm_out ("\tl.s\t$f%d, _%s_%d\n", reg, b->name,
+                             cur_const_val);
+                    frame_data_out ("\t_%s_%d: .float %f\n", b->name,
+                                    cur_const_val, b->tmp_val_u.tmp_fval);
                     cur_const_val++;
                 }
                 else if (0 <= b->place && 32 > b->place)
                 {
-                    /*fprintf(stderr, "line: %d b->tmp: %f\tb->place: %d\n", linenumber, b->tmp_val_u.tmp_fval, b->place);*/
+                    /*fprintf(stderr, "line: %d b->tmp: %f\tb->place: %d\n", linenumber, b->tmp_val_u.tmp_fval, b->place); */
                     /* 
                      * if 0 <= place < 32, then it was stored in $fN 
                      * so we need to store from $fN
                      */
-                    if(0.0 == b->tmp_val_u.tmp_fval && b->place == 0){
+                    if (0.0 == b->tmp_val_u.tmp_fval && b->place == 0)
+                    {
                         /* if tmp isn't set, it's a read */
-                        /*asm_out("\tmfc1\t$%d, $f%d\n", reg, b->place);*/
+                        /*asm_out("\tmfc1\t$%d, $f%d\n", reg, b->place); */
                         reg = 0;
-                    }else if(0.0 != b->tmp_val_u.tmp_fval && b->place == 0){
+                    }
+                    else if (0.0 != b->tmp_val_u.tmp_fval && b->place == 0)
+                    {
                         asm_out ("\tl.s\t$f%d, _f_%d\n", reg, cur_const_val);
-                        frame_data_out("\t_f_%d: .float %f\n", cur_const_val, b->tmp_val_u.tmp_fval);
+                        frame_data_out ("\t_f_%d: .float %f\n", cur_const_val,
+                                        b->tmp_val_u.tmp_fval);
                         cur_const_val++;
-                    }else{
+                    }
+                    else
+                    {
                         reg = b->place;
                     }
                 }
@@ -337,8 +345,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 if (NULL != b->name)
                 {
                     /* asm_out ("\tlw\t$%d, _%s\n", reg, b->name); */
-                    asm_out ("\tl.s\t$f%d, _%s_%d\n", reg, b->name, cur_const_val);
-                    frame_data_out("\t_%s_%d: .float %f\n", b->name, cur_const_val, b->tmp_val_u.tmp_fval);
+                    asm_out ("\tl.s\t$f%d, _%s_%d\n", reg, b->name,
+                             cur_const_val);
+                    frame_data_out ("\t_%s_%d: .float %f\n", b->name,
+                                    cur_const_val, b->tmp_val_u.tmp_fval);
                     cur_const_val++;
                 }
                 else if (0 == b->place)
@@ -693,8 +703,8 @@ type_decl_enter_ST1 (int a, id_list * b)
     {
         name =
             (b->P_ini_i->type ==
-             ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->
-            P_ini_i->init_id_u.name;
+             ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->P_ini_i->
+            init_id_u.name;
         if ((entry = lookup (name)))
             if ((entry) && (entry->scope >= scope))
             {
@@ -735,8 +745,8 @@ type_decl_enter_ST2 (char *a, id_list * b)
         {
             name =
                 (b->P_ini_i->type ==
-                 ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->
-                P_ini_i->init_id_u.name;
+                 ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->P_ini_i->
+                init_id_u.name;
             if (b->P_ini_i->type == ARR_)
             {
                 b->P_ini_i->init_id_u.P_arr_s->arr_info->arrtype = STR_;
@@ -903,8 +913,8 @@ search (char *a, char *b)
             if (!strcmp (c, PSS1->struct_semantic_u.str_info.str_var_name))
             {
                 if (((PST1 =
-                      lookup (PSS1->struct_semantic_u.
-                              str_info.struct_type_name)) == NULL)
+                      lookup (PSS1->struct_semantic_u.str_info.
+                              struct_type_name)) == NULL)
                     || (PST1->scope > scope))
                     return NULL;
                 else
@@ -1314,22 +1324,26 @@ asm_emit_global_decl_list (var_decl * a)
 
         if (PII->assignment_during_initialization)
         {
-            if (INT_ == a->type){
-                    asm_out (" %d\n", PII->val_u.intval);
+            if (INT_ == a->type)
+            {
+                asm_out (" %d\n", PII->val_u.intval);
             }
-            else if (FLOAT_ == a->type){
-                    asm_out (" %f\n", PII->val_u.fval);
+            else if (FLOAT_ == a->type)
+            {
+                asm_out (" %f\n", PII->val_u.fval);
             }
         }
         else
         {
             /* If no value is specified, _always_ initialize static data to
              * zero (as recommended by Dr. Hsu) */
-            if (INT_ == a->type){
-                    PII->val_u.intval = 0;
+            if (INT_ == a->type)
+            {
+                PII->val_u.intval = 0;
             }
-            else if (FLOAT_ == a->type){
-                    PII->val_u.fval = 0.0;
+            else if (FLOAT_ == a->type)
+            {
+                PII->val_u.fval = 0.0;
             }
             asm_out (" 0\n");
         }
@@ -1416,8 +1430,11 @@ asm_emit_scoped_decl_list (var_decl * v)
             {
                 int reg = get_result_reg ();
                 /* asm_out ("\tli\t$%d, %f\n", reg, PII->val_u.fval); */
-                asm_out ("\tla\t$%d, _%s_%d\n", reg, PII->init_id_u.name, cur_const_val);
-                frame_data_out("\t_%s_%d:\t.float\t%f\n", PII->init_id_u.name, cur_const_val, PII->val_u.fval);
+                asm_out ("\tla\t$%d, _%s_%d\n", reg, PII->init_id_u.name,
+                         cur_const_val);
+                frame_data_out ("\t_%s_%d:\t.float\t%f\n",
+                                PII->init_id_u.name, cur_const_val,
+                                PII->val_u.fval);
                 cur_const_val++;
                 asm_out ("\tsw\t$%d, %d($fp)\n", reg, PII->offset);
             }
@@ -1426,12 +1443,15 @@ asm_emit_scoped_decl_list (var_decl * v)
                 /* FIXME: asm_emit_global_decl_list only supports scalar values */
             }
         }
-        else{
-            if (INT_ == v->type){
-                    PII->val_u.intval = 0;
+        else
+        {
+            if (INT_ == v->type)
+            {
+                PII->val_u.intval = 0;
             }
-            else if (FLOAT_ == v->type){
-                    PII->val_u.fval = 0.0;
+            else if (FLOAT_ == v->type)
+            {
+                PII->val_u.fval = 0.0;
             }
         }
     }
@@ -1452,7 +1472,9 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     if (NULL == b)
     {
         res_reg = regA;
-    } else {
+    }
+    else
+    {
         res_reg = get_result_reg ();
         regB = get_reg (b);
     }
@@ -1477,15 +1499,19 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            if(0 >= a->place || 32 < a->place){
+            if (0 >= a->place || 32 < a->place)
+            {
                 asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
-            }else{
+            }
+            else
+            {
                 regA = a->place;
             }
         }
 
         /* if b is null, this is an expr-to-relop_factor reduction */
-        if (NULL != b) {
+        if (NULL != b)
+        {
             /* if name is null, b is a constant */
             if (NULL != b->name)
             {
@@ -1504,11 +1530,15 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                fprintf(stderr, "b->place: %d\n", b->place);
-                if(1 > b->place || 32 <= b->place){
-                    regB = get_reg(b);
-                    asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
-                }else{
+                fprintf (stderr, "b->place: %d\n", b->place);
+                if (1 > b->place || 32 <= b->place)
+                {
+                    regB = get_reg (b);
+                    asm_out ("\tli\t$%d, %d\n", regB,
+                             b->tmp_val_u.tmp_intval);
+                }
+                else
+                {
                     regB = b->place;
                 }
             }
@@ -1538,7 +1568,8 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         }
 
         /* if b is null, this is an expr-to-relop_factor reduction */
-        if (NULL != b) {
+        if (NULL != b)
+        {
             /* if name is null, b is a constant */
             if (NULL != b->name)
             {
@@ -1568,33 +1599,34 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     {
         switch (opval)
         {
-            case OP_GT:
-                asm_out ("\tsgt\t$%d, $%d, $%d\n", res_reg, regA, regB);
-                break;
-            case OP_GE:
-                asm_out ("\tsge\t$%d, $%d, $%d\n", res_reg, regA, regB);
-                break;
-            case OP_LT:
-                asm_out ("\tslt\t$%d, $%d, $%d\n", res_reg, regA, regB);
-                break;
-            case OP_LE:
-                asm_out ("\tsle\t$%d, $%d, $%d\n", res_reg, regA, regB);
-                break;
-            case OP_NE:
-                asm_out ("\tsne\t$%d, $%d, $%d\n", res_reg, regA, regB);
-                break;
-            case OP_EQ:
-                asm_out ("\tseq\t$%d, $%d, $%d\n", res_reg, regA, regB);
-                break;
-            default:
-                fprintf (stderr, "don't know how to handle relop: %d\n", opval);
-                assert(0);
+        case OP_GT:
+            asm_out ("\tsgt\t$%d, $%d, $%d\n", res_reg, regA, regB);
+            break;
+        case OP_GE:
+            asm_out ("\tsge\t$%d, $%d, $%d\n", res_reg, regA, regB);
+            break;
+        case OP_LT:
+            asm_out ("\tslt\t$%d, $%d, $%d\n", res_reg, regA, regB);
+            break;
+        case OP_LE:
+            asm_out ("\tsle\t$%d, $%d, $%d\n", res_reg, regA, regB);
+            break;
+        case OP_NE:
+            asm_out ("\tsne\t$%d, $%d, $%d\n", res_reg, regA, regB);
+            break;
+        case OP_EQ:
+            asm_out ("\tseq\t$%d, $%d, $%d\n", res_reg, regA, regB);
+            break;
+        default:
+            fprintf (stderr, "don't know how to handle relop: %d\n", opval);
+            assert (0);
         }
     }
 
 
     free_reg (regA);
-    if (-9999 != regB) free_reg (regB);
+    if (-9999 != regB)
+        free_reg (regB);
     save_reg (res_reg);
 
     return res_reg;
@@ -1632,9 +1664,12 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            if(0 == a->place){
+            if (0 == a->place)
+            {
                 asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
-            }else{
+            }
+            else
+            {
                 regA = a->place;
             }
         }
@@ -1657,9 +1692,12 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            if(0 == b->place){
+            if (0 == b->place)
+            {
                 asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
-            }else{
+            }
+            else
+            {
                 regB = b->place;
             }
         }
@@ -1705,26 +1743,33 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            /*asm_out ("\tlw\t$%d, _%s\n", regB, b->name);*/
+            /*asm_out ("\tlw\t$%d, _%s\n", regB, b->name); */
             asm_out ("\tl.s\t$f%d, _f_%d\n", regB, cur_const_val);
-            frame_data_out("\t_f_%d: .float %f\n", cur_const_val, b->tmp_val_u.tmp_fval);
+            frame_data_out ("\t_f_%d: .float %f\n", cur_const_val,
+                            b->tmp_val_u.tmp_fval);
             cur_const_val++;
         }
     }
 
     if (OP_PLUS == opval)
     {
-        if(INT_ == a->type){
+        if (INT_ == a->type)
+        {
             asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, regA, regB);
-        }else{
+        }
+        else
+        {
             asm_out ("\tadd.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
         }
     }
     else if (OP_MINUS == opval)
     {
-        if(INT_ == a->type){
+        if (INT_ == a->type)
+        {
             asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, regA, regB);
-        }else{
+        }
+        else
+        {
             asm_out ("\tsub.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
         }
     }
@@ -1767,12 +1812,16 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
         }
         else
         {
-            if(0 == a->place){
+            if (0 == a->place)
+            {
                 asm_out ("\tli\t$%d, %d\n", regA, a->tmp_val_u.tmp_intval);
-            }else{
+            }
+            else
+            {
                 regA = a->place;
-                if(a->place == regB){
-                    regB = get_reg(b);
+                if (a->place == regB)
+                {
+                    regB = get_reg (b);
                 }
             }
         }
@@ -1797,9 +1846,13 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                if(0 == b->place){
-                    asm_out ("\tli\t$%d, %d\n", regB, b->tmp_val_u.tmp_intval);
-                }else{
+                if (0 == b->place)
+                {
+                    asm_out ("\tli\t$%d, %d\n", regB,
+                             b->tmp_val_u.tmp_intval);
+                }
+                else
+                {
                     regB = b->place;
                 }
             }
@@ -1847,9 +1900,10 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             }
             else
             {
-                /*asm_out ("\tlw\t$%d, _%s\n", regB, b->name);*/
+                /*asm_out ("\tlw\t$%d, _%s\n", regB, b->name); */
                 asm_out ("\tl.s\t$f%d, _f_%d\n", regB, cur_const_val);
-                frame_data_out("\t_f_%d: .float %f\n", cur_const_val, b->tmp_val_u.tmp_fval);
+                frame_data_out ("\t_f_%d: .float %f\n", cur_const_val,
+                                b->tmp_val_u.tmp_fval);
                 cur_const_val++;
             }
         }
@@ -1857,17 +1911,23 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
 
     if (OP_TIMES == opval)
     {
-        if(INT_ == a->type){
+        if (INT_ == a->type)
+        {
             asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, regA, regB);
-        }else{
+        }
+        else
+        {
             asm_out ("\tmul.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
         }
     }
     else if (OP_DIVIDE == opval)
     {
-        if(INT_ == a->type){
+        if (INT_ == a->type)
+        {
             asm_out ("\tdiv\t$%d, $%d, $%d\n", res_reg, regA, regB);
-        }else{
+        }
+        else
+        {
             asm_out ("\tdiv.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
         }
     }
@@ -1881,21 +1941,27 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
 void
 asm_emit_write (TypeList * idl)
 {
-    symtab* symptr = NULL;
-    if(NULL != idl->P_var_r->name){
-        symptr = lookup(idl->P_var_r->name);
+    symtab *symptr = NULL;
+    if (NULL != idl->P_var_r->name)
+    {
+        symptr = lookup (idl->P_var_r->name);
     }
     if (INT_ == idl->P_var_r->type)
     {
         asm_out ("\tli\t$v0, 1\n");
-        if(NULL != symptr){
-            if(symptr->scope > 0){
+        if (NULL != symptr)
+        {
+            if (symptr->scope > 0)
+            {
                 asm_out ("\tlw\t$a0, %d($fp)\n", symptr->offset);
-            }else{
+            }
+            else
+            {
                 asm_out ("\tlw\t$a0, _%s\n", idl->P_var_r->name);
             }
         }
-        else{
+        else
+        {
             /* FIXME: I don't think this is right */
             asm_out ("\tmove\t$a0, $%d\n", idl->P_var_r->place);
         }
@@ -1903,19 +1969,22 @@ asm_emit_write (TypeList * idl)
     else if (FLOAT_ == idl->P_var_r->type)
     {
         asm_out ("\tli\t$v0, 2\n");
-        if(NULL != symptr){
+        if (NULL != symptr)
+        {
             asm_out ("\tl.s\t$f12, %d($fp)\n", symptr->offset);
         }
-        else{
+        else
+        {
             /* FIXME: I don't think this is right either */
             asm_out ("\tmove.s\t$f12, $%d\n", idl->P_var_r->place);
         }
     }
     else
-    {/* string */
+    {                           /* string */
         asm_out ("\tli\t$v0, 4\n");
         /* this might require scope? */
-        frame_data_out("\t_sConst%d: .asciiz %s\n", cur_const_val, idl->P_var_r->tmp_val_u.tmp_str);
+        frame_data_out ("\t_sConst%d: .asciiz %s\n", cur_const_val,
+                        idl->P_var_r->tmp_val_u.tmp_str);
         asm_out ("\tla\t$a0, _sConst%d\n", cur_const_val);
         cur_const_val++;
     }
@@ -1944,8 +2013,8 @@ gen_prologue (const char *name)
     asm_out ("%s:\n", name);
 
     /*
-    asm_out ("\tsub\t$sp, $sp, 4\n");
-    */
+       asm_out ("\tsub\t$sp, $sp, 4\n");
+     */
     asm_out ("\tsw\t$ra, ($sp)\n");
 
     asm_out ("\tsw\t$fp, -4($sp)\n");
@@ -1955,14 +2024,16 @@ gen_prologue (const char *name)
     asm_out ("\tsub\t$sp, $sp, $v0\n");
 
     /* save $s0-7 */
-    if(0 != strcmp(name, "main")){
-        for(i = 0; i < 8; i++){
-            asm_out("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
-            asm_out("\tsw\t$s%d, ($sp)\n", i);
+    if (0 != strcmp (name, "main"))
+    {
+        for (i = 0; i < 8; i++)
+        {
+            asm_out ("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
+            asm_out ("\tsw\t$s%d, ($sp)\n", i);
         }
     }
 
-    asm_out("\n");
+    asm_out ("\n");
 
     asm_out ("_begin_%s:\n", name);
 }
@@ -1974,10 +2045,12 @@ gen_epilogue (const char *name)
     asm_out ("\n_end_%s:\n", name);
 
     /* restore $s0-7 in reverse order (due to stack) */
-    if(0 != strcmp(name, "main")){
-        for(i = 7; i >= 0; i--){
-            asm_out("\tlw\t$s%d, ($sp)\t#pop $s%d\n", i, i);
-            asm_out("\tadd\t$sp, $sp, 4\n", i);
+    if (0 != strcmp (name, "main"))
+    {
+        for (i = 7; i >= 0; i--)
+        {
+            asm_out ("\tlw\t$s%d, ($sp)\t#pop $s%d\n", i, i);
+            asm_out ("\tadd\t$sp, $sp, 4\n", i);
         }
     }
 
@@ -1993,14 +2066,15 @@ gen_epilogue (const char *name)
     else
     {
         asm_out ("\tjr $ra\n");
-        asm_out("\tnop\n");
+        asm_out ("\tnop\n");
     }
 
     asm_out ("\n.data\n");
     asm_out ("\t_framesize_%s: .word %d\n", name, abs (offset) - 4);    /* -4 to remove prior +4 */
-    if(NULL != frame_data){
+    if (NULL != frame_data)
+    {
         asm_out (frame_data);
-        free(frame_data);
+        free (frame_data);
         frame_data = NULL;
     }
 }
@@ -2035,9 +2109,9 @@ void
 gen_control_test (var_ref * a, int exit_label_num)
 {
     /*
-    int reg = get_reg (a);
-    a->place = reg;
-    */
+       int reg = get_reg (a);
+       a->place = reg;
+     */
 #if 0
     fprintf (stderr, "scope: %d\n", scope);
     fprintf (stderr, "\tvar '%s' is at place %d\n", a->name, a->place);
@@ -2052,16 +2126,17 @@ gen_control_test (var_ref * a, int exit_label_num)
             asm_out ("\tli\t$%d, %d\n", reg, a->tmp_val_u.tmp_intval);
             break;
         case FLOAT_:
-            frame_data_out("\t_sConst%d: .float %f\n", cur_const_val, a->tmp_val_u.tmp_fval);
+            frame_data_out ("\t_sConst%d: .float %f\n", cur_const_val,
+                            a->tmp_val_u.tmp_fval);
             asm_out ("\tla\t$%d, _sConst%d\n", reg, cur_const_val);
             cur_const_val++;
             break;
         default:
-            assert(0);
+            assert (0);
         }
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
     }
-    else if (a->place > 0 && a->place < 32) /* FIXME: this is a bad way to check if place is initialized */
+    else if (a->place > 0 && a->place < 32)     /* FIXME: this is a bad way to check if place is initialized */
     {
         int testreg = get_reg (NULL);
         asm_out ("\tmove\t$%d, $%d\n", testreg, a->place);
@@ -2099,19 +2174,24 @@ gen_control_exit_ifelse (int label_num)
 }
 
 void
-frame_data_out(char const* fmt, ...){
+frame_data_out (char const *fmt, ...)
+{
 
     va_list ap;
     assert (NULL != fmt);
     va_start (ap, fmt);
-    if(frame_data == NULL){
-        frame_data = malloc(sizeof(char) * 128);
-    }else{
-        frame_data = realloc(frame_data, strlen(frame_data) + sizeof(char)*128);
+    if (frame_data == NULL)
+    {
+        frame_data = malloc (sizeof (char) * 128);
     }
-    vsprintf (&(frame_data[strlen(frame_data)]), fmt, ap);
+    else
+    {
+        frame_data =
+            realloc (frame_data, strlen (frame_data) + sizeof (char) * 128);
+    }
+    vsprintf (&(frame_data[strlen (frame_data)]), fmt, ap);
     /* This removes extra allocated memory */
-    frame_data = realloc(frame_data, strlen(frame_data)+1);
+    frame_data = realloc (frame_data, strlen (frame_data) + 1);
 }
 
 /*
