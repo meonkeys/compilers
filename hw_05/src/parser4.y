@@ -527,7 +527,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				$$=$6;
 			} else {
 				gen_control_iterate($3->label_num);
-				gen_control_exit($3->label_num);
+				gen_control_endlabel($3->label_num);
 			}
 		}
 	        | FOR MK_LPAREN assign_expr_list MK_SEMICOLON relop_expr_list MK_SEMICOLON assign_expr_list MK_RPAREN stmt
@@ -550,20 +550,26 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				$$=ERROR_;
 			} else {
 				$$=$5;
-				gen_control_exit ($3->label_num);
+				gen_control_endlabel ($3->label_num);
 			}
 		}
-		| IF MK_LPAREN test MK_RPAREN stmt ELSE stmt{
+		| IF MK_LPAREN test MK_RPAREN stmt ELSE
+		{
+			gen_control_exit_ifelse ($3->label_num);
+			gen_control_endlabel ($3->label_num)
+		}
+		stmt
+		{
 			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
 				printf("error %d: condition not a basic type in if statement\n",linenumber);
 				$$=ERROR_;
 			} else {
-				if (($5==ERROR_)||($7==ERROR_)) {
+				if (($5==ERROR_)||($8==ERROR_)) {
 					$$=ERROR_;
 				} else {
 					$$=ZERO_;
-					gen_control_exit ($3->label_num);
 				}
+				gen_control_ifelse_endlabel ($3->label_num);
 			}
 		}
 

@@ -275,7 +275,9 @@ void gen_epilogue (const char *name);
 void gen_control_start (int test_label_num);
 void gen_control_test (var_ref * a, int exit_label_num);
 void gen_control_iterate (int test_label_num);
-void gen_control_exit (int exit_label_num);
+void gen_control_endlabel (int exit_label_num);
+void gen_control_exit_ifelse (int else_label_num);
+void gen_control_ifelse_endlabel (int else_label_num);
 
 void eval_relop_expr(var_ref* a, var_ref b, int op);
 

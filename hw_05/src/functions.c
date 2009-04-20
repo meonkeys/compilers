@@ -1999,7 +1999,7 @@ gen_control_test (var_ref * a, int exit_label_num)
         }
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
     }
-    else if (a->place > 0 && a->place < 32)
+    else if (a->place > 0 && a->place < 32) /* FIXME: this is a bad way to check if place is initialized */
     {
         int testreg = get_reg (NULL);
         asm_out ("\tmove\t$%d, $%d\n", testreg, a->place);
@@ -2013,15 +2013,27 @@ gen_control_test (var_ref * a, int exit_label_num)
 }
 
 void
-gen_control_iterate (int test_label_num)
+gen_control_iterate (int label_num)
 {
-    asm_out ("\tj\t_Test%d\n", test_label_num);
+    asm_out ("\tj\t_Test%d\n", label_num);
 }
 
 void
-gen_control_exit (int exit_label_num)
+gen_control_endlabel (int label_num)
 {
-    asm_out ("_Lexit%d:\n", exit_label_num);
+    asm_out ("_Lexit%d:\n", label_num);
+}
+
+void
+gen_control_ifelse_endlabel (int label_num)
+{
+    asm_out ("_Lelse%d:\n", label_num);
+}
+
+void
+gen_control_exit_ifelse (int label_num)
+{
+    asm_out ("\tj\t_Lelse%d\n", label_num);
 }
 
 void
