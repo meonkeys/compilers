@@ -637,16 +637,15 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			}
 			else{
 				if(INT_ == $2->type){
-					asm_out("#fooooo\n");
-					if(0 == $2->place && NULL != $2->name){
+					if(NULL != $2->name){
 						symtab* symptr = lookup($2->name);
 						assert(NULL != symptr);
 						asm_out("\tlw\t$v0, %d($fp)\n", symptr->offset);
 					}else{
-						asm_out("\tmove\t$%d, $v0\n", $2->place);
+						asm_out("\tmove\t$v0, $%d\n", $2->place);
 					}
 				}else if(FLOAT_ == $2->type){
-					asm_out("\tmov.s\t$f%d, $f0\n", $2->place);
+					asm_out("\tmov.s\t$f0, $f%d\n", $2->place);
 				}
 				$$=ZERO_;
 			}
