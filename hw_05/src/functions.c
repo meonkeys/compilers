@@ -1711,11 +1711,19 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
 
     if (OP_PLUS == opval)
     {
-        asm_out ("\tadd.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+        if(INT_ == a->type){
+            asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        }else{
+            asm_out ("\tadd.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+        }
     }
     else if (OP_MINUS == opval)
     {
-        asm_out ("\tsub.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+        if(INT_ == a->type){
+            asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        }else{
+            asm_out ("\tsub\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+        }
     }
 
     free_reg (regA);
@@ -1846,11 +1854,19 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
 
     if (OP_TIMES == opval)
     {
-        asm_out ("\tmul.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+        if(INT_ == a->type){
+            asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        }else{
+            asm_out ("\tmul.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+        }
     }
     else if (OP_DIVIDE == opval)
     {
-        asm_out ("\tdiv.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+        if(INT_ == a->type){
+            asm_out ("\tdiv\t$%d, $%d, $%d\n", res_reg, regA, regB);
+        }else{
+            asm_out ("\tdiv.s\t$f%d, $f%d, $f%d\n", res_reg, regA, regB);
+        }
     }
 
     free_reg (regA);
