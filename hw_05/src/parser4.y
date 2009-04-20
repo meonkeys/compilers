@@ -853,7 +853,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
 				asm_out("\tjal\t%s\n", $1);
 			}
-			
+
 		}
 		| OP_MINUS ID MK_LPAREN relop_expr_list MK_RPAREN{
 			$$=check_function($2,$4);
