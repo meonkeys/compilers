@@ -16,9 +16,6 @@ int fact()
   else
     {
       currentnum = currentnum - 1;
-	  write("fact_current: ");
-	  write(currentnum);
-	  write("\n");
       return ( localnum * fact( ) );
     }
 }

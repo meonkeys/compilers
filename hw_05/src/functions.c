@@ -278,7 +278,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else if (1 == b->is_return)
                 {
-                    asm_out ("#FOOOOOOOOOOOOOOOOO\n");
                     reg = b->place;
                 }
                 else if (0 == b->place)
@@ -1713,10 +1712,9 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
                 asm_out ("\tli\t$%d, %d\t# line %d\n", regA,
                          a->tmp_val_u.tmp_intval, linenumber);
             }
-            else if (1 == a->is_return)
+            else if(1 == a->is_return)
             {
-                asm_out ("#BAAAAAAAAAAAAAAARRRRRRRR\n");
-                regA = a->place;
+                    regA= a->place;
             }
             else
             {
@@ -1751,7 +1749,6 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             }
             else if (1 == b->is_return)
             {
-                asm_out ("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
                 regB = b->place;
             }
             else
@@ -1776,7 +1773,6 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             }
             else if (1 == b->is_return)
             {
-                asm_out ("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
                 regA = a->place;
             }
             else if (0 == ptrA->place)
@@ -1805,7 +1801,6 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
             }
             else if (1 == b->is_return)
             {
-                asm_out ("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
                 regB = b->place;
             }
             else if (0 == ptrA->place)
@@ -1886,7 +1881,6 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             }
             else if (1 == a->is_return)
             {
-                asm_out ("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
                 regA = a->place;
             }
             else
@@ -1928,7 +1922,6 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
                 }
                 else if (1 == b->is_return)
                 {
-                    asm_out ("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
                     regB = b->place;
                 }
                 else
@@ -1966,7 +1959,6 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
             }
             else if (1 == a->is_return)
             {
-                asm_out ("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
                 regA = a->place;
             }
             else
@@ -1996,7 +1988,6 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
                 }
                 else if (1 == b->is_return)
                 {
-                    asm_out ("#bZZZZZZZZZZZZZZZZZZZZZZZZZZ\n");
                     regB = b->place;
                 }
                 else
@@ -2179,7 +2170,6 @@ gen_epilogue (const char *name)
     else
     {
         asm_out ("\tjr\t$ra\n");
-        asm_out ("\tnop\n");
     }
 
     asm_out ("\n.data\n");
