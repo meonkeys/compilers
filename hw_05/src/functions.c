@@ -1550,6 +1550,9 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
             case OP_NE:
                 asm_out ("\tsne\t$%d, $%d, $%d\n", res_reg, regA, regB);
                 break;
+            case OP_EQ:
+                asm_out ("\tseq\t$%d, $%d, $%d\n", res_reg, regA, regB);
+                break;
 #if 0
             default:
                 fprintf (stderr, "don't know how to handle relop: %d\n", opval);
