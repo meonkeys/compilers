@@ -873,7 +873,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 				}
 				$$->is_return = 1;
 			}
-			
+
 		}
 		| OP_MINUS ID MK_LPAREN relop_expr_list MK_RPAREN{
 			$$=check_function($2,$4);

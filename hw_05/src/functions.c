@@ -2097,7 +2097,7 @@ gen_epilogue (const char *name)
     }
     else
     {
-        asm_out ("\tjr $ra\n");
+        asm_out ("\tjr\t$ra\n");
         asm_out ("\tnop\n");
     }
 
