@@ -261,6 +261,9 @@ int asm_emit_expr (var_ref * a, var_ref * b, int opval);
 int asm_emit_term (var_ref * a, var_ref * b, int opval);
 int asm_emit_relop_factor (var_ref * a, var_ref * b, int opval);
 
+int asm_emit_load_int(int reg, var_ref* v);
+int asm_emit_load_float(int reg, var_ref* v);
+
 void asm_emit_write (TypeList * idl);
 void asm_emit_read (void);
 void asm_emit_fread (void);

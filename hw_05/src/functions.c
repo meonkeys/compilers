@@ -1682,141 +1682,21 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
     int regB = get_reg (b);
     int res_reg = get_result_reg ();
 
-    symtab *ptrA = NULL;
-    symtab *ptrB = NULL;
-
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        if (NULL != a->name)
-        {
-            ptrA = lookup (a->name);
-            assert (NULL != ptrA);
+        regA = asm_emit_load_int(regA, a);
 
-            /*  FIXME: I don't think this is right */
-            if (ptrA->scope > 0)
-            {
-                asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", regA,
-                         ptrA->offset, linenumber);
-            }
-            else
-            {
-                asm_out ("\tlw\t$%d, _%s\t# line %d\n", regA, a->name,
-                         linenumber);
-            }
-        }
-        else
+        if (regB != regA)
         {
-            if (0 == a->place)
-            {
-                asm_out ("\tli\t$%d, %d\t# line %d\n", regA,
-                         a->tmp_val_u.tmp_intval, linenumber);
-            }
-            else if (1 == a->is_return)
-            {
-                regA = a->place;
-            }
-            else
-            {
-                regA = a->place;
-            }
+            regB = asm_emit_load_int(regB, b);
         }
-
-        /* if it's null it's a constant */
-        if (NULL != b->name)
-        {
-            ptrB = lookup (b->name);
-            assert (NULL != ptrB);
-
-            /*  FIXME: I don't think this is right */
-            if (ptrB->scope > 0)
-            {
-                asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", regB,
-                         ptrB->offset, linenumber);
-            }
-            else
-            {
-                asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name,
-                         linenumber);
-            }
-        }
-        else
-        {
-            if (0 == b->place)
-            {
-                asm_out ("\tli\t$%d, %d\t# line %d\n", regB,
-                         b->tmp_val_u.tmp_intval, linenumber);
-            }
-            else if (1 == b->is_return)
-            {
-                regB = b->place;
-            }
-            else
-            {
-                regB = b->place;
-            }
-        }
-
     }
     else
-    {                           /* FLOAT_ */
-        if (NULL != a->name)
-        {
-            ptrA = lookup (a->name);
-            assert (NULL != ptrA);
-
-            /*  FIXME: I don't think this is right */
-            if (ptrA->scope > 0)
-            {
-                asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", regA,
-                         ptrA->offset, linenumber);
-            }
-            else if (1 == b->is_return)
-            {
-                regA = a->place;
-            }
-            else if (0 == ptrA->place)
-            {
-                asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", regA, a->name,
-                         linenumber);
-            }
-        }
-        else
-        {
-            asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", regA, a->name,
-                     linenumber);
-        }
-
-        /* if it's null it's a constant */
-        if (NULL != b->name)
-        {
-            ptrB = lookup (b->name);
-            assert (NULL != ptrB);
-
-            /*  FIXME: I don't think this is right */
-            if (ptrB->scope > 0)
-            {
-                asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", regB,
-                         ptrB->offset, linenumber);
-            }
-            else if (1 == b->is_return)
-            {
-                regB = b->place;
-            }
-            else if (0 == ptrA->place)
-            {
-                asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", regB, b->name,
-                         linenumber);
-            }
-        }
-        else
-        {
-            /*asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name, linenumber); */
-            asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", regB, cur_const_val,
-                     linenumber);
-            frame_data_out ("\t_f_%d: .float %f\t# line %d\n", cur_const_val,
-                            b->tmp_val_u.tmp_fval, linenumber);
-            cur_const_val++;
+    {   /* FLOAT_ */
+        regA = asm_emit_load_float(regA, a);
+        if(regB != regA){
+            regB = asm_emit_load_float(regB, b);
         }
     }
 
@@ -1862,150 +1742,23 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
     int regB = get_reg (b);
     int res_reg = get_result_reg ();
 
-    symtab *ptrA = NULL;
-    symtab *ptrB = NULL;
-
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        if (NULL != a->name)
-        {
-            ptrA = lookup (a->name);
-            assert (NULL != ptrA);
-
-            /*  FIXME: I don't think this is right */
-            if (ptrA->scope > 0)
-            {
-                asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", regA,
-                         ptrA->offset, linenumber);
-            }
-            else if (1 == a->is_return)
-            {
-                regA = a->place;
-            }
-            else
-            {
-                asm_out ("\tlw\t$%d, _%s\t# line %d\n", regA, a->name,
-                         linenumber);
-            }
-        }
-        else
-        {
-            if (0 == a->place)
-            {
-                asm_out ("\tli\t$%d, %d\t# line %d\n", regA,
-                         a->tmp_val_u.tmp_intval, linenumber);
-            }
-            else
-            {
-                regA = a->place;
-                if (a->place == regB)
-                {
-                    regB = get_reg (b);
-                }
-            }
-        }
+        regA = asm_emit_load_int(regA, a);
 
         if (regB != regA)
         {
-            /* if it's null it's a constant */
-            if (NULL != b->name)
-            {
-                ptrB = lookup (b->name);
-                assert (NULL != ptrB);
-
-                /*  FIXME: I don't think this is right */
-                if (ptrB->scope > 0)
-                {
-                    asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", regB,
-                             ptrB->offset, linenumber);
-                }
-                else if (1 == b->is_return)
-                {
-                    regB = b->place;
-                }
-                else
-                {
-                    asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name,
-                             linenumber);
-                }
-            }
-            else
-            {
-                if (0 == b->place)
-                {
-                    asm_out ("\tli\t$%d, %d\t# line %d\n", regB,
-                             b->tmp_val_u.tmp_intval, linenumber);
-                }
-                else
-                {
-                    regB = b->place;
-                }
-            }
+            regB = asm_emit_load_int(regB, b);
         }
     }
     else
-    {                           /* FLOAT_ */
-        if (NULL != a->name)
-        {
-            ptrA = lookup (a->name);
-            assert (NULL != ptrA);
-
-            /*  FIXME: I don't think this is right */
-            if (ptrA->scope > 0)
-            {
-                asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", regA,
-                         ptrA->offset, linenumber);
-            }
-            else if (1 == a->is_return)
-            {
-                regA = a->place;
-            }
-            else
-            {
-                asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", regA, a->name,
-                         linenumber);
-            }
-        }
-        else
-        {
-            asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", regA, a->name,
-                     linenumber);
-        }
+    { /* FLOAT_ */
+        regA = asm_emit_load_float(regA, a);
 
         if (regB != regA)
         {
-            /* if it's null it's a constant */
-            if (NULL != b->name)
-            {
-                ptrB = lookup (b->name);
-                assert (NULL != ptrB);
-
-                /*  FIXME: I don't think this is right */
-                if (ptrB->scope > 0)
-                {
-                    asm_out ("\tl.s\t$f%d, %d($fp)\n", regB, ptrB->offset);
-                }
-                else if (1 == b->is_return)
-                {
-                    regB = b->place;
-                }
-                else
-                {
-                    asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", regB, b->name,
-                             linenumber);
-                }
-            }
-            else
-            {
-                /*asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name, linenumber); */
-                asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", regB,
-                         cur_const_val, linenumber);
-                frame_data_out ("\t_f_%d: .float %f\t# line %d\n",
-                                cur_const_val, b->tmp_val_u.tmp_fval,
-                                linenumber);
-                cur_const_val++;
-            }
+            regB = asm_emit_load_float(regB, b);
         }
     }
 
@@ -2040,6 +1793,87 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
     free_reg (regB);
     save_reg (res_reg);
     return res_reg;
+}
+
+/* returns register */
+int
+asm_emit_load_int(int reg, var_ref* v){
+    symtab* ptr = NULL;
+
+    if (NULL != v->name)
+    {
+        ptr = lookup (v->name);
+        assert (NULL != ptr);
+
+        /*  FIXME: I don't think this is right */
+        if (ptr->scope > 0)
+        {
+            asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
+                     ptr->offset, linenumber);
+        }
+        else
+        {
+            asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, v->name,
+                     linenumber);
+        }
+    }
+    else
+    {
+        if (0 == v->place)
+        {
+            asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
+                     v->tmp_val_u.tmp_intval, linenumber);
+        }
+        else if (1 == v->is_return)
+        {
+            reg = v->place;
+        }
+        else
+        {
+            reg = v->place;
+        }
+    }
+
+    return reg;
+}
+
+int
+asm_emit_load_float(int reg, var_ref* v){
+    symtab* ptr = NULL;
+
+    /* if it's null it's a constant */
+    if (NULL != v->name)
+    {
+        ptr = lookup (v->name);
+        assert (NULL != ptr);
+
+        /*  FIXME: I don't think this is right */
+        if (ptr->scope > 0)
+        {
+            asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", reg,
+                     ptr->offset, linenumber);
+        }
+        else if (1 == v->is_return)
+        {
+            reg = v->place;
+        }
+        else if (0 == ptr->place)
+        {
+            asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", reg, v->name,
+                     linenumber);
+        }
+    }
+    else
+    {
+        /*asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name, linenumber); */
+        asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", reg, cur_const_val,
+                 linenumber);
+        frame_data_out ("\t_f_%d: .float %f\t# line %d\n", cur_const_val,
+                        v->tmp_val_u.tmp_fval, linenumber);
+        cur_const_val++;
+    }
+
+    return reg;
 }
 
 void
