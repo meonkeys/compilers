@@ -1492,9 +1492,6 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     int regB = -9999;
     int res_reg;
 
-    symtab *ptrA = NULL;
-    symtab *ptrB = NULL;
-
     if (NULL == b)
     {
         res_reg = regA;
@@ -1508,123 +1505,22 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        if (NULL != a->name)
-        {
-            ptrA = lookup (a->name);
-            assert (NULL != ptrA);
-
-            /*  FIXME: I don't think this is right */
-            if (ptrA->scope > 0)
-            {
-                asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", regA,
-                         ptrA->offset, linenumber);
-            }
-            else
-            {
-                asm_out ("\tlw\t$%d, _%s\t# line %d\n", regA, a->name,
-                         linenumber);
-            }
-        }
-        else
-        {
-            if (0 >= a->place || REG_COUNT < a->place)
-            {
-                asm_out ("\tli\t$%d, %d\t# line %d\n", regA,
-                         a->tmp_val_u.tmp_intval, linenumber);
-            }
-            else
-            {
-                regA = a->place;
-            }
-        }
+        regA = asm_emit_load_int(regA, a);
 
         /* if b is null, this is an expr-to-relop_factor reduction */
         if (NULL != b)
         {
-            /* if name is null, b is a constant */
-            if (NULL != b->name)
-            {
-                ptrB = lookup (b->name);
-                assert (NULL != ptrB);
-
-                /*  FIXME: I don't think this is right */
-                if (ptrB->scope > 0)
-                {
-                    asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", regB,
-                             ptrB->offset, linenumber);
-                }
-                else
-                {
-                    asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name,
-                             linenumber);
-                }
-            }
-            else
-            {
-                if (1 > b->place || REG_COUNT <= b->place)
-                {
-                    asm_out ("\tli\t$%d, %d\t# line %d\n", regB,
-                             b->tmp_val_u.tmp_intval, linenumber);
-                }
-                else
-                {
-                    regB = b->place;
-                }
-            }
+            regB = asm_emit_load_int(regB, b);
         }
-
     }
     else
-    {                           /* FLOAT_ */
-        if (NULL != a->name)
-        {
-            ptrA = lookup (a->name);
-            assert (NULL != ptrA);
-
-            /*  FIXME: I don't think this is right */
-            if (ptrA->scope > 0)
-            {
-                asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", regA,
-                         ptrA->offset, linenumber);
-            }
-            else if (0 == ptrA->place)
-            {
-                asm_out ("\tlw\t$%d, _%s\t# line %d\n", regA, a->name,
-                         linenumber);
-            }
-        }
-        else
-        {
-            asm_out ("\tlw\t$%d, _%s\t# line %d\n", regA, a->name,
-                     linenumber);
-        }
+    { /* FLOAT_ */
+        regA = asm_emit_load_float(regA, a);
 
         /* if b is null, this is an expr-to-relop_factor reduction */
         if (NULL != b)
         {
-            /* if name is null, b is a constant */
-            if (NULL != b->name)
-            {
-                ptrB = lookup (b->name);
-                assert (NULL != ptrB);
-
-                /*  FIXME: I don't think this is right */
-                if (ptrB->scope > 0)
-                {
-                    asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", regB,
-                             ptrB->offset, linenumber);
-                }
-                else if (0 == ptrA->place)
-                {
-                    asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name,
-                             linenumber);
-                }
-            }
-            else
-            {
-                asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name,
-                         linenumber);
-            }
+            regB = asm_emit_load_float(regB, b);
         }
     }
 
