@@ -648,6 +648,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 					asm_out("\tmov.s\t$f0, $f%d\t# line %d\n", $2->place, linenumber);
 				}
 				$$=ZERO_;
+				/* FIXME: need to include a jump to epilogue? */
 			}
 			IS_RETURN=1;
 		}

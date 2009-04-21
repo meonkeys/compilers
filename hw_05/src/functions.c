@@ -236,9 +236,9 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
             if (ptrA->scope > 0)
             {
+                /*
                 if (NULL != b->name)
                 {
-                    /*  FIXME: I don't think this is right */
                     if (ptrB->scope > 0)
                     {
                         asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
@@ -255,6 +255,8 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
                              b->tmp_val_u.tmp_intval, linenumber);
                 }
+                */
+                reg = asm_emit_load_int(reg, b);
                 ptrA->place = reg;
                 asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
                          linenumber);
