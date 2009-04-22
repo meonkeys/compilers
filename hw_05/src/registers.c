@@ -23,7 +23,7 @@ get_reg (var_ref * vr)
         int i;
         /* grab the first free one */
 
-        for (i = 8; i < 16; i++)
+        for (i = 8; i < 25; i++)
         {
             if (reg_costs[i] == 0)
             {
@@ -33,7 +33,7 @@ get_reg (var_ref * vr)
         }
 
         /* no free ones, grab the first saved one */
-        for (i = 8; i < 16; i++)
+        for (i = 8; i < 25; i++)
         {
             if (reg_costs[i] == 1)
             {
@@ -41,7 +41,7 @@ get_reg (var_ref * vr)
             }
         }
 
-        for (i = 8; i < 16; i++)
+        for (i = 8; i < 25; i++)
         {
             if (reg_costs[i] == 2)
             {
@@ -66,7 +66,38 @@ get_reg (var_ref * vr)
 int
 get_result_reg (void)
 {
-    return reg++;
+    /*return reg++;*/
+    int i;
+    /* grab the first free one */
+
+    for (i = 8; i < 25; i++)
+    {
+        if (reg_costs[i] == 0)
+        {
+            reg_costs[i] = 1;
+            return i;
+        }
+    }
+
+    /* no free ones, grab the first saved one */
+    for (i = 8; i < 25; i++)
+    {
+        if (reg_costs[i] == 1)
+        {
+            return i;
+        }
+    }
+
+    for (i = 8; i < 25; i++)
+    {
+        if (reg_costs[i] == 2)
+        {
+            return i;
+        }
+    }
+
+    /* The spill case!  We return the stack pointer */
+    return 29;
 }
 
 void
