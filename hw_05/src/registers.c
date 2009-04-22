@@ -20,37 +20,7 @@ get_reg (var_ref * vr)
 {
     if (NULL == vr || 0 >= vr->place || REG_COUNT <= vr->place)
     {
-        int i;
-        /* grab the first free one */
-
-        for (i = 8; i < 25; i++)
-        {
-            if (reg_costs[i] == 0)
-            {
-                reg_costs[i] = 1;
-                return i;
-            }
-        }
-
-        /* no free ones, grab the first saved one */
-        for (i = 8; i < 25; i++)
-        {
-            if (reg_costs[i] == 1)
-            {
-                return i;
-            }
-        }
-
-        for (i = 8; i < 25; i++)
-        {
-            if (reg_costs[i] == 2)
-            {
-                return i;
-            }
-        }
-
-        /* The spill case!  We return the stack pointer */
-        return 29;
+        return get_result_reg();
     }
     else if (NULL != vr && vr->place < REG_COUNT && vr->place > 0)
     {
