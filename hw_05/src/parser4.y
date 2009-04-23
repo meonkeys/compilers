@@ -29,10 +29,6 @@ int param_offset = 8;
 char* frame_data = NULL;
 
 int GLOBAL_DECLS_STARTED=0;
-/* FIXME: this is only a temporary way to handle unique label creation for
-while and if-else control structures (and for loops, in the next assignment).
-We'll need a stack to handle nested control structures (see 5161Class16.pdf).
-*/
 int LABEL_NUM=0;
 %}
 
