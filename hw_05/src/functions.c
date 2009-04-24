@@ -1308,6 +1308,7 @@ asm_out (char const *fmt, ...)
     vfprintf (asm_out_fp, fmt, ap);
 }
 
+/* Unless global declarations exist, this function is not called. */
 void
 asm_emit_global_decls_start (void)
 {
@@ -1949,7 +1950,7 @@ gen_control_test (var_ref * a, int exit_label_num)
         switch (a->type)
         {
         case INT_:
-            if(1 > a->place || 32 <= a->place){
+            if(1 > a->place || REG_COUNT <= a->place){
                 asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
                      a->tmp_val_u.tmp_intval, linenumber);
             }else{

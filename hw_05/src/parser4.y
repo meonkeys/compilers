@@ -558,7 +558,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 		stmt
 		{
 			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
-				printf("error %d: condition not a basic type in if statement\n",linenumber);
+				printf("error %d: condition not a basic type in if-else statement\n",linenumber);
 				$$=ERROR_;
 			} else {
 				if (($5==ERROR_)||($8==ERROR_)) {
