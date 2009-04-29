@@ -527,10 +527,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				gen_control_endlabel($3->label_num);
 			}
 		}
-	        | FOR MK_LPAREN assign_expr_list MK_SEMICOLON {
-			asm_out ("# TODO: emit variable initialization\n");
-		}
-		test {
+	        | FOR MK_LPAREN assign_expr_list MK_SEMICOLON test {
 			asm_out ("# TODO: emit jump to _ForLoopBodyX\n");
 			asm_out ("# TODO: emit label _IncrementX\n");
 		} MK_SEMICOLON assign_expr_list MK_RPAREN {
@@ -541,15 +538,15 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 		{
 			if($3==ERROR_)
 				$$=ERROR_;
-			else if(($6->type!=INT_)&&($6->type!=FLOAT_)) {
+			else if(($5->type!=INT_)&&($5->type!=FLOAT_)) {
 				printf("error %d: condition not a basic type in for loop\n",linenumber);
 				$$=ERROR_;
-			} else if($9==ERROR_)
+			} else if($8==ERROR_)
 				$$=ERROR_;
 			else {
-				$$=$9;
+				$$=$8;
 				asm_out ("# TODO: emit jump to _IncrementX\n");
-				gen_control_endlabel($6->label_num);
+				gen_control_endlabel($5->label_num);
 			}
 		}
 
