@@ -1,0 +1,42 @@
+/* Testcase 8: Mixed while with if-else */
+
+void main()
+{
+ int b,c,d;
+
+ b = 4;
+ c = 5;
+ 
+ while( b < c)
+ {
+  d = b + c;
+  if (d > c) 
+    {
+      while (d > c) 
+	{
+	  write("The answer is = ");
+	  write (d);
+	  write ("\n");
+	  d =d-1;
+	}
+    } 
+  else 
+    {
+      b = b - 1;
+    }
+  b = b + 2;
+ }
+ 
+  write("The answer for b is ");
+  write (b);
+  write ("\n");
+}
+
+/*
+Expected Output:  The answer is = 9
+		  The answer is = 8
+		  The answer is = 7
+		  The answer is = 6
+		  The answer for b is = 6
+
+*/

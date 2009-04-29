@@ -1,0 +1,5 @@
+int gid;
+
+void main(){
+	gid = 1;
+}

@@ -1,0 +1,8 @@
+int main()
+{
+   int i[1];
+   int b[5][5];
+   float c[4][3][2];
+   i[0] = 5;
+   return 0;
+}

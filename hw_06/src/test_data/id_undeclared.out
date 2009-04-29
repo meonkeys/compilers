@@ -1,0 +1,5 @@
+error 3: undeclared variable i
+error 3: undeclared variable i
+error 4: undeclared variable i
+error:  Semantic Analysis failed due to errors
+Error found in Line 	7	next token: 	
