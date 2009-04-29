@@ -13,18 +13,18 @@ typedef enum
  * association between records and registers */
 /* regtable[REG_COUNT];*/
 
-int reg_costs[REG_COUNT];
+reg_status reg_costs[REG_COUNT];
 
 int
 get_reg (var_ref * vr)
 {
-    if (NULL == vr || 0 >= vr->place || REG_COUNT <= vr->place)
+    if (NULL == vr || vr->place < 1 || vr->place > REG_COUNT)
     {
         return get_result_reg();
     }
     else if (NULL != vr && vr->place < REG_COUNT && vr->place > 0)
     {
-        reg_costs[vr->place] = 1;       /* I think this is the right cost to set */
+        reg_costs[vr->place] = NOTSAVED;       /* I think this is the right cost to set */
         return vr->place;
     }
     else
@@ -36,15 +36,14 @@ get_reg (var_ref * vr)
 int
 get_result_reg (void)
 {
-    /*return reg++;*/
     int i;
     /* grab the first free one */
 
     for (i = 8; i < 25; i++)
     {
-        if (reg_costs[i] == 0)
+        if (reg_costs[i] == FREE)
         {
-            reg_costs[i] = 1;
+            reg_costs[i] = NOTSAVED;
             return i;
         }
     }
@@ -52,7 +51,7 @@ get_result_reg (void)
     /* no free ones, grab the first saved one */
     for (i = 8; i < 25; i++)
     {
-        if (reg_costs[i] == 1)
+        if (reg_costs[i] == NOTSAVED)
         {
             return i;
         }
@@ -60,7 +59,7 @@ get_result_reg (void)
 
     for (i = 8; i < 25; i++)
     {
-        if (reg_costs[i] == 2)
+        if (reg_costs[i] == SAVED)
         {
             return i;
         }
@@ -73,19 +72,19 @@ get_result_reg (void)
 void
 free_reg (int r)
 {
-    reg_costs[r] = 0;
+    reg_costs[r] = FREE;
 }
 
 void
 ns_reg (int r)
 {
-    reg_costs[r] = 1;
+    reg_costs[r] = NOTSAVED;
 }
 
 void
 save_reg (int r)
 {
-    reg_costs[r] = 2;
+    reg_costs[r] = SAVED;
 }
 
 /*
