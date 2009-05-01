@@ -157,7 +157,54 @@ assign_ex (char *a, var_ref * b)
             b->type = ERROR_;
             break;
         case INT_:
+            if (INT_ == b->type)
+            {
+                int reg = get_reg (b);
+                symtab *ptrB = lookup (b->name);
+
+                if (PST->scope > 0)
+                {
+                    reg = asm_emit_load_int(reg, b);
+                    PST->place = reg;
+                    asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, PST->offset,
+                             linenumber);
+                    ns_reg (reg);
+                }
+                else
+                {
+                    if (NULL != b->name)
+                    {
+                        /*  FIXME: I don't think this is right */
+                        if (ptrB->scope > 0)
+                        {
+                            asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
+                                     ptrB->offset, linenumber);
+                        }
+                        else
+                        {
+                            asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, b->name,
+                                     linenumber);
+                        }
+                    }
+                    else if (0 == b->place)
+                    {
+                        asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
+                                 b->tmp_val_u.tmp_intval, linenumber);
+                    }
+                    PST->place = reg;
+                    asm_out ("\tsw\t$%d, _%s\t# line %d\n", reg, PST->lexeme,
+                             linenumber);
+                    ns_reg (reg);
+                }
+            }
+            else
+            {
+                b->type = INT_;
+                b->tmp_val_u.tmp_intval = b->tmp_val_u.tmp_fval;
+            }
+            break;
         case FLOAT_:
+            assert(0); /* FIXME */
             break;
         default:
             printf ("CHECKER ERROR: unknown types, line %d\n", linenumber);
@@ -236,26 +283,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
             if (ptrA->scope > 0)
             {
-                /*
-                if (NULL != b->name)
-                {
-                    if (ptrB->scope > 0)
-                    {
-                        asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
-                                 offsetB, linenumber);
-                    }
-                    else
-                    {
-                        asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, b->name,
-                                 linenumber);
-                    }
-                }
-                else if (0 == b->place)
-                {
-                    asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
-                             b->tmp_val_u.tmp_intval, linenumber);
-                }
-                */
                 reg = asm_emit_load_int(reg, b);
                 ptrA->place = reg;
                 asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,

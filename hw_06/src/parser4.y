@@ -528,11 +528,11 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			}
 		}
 	        | FOR MK_LPAREN assign_expr_list MK_SEMICOLON test {
-			asm_out ("# TODO: emit jump to _ForLoopBodyX\n");
-			asm_out ("# TODO: emit label _IncrementX\n");
+			asm_out ("\tj\t_ForLoopBody%d\t# line %d\n", $5->label_num, linenumber);
+			asm_out ("_Increment%d:\t# line %d\n", $5->label_num, linenumber);
 		} MK_SEMICOLON assign_expr_list MK_RPAREN {
-			asm_out ("# TODO: emit jump to _TestX\n");
-			asm_out ("# TODO: emit label _ForLoopBodyX\n");
+			gen_control_iterate ($5->label_num);
+			asm_out ("_ForLoopBody%d:\t# line %d\n", $5->label_num, linenumber);
 		}
 		stmt
 		{
@@ -545,7 +545,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				$$=ERROR_;
 			else {
 				$$=$8;
-				asm_out ("# TODO: emit jump to _IncrementX\n");
+				asm_out ("\tj\t_Increment%d\t# line %d\n", $5->label_num, linenumber);
 				gen_control_endlabel($5->label_num);
 			}
 		}
