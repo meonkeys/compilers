@@ -1,0 +1,48 @@
+/* Testcase 6: int/float conversion in expression and parameter passing*/
+
+float pi=3.1416;
+
+float sqr(float num)
+{
+  return (num*num);
+}
+
+float calarea(int r)
+{
+  float area;
+  area = pi * sqr(r);
+  return area;
+}
+
+int floor(float num)
+{
+  int temp;
+  temp = num;
+  return temp;
+}
+
+int main(){
+  
+  int r;
+  float area;
+  float rem;
+  
+  r=read();
+
+  area=calarea(r);
+  rem=area-floor(area);
+
+  write(area);
+  write(" ");
+  write(rem);
+
+  return 1;
+}
+
+/* 
+   Input : 3 
+   
+   Expected output:
+   
+   28.274399 0.274399
+*/

@@ -1,0 +1,53 @@
+/* Testcase 10 : short circuit boolean expressions */
+
+int main()
+{
+ int a,b,c,d,e,f,g;
+ float fnum = 3.2;
+  
+ a = read();
+ b = read();
+ c = a + 2; 
+ d = b + 4;
+ e = a + 1;
+ f = b;
+ g = c*d - 1; 
+ 
+ if (a || b || c && d && (e>1) || (f>1)&&(g<1) )
+  { 
+    write("True \n");
+  }
+ else
+  {
+    write("False \n");
+  }
+
+ if( !(fnum < a) || c/a  < 0 && !f)
+ {
+	write( "True \n");
+ }
+ else
+ {
+	write("Segmentation Fault\n Core dumped\n");
+ }   
+
+ if( !(!(!( c*d > 0 && g - 8 < 0))) && !( c * d * e / a * b ))  
+ {
+ 	write("Segmentation Fault\n Core dumped\n");
+ }
+ else
+ {
+        write( "False "); 
+ }
+   
+ return 1;
+}
+
+/* 
+Input:
+0 0
+Output:
+False
+True
+False
+*/

@@ -1,0 +1,74 @@
+/* Testcase 11: quick sort */
+
+/* partition*/
+int partition(int A[],int p,int r){
+  int x,temp;
+  int i,j;
+
+  x=A[p];
+  i=p-1;
+  j=r+1;
+  while (1){
+
+    j=j-1;
+    while (A[j]>x)
+	j=j-1;
+
+    i=i+1;
+    while (A[i]<x)
+	i=i+1;
+
+    if (i<j){
+      temp=A[i];
+      A[i]=A[j];
+      A[j]=temp;
+    }else{
+      return j;
+    }
+  }
+}
+
+/*quicksort */
+int quicksort(int A[], int p, int r){
+  int q;
+  if (p<r){
+   q=partition(A, p,r);
+   quicksort(A,p,q);
+   quicksort(A,q+1,r);
+  }
+  return 1;
+}
+
+/* main program */
+int main()
+{
+ int array[20];
+ int i;
+
+
+ for (i =0; i < 20; i = i + 1)
+   {
+ 	array[i]=read();
+   }
+
+ write("The Unsorted arrar = ");
+ for (i =0; i < 20; i = i + 1)
+   write(array[i]);
+ write("\n");
+
+ quicksort(array, 0, 19);
+
+ write("The sorted arrar = ");
+ for (i =0; i < 20; i = i + 1)
+   write(array[i]);
+ write("\n");
+ 
+ return 1;
+}
+
+/* Input:
+   The Unsorted arrar = 23 4 5 -4 34 3 6 2 56 5 8 9 4 90 4 7 -7 -34 56 87 
+   
+   Output:
+   The sorted arrar = -34 -7 -4 2 3 4 4 4 5 5 6 7 8 9 23 34 56 56 87 90 
+*/

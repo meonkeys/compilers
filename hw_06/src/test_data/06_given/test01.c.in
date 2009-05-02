@@ -1,0 +1,42 @@
+
+/* Testcase 1: function call with parameters */
+
+int func(int a, int b)
+{
+  if (a>1)
+    return a*b-3;
+  else
+    return a*(b-3);
+}
+
+int main()
+{
+  int a=1,b=2,c,d;
+  int result;
+  
+  c=a*b;
+  
+  if (b>1)
+    {
+      c=a*b;
+      d=c;
+      a=b+c;
+      b=a;
+    }
+  else
+    {
+      a=b-c;
+      b=a;
+      d=c;
+    }
+  
+  result=func(a,b)-3;
+  result=func(a - 1, b * 2)*result;
+  
+  write(result);
+  return 1;
+}
+
+/* Expected output:
+210
+*/

@@ -1,0 +1,68 @@
+/*Testcase 8: to check for nested for & while loops, array with array subscripts */
+
+int dim = 4;
+
+int a[100][4], b[100][4];
+int c[4];
+
+void print(int k)
+{
+  int i,j;
+      for (j = 0; j < dim; j = j + 1)
+	{
+	  write(a[k][j]);
+	}
+      write("\n"); 
+}
+
+void arraymult()
+{
+  int i,j,k;
+  for (i = 0; i < dim; i = i + 1)
+    {
+      for (j = 0; j < dim; j = j + 1)
+	{
+	  int sum = 0;
+	  
+	  k = 0;
+	  while(k < dim)
+	    {
+	      sum = sum + a[c[i]][k]*b[k][j];
+	      k = k + 1;
+	    }
+	  a[c[i]][j] = sum;
+	}
+    }
+  for (i = 0; i < dim; i = i + 1)
+    {
+      print(c[i]);
+    }
+}
+
+
+int main()
+{
+  int i,j;
+  c[0] = 10;
+  c[1] = 20;
+  c[2] = 40;
+  c[3] = 80;
+  for (i = 0; i < 100; i = i +1)
+    {
+      for (j = 0; j < dim; j = j +1)
+	{
+	  a[i][j] = i+j;
+	  b[i][j] = i*3+j;
+	}
+    }
+  arraymult();
+
+ return 1;
+}
+
+/* Expected output:
+222 480 3083 31449 
+402 870 5583 56949 
+762 1650 10583 107949 
+1482 3210 20583 209949 
+*/

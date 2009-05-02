@@ -1,0 +1,40 @@
+
+/* Testcase 7: check for passing arrays */
+
+int func1(int arr[])
+{
+  int sum;
+  int i;
+  sum = 0;
+  for (i=0; i < 10; i = i+1)
+    {
+      sum = sum + arr[i];
+    }
+  return sum;
+}
+
+
+
+int main()
+{
+ int array[10][10];
+ int i,sum,j;
+ 
+ for (i =0; i < 10; i = i + 1)
+  for (j =0; j < 10; j = j + 1)
+   {
+     array[i][j] = i * j;
+   }
+
+ sum = 0;
+ for (i =0; i < 10; i = i + 1)
+   sum = sum + func1(array[i]);
+
+ write("Sum = ");
+ write(sum);
+ return 1;
+}
+
+/* Expected output:
+Sum = 2025
+*/

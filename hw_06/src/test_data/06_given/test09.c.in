@@ -1,0 +1,50 @@
+/*Testcase 9: Insertion sort */
+
+int insertion_sort(int arr[], int size)
+{
+  int i;
+  for (i=1; i < size; i = i+1)
+    {
+      int j, temp;
+      temp = arr[i];
+      for (j=i; j > 0 && temp < arr[j-1]; j = j-1)
+	arr[j] = arr[j-1];
+      arr[j] = temp;
+    }
+  return 1;
+}
+
+
+
+int main()
+{
+ int array[20];
+ int i;
+ 
+ for (i =0; i < 20; i = i + 2)
+   {
+     array[i] = 100-i;
+     array[i+1] = 10+i*2;
+   }
+
+ write("The Unsorted array = ");
+
+ for (i =0; i < 20; i = i + 1)
+   write(array[i]);
+ write("\n");
+ 
+ insertion_sort(array, 20);
+
+ write("The sorted array = ");
+ for (i =0; i < 20; i = i + 1)
+   write(array[i]);
+ write("\n");
+ 
+ return 1;
+}
+
+/* Expected output:
+The Unsorted array = 100 10 98 14 96 18 94 22 92 26 90 30 88 34 86 38 84 42 82 46 
+The sorted array = 10 14 18 22 26 30 34 38 42 46 82 84 86 88 90 92 94 96 98 100 
+*/
+

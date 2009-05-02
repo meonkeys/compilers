@@ -1,0 +1,42 @@
+/* Testcase 2:  to check for correct scope handling and recursive function calls */
+
+int nDisks;      /* global var to store number of disks/rings */
+int nMoves = 0;  /* store number of moves made */
+
+void MoveDisks(int nDisks, int from, int to, int using)
+{
+  if (nDisks > 0)
+    {
+      MoveDisks(nDisks-1,from,using,to);
+      write("Moving disc from ");
+      write(from);
+      write(" to ");
+      write(to);
+      write("\n");
+      nMoves = nMoves + 1;
+      MoveDisks(nDisks-1,using,to,from);
+    }
+}
+
+int main()
+{
+  write("\nEnter number of disks : ");
+  nDisks= read();
+  MoveDisks(nDisks,1,3,2);
+  write("\nNumber of moves = ");
+  write(nMoves);
+  write("\n");
+
+  return 1;
+}
+
+/* Expected output for input 3:
+Moving disc from 1 to 3
+Moving disc from 1 to 2
+Moving disc from 3 to 2
+Moving disc from 1 to 3
+Moving disc from 2 to 1
+Moving disc from 2 to 3
+Moving disc from 1 to 3
+Number of moves = 7
+*/

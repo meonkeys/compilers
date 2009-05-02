@@ -1,0 +1,67 @@
+/*TestCase 5: to test type conversions, floats */
+
+float delta = 1.0;
+
+
+int floor(float num)
+{
+  int temp;
+  temp = num;
+  return temp;
+}
+
+
+int ceil(float num)
+{
+ int temp;
+ if (num > 0) /* convert from int to float */
+  {
+    temp = num + delta;
+  }
+ else 
+   {
+     temp = num - delta;
+   }
+ return temp;
+}
+
+
+float absf(float num)
+{
+  float  temp;
+  if (num < 0)
+    {
+      temp = 0 - num;
+    }
+  else
+    {
+      temp = num;
+    }
+  return temp;
+}
+
+
+int main()
+{
+  float num;
+  float midp;
+ 
+  write("Enter number "); 
+  
+  num = fread(); 
+  
+  write(absf(num));
+  write(ceil(num));
+  write(floor(num));
+  midp = (ceil(num) + floor(num))/2.0;
+  write(midp);
+
+  return 1;
+}
+
+/* Expected output for input: 34.2
+34.200001
+35
+34
+34.500000
+*/
