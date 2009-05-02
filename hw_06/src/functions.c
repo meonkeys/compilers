@@ -204,7 +204,7 @@ assign_ex (char *a, var_ref * b)
             }
             break;
         case FLOAT_:
-            assert(0); /* FIXME */
+            assert(0); /* we should also implement floating-point iterators */
             break;
         default:
             printf ("CHECKER ERROR: unknown types, line %d\n", linenumber);
