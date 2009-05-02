@@ -581,7 +581,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			}
 		}
 
-		/* function call */
+		/* function call - return value (if any) is ignored */
 		|ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON{
 			var_ref *PVR;
 			if ((strcmp($1,"write") == 0) ||
@@ -606,10 +606,10 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				}
 			}
 			else {
-			PVR=check_function($1,$3);
-			/* TODO: save caller registers $t range iirc */
-			asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
-			$$=PVR->type;
+				PVR=check_function($1,$3);
+				/* TODO: save caller registers $t range iirc */
+				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
+				$$=PVR->type;
 			}
 		}
 		| MK_SEMICOLON{$$=ZERO_;}
@@ -868,15 +868,15 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 				$$->type=INT_;
 			$$->name=NULL;
 		}
-		| /* FUNCTION CALL */
-			ID MK_LPAREN relop_expr_list MK_RPAREN{
+		/* function call used as a subexpression - return value is used */
+		| ID MK_LPAREN relop_expr_list MK_RPAREN {
 			$$=check_function($1,$3);
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
 				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
 				if(INT_ == $$->type){
-					$$->place = 2;
+					$$->place = 2; /* used below, in RETURN relop_expr MK_SEMICOLON */
 				}else if(FLOAT_ == $$->type){
-					$$->place = 0;
+					$$->place = 0; /* used below, in RETURN relop_expr MK_SEMICOLON */
 				}
 				$$->is_return = 1;
 			}
