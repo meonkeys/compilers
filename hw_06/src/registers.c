@@ -39,7 +39,7 @@ get_result_reg (void)
     int i;
     /* grab the first free one */
 
-    for (i = 8; i < 25; i++)
+    for (i = 8; i < 26; i++)
     {
         if (reg_costs[i] == FREE)
         {
@@ -49,7 +49,7 @@ get_result_reg (void)
     }
 
     /* no free ones, grab the first saved one */
-    for (i = 8; i < 25; i++)
+    for (i = 8; i < 26; i++)
     {
         if (reg_costs[i] == NOTSAVED)
         {
@@ -57,7 +57,7 @@ get_result_reg (void)
         }
     }
 
-    for (i = 8; i < 25; i++)
+    for (i = 8; i < 26; i++)
     {
         if (reg_costs[i] == SAVED)
         {
