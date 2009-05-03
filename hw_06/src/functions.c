@@ -186,6 +186,10 @@ assign_ex (char *a, var_ref * b)
                                      linenumber);
                         }
                     }
+                    else if (2 == b->place)
+                    {
+                        asm_out ("\tmove\t$%d, $v0\t# line %d\n", reg, linenumber);
+                    }
                     else if (0 == b->place)
                     {
                         asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
@@ -1264,7 +1268,7 @@ put_read_ST ()
 }
 
 TYPE
-check_return (int flag, TYPE type)
+check_return (int flag)
 {
     if (flag)
         return ZERO_;
@@ -1879,13 +1883,13 @@ gen_prologue (const char *name)
     /*
        asm_out ("\tsub\t$sp, $sp, 4\n");
      */
-    asm_out ("\tsw\t$ra, ($sp)\n");
+    asm_out ("\tsw\t$ra, ($sp)\t# store return address\n");
 
-    asm_out ("\tsw\t$fp, -4($sp)\n");
-    asm_out ("\tadd\t$fp, $sp, -4\n");
-    asm_out ("\tadd\t$sp, $sp, -8\n");
+    asm_out ("\tsw\t$fp, -4($sp)\t# save old frame pointer\n");
+    asm_out ("\tadd\t$fp, $sp, -4\t# move frame pointer to start of new activation record\n");
+    asm_out ("\tadd\t$sp, $sp, -8\t# move stack pointer to new stack top\n");
     asm_out ("\tlw\t$v0, _framesize_%s\n", name);
-    asm_out ("\tsub\t$sp, $sp, $v0\n");
+    asm_out ("\tsub\t$sp, $sp, $v0\t# push new activation record on stack\n");
 
     /* save $s0-7 */
     if (0 != strcmp (name, "main"))
@@ -1918,9 +1922,9 @@ gen_epilogue (const char *name)
         }
     }
 
-    asm_out ("\tlw\t$ra, 4($fp)\n");
-    asm_out ("\tadd\t$sp, $fp, 4\n");
-    asm_out ("\tlw\t$fp, 0($fp)\n");
+    asm_out ("\tlw\t$ra, 4($fp)\t# restore return address\n");
+    asm_out ("\tadd\t$sp, $fp, 4\t# pop activation record\n");
+    asm_out ("\tlw\t$fp, 0($fp)\t# restore frame pointer to caller's setting\n");
 
     if (strcmp (name, "main") == 0)
     {

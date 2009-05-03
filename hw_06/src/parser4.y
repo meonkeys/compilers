@@ -133,7 +133,7 @@ global_decl	: decl_list function_decl{$$=(($1==ERROR_)||($2==ERROR_))?ERROR_:ZER
 		;
 
 		/* function declaration w/return and parameters */
-function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST($1,$2,$5);func_return=$1; } MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE {delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
+function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST($1,$2,$5);func_return=$1; } MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE {delete_scope(scope);scope--;$$=((check_return(IS_RETURN)==ERROR_)||($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
 
 		| struct_type ID MK_LPAREN {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;} param_list {func_enter_ST(STR_,$2,$5);func_return=ERROR_; }MK_RPAREN MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
 
@@ -141,7 +141,7 @@ function_decl	: type ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=fu
 		| VOID ID MK_LPAREN {scope++;IS_RETURN=0;} param_list {$<Type>$=func_enter_ST(VOID_,$2,$5);func_return=VOID_; ;}MK_RPAREN {gen_prologue($2)} MK_LBRACE block MK_RBRACE{delete_scope(scope);scope--;$$=(($<Type>6==ERROR_)||($10==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
 
 		/* function declaration w/return, no parameters */
-		| type ID MK_LPAREN   MK_RPAREN {$<Type>$=func_enter_ST($1,$2,NULL);func_return=$1; gen_prologue($2);}MK_LBRACE{scope++;IS_RETURN=0;} block MK_RBRACE{delete_scope(scope);scope--;$$=((check_return(IS_RETURN,$1)==ERROR_)||($<Type>5==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
+		| type ID MK_LPAREN   MK_RPAREN {$<Type>$=func_enter_ST($1,$2,NULL);func_return=$1; gen_prologue($2);}MK_LBRACE{scope++;IS_RETURN=0;} block MK_RBRACE{delete_scope(scope);scope--;$$=((check_return(IS_RETURN)==ERROR_)||($<Type>5==ERROR_)||($8==ERROR_))?ERROR_:ZERO_; gen_epilogue($2); offset = -4;}
 
 		| struct_type ID MK_LPAREN  MK_RPAREN MK_LBRACE {printf("error %d: functions do not return structs in C--\n",linenumber);scope++;IS_RETURN=0;func_enter_ST(STR_,$2,NULL);func_return=ERROR_;} block MK_RBRACE{delete_scope(scope);scope--;$$=ERROR_; offset = -4;}
 
@@ -585,7 +585,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			}
 		}
 
-		/* function call */
+		/* function call - return value (if any) is ignored */
 		|ID MK_LPAREN relop_expr_list MK_RPAREN MK_SEMICOLON{
 			var_ref *PVR;
 			if ((strcmp($1,"write") == 0) ||
@@ -610,10 +610,10 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				}
 			}
 			else {
-			PVR=check_function($1,$3);
-			/* TODO: save caller registers $t range iirc */
-			asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
-			$$=PVR->type;
+				PVR=check_function($1,$3);
+				/* TODO: save caller registers $t range iirc */
+				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
+				$$=PVR->type;
 			}
 		}
 		| MK_SEMICOLON{$$=ZERO_;}
@@ -651,8 +651,13 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 					if(NULL != $2->name){
 						symtab* symptr = lookup($2->name);
 						assert(NULL != symptr);
+						/* return value is local variable */
 						asm_out("\tlw\t$v0, %d($fp)\t# line %d\n", symptr->offset, linenumber);
-					}else{
+					} else if (0 == $2->place) {
+						/* return value is int constant */
+						asm_out("\tli\t$v0, %d\t# line %d\n", $2->tmp_val_u.tmp_intval, linenumber);
+					} else {
+						/* return value is in a register */
 						asm_out("\tmove\t$v0, $%d\t# line %d\n", $2->place, linenumber);
 					}
 				}else if(FLOAT_ == $2->type){
@@ -872,15 +877,15 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 				$$->type=INT_;
 			$$->name=NULL;
 		}
-		| /* FUNCTION CALL */
-			ID MK_LPAREN relop_expr_list MK_RPAREN{
+		/* function call used as a subexpression - return value is used */
+		| ID MK_LPAREN relop_expr_list MK_RPAREN {
 			$$=check_function($1,$3);
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
 				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
 				if(INT_ == $$->type){
-					$$->place = 2;
+					$$->place = 2; /* indicates $v0 */
 				}else if(FLOAT_ == $$->type){
-					$$->place = 0;
+					$$->place = 0; /* indicates $f0 */
 				}
 				$$->is_return = 1;
 			}
