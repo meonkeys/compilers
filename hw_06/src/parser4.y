@@ -647,8 +647,13 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 					if(NULL != $2->name){
 						symtab* symptr = lookup($2->name);
 						assert(NULL != symptr);
+						/* return value is local variable */
 						asm_out("\tlw\t$v0, %d($fp)\t# line %d\n", symptr->offset, linenumber);
-					}else{
+					} else if (0 == $2->place) {
+						/* return value is int constant */
+						asm_out("\tli\t$v0, %d\t# line %d\n", $2->tmp_val_u.tmp_intval, linenumber);
+					} else {
+						/* return value is in a register */
 						asm_out("\tmove\t$v0, $%d\t# line %d\n", $2->place, linenumber);
 					}
 				}else if(FLOAT_ == $2->type){
@@ -874,9 +879,9 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
 				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
 				if(INT_ == $$->type){
-					$$->place = 2; /* used below, in RETURN relop_expr MK_SEMICOLON */
+					$$->place = 2; /* indicates $v0 */
 				}else if(FLOAT_ == $$->type){
-					$$->place = 0; /* used below, in RETURN relop_expr MK_SEMICOLON */
+					$$->place = 0; /* indicates $f0 */
 				}
 				$$->is_return = 1;
 			}

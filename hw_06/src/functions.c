@@ -186,6 +186,10 @@ assign_ex (char *a, var_ref * b)
                                      linenumber);
                         }
                     }
+                    else if (2 == b->place)
+                    {
+                        asm_out ("\tmove\t$%d, $v0\t# line %d\n", reg, linenumber);
+                    }
                     else if (0 == b->place)
                     {
                         asm_out ("\tli\t$%d, %d\t# line %d\n", reg,

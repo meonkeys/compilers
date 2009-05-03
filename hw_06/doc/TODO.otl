@@ -1,3 +1,25 @@
-[_] for loops
+[X] for loops (Adam)
 	[X] int iterator
-	[_] float iterator
+	[N] float iterator
+[_] arrays (Joe)
+[_] passing args to funcs (Adam)
+	only use the stack; no need for $a0-$a3 (optimize later)
+	[X] what's our calling convention, ie: how are $fp and $sp used?
+		$fp is set to the start of the activation record
+		$sp is set to the top of the stack
+	[X] add more comments to generated code
+	[X] fix return statements when constants are returned
+	[_] push args on the stack prior to emitting "jal" instruction
+		push params in reverse order: Nth, N-1, N-2 ... 1st
+			see examples/pass_one_arg.s
+	[_] when value is returned (in $v0 or $f0), how should caller use it?
+		see assign_ex
+		func call with return value reduces to "factor" (which is a var_ref)
+		[_] how do we currently get the return value of read() and fread()?
+	useful reference docs
+		lecture slides: Code Generation (funcs w/o args, understanding the stack)
+			"Simple Code Generation, Expressions, Register Tracking"
+			pp. 1-14
+		lecture slides: Ch 6/8 Code Generation (passing args to funcs)
+			"Switch Statement, Array References, Procedure/Function Call"
+			pp. 23-29
