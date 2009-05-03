@@ -251,7 +251,7 @@ TYPE func_enter_ST (TYPE a, char *b, param_list * c);
 param_list *MakeParamList (param_list * a, param * b);
 TYPE param_P (param * a, char *b);
 void put_read_ST (void);
-TYPE check_return (int flag, TYPE type);
+TYPE check_return (int flag);
 void asm_out (char const *fmt, ...);
 void asm_emit_global_decls_start (void);
 void asm_emit_global_decl_list (var_decl * v);

@@ -1264,7 +1264,7 @@ put_read_ST ()
 }
 
 TYPE
-check_return (int flag, TYPE type)
+check_return (int flag)
 {
     if (flag)
         return ZERO_;
