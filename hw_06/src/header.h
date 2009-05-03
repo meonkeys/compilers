@@ -8,8 +8,8 @@ typedef enum
 { INTEGERC, FLOATC, STRINGC } C_type;
 
 typedef enum TYPE_e
-{ ZERO_, INT_, FLOAT_, ARR_, STR_, VOID_, ERROR_, CONST_, FUNC_, POINTER_,
-    STR_VAR_, STRING_, TYPEDEF_
+{ ZERO_, INT_, FLOAT_, ARR_, STR_, VOID_, ERROR_, CONST_, FUNC_, STR_VAR_,
+    STRING_, TYPEDEF_
 } TYPE;
 
 typedef enum
