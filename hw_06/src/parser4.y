@@ -476,10 +476,11 @@ init_id		: ID{
 			$$->init_id_u.P_arr_s->arr_info=Allocate(TYPE_ARR);
 			$$->init_id_u.P_arr_s->name=$1;
 			$$->init_id_u.P_arr_s->arr_info->dim=$2->dim;
-			for (j=0; j< 10; j++)
+			for (j=0; j< $2->dim; j++)
 			{
 				$$->init_id_u.P_arr_s->arr_info->dim_limit[j] = $2->dim_limit[j];
 			}
+			set_array_size($$->init_id_u.P_arr_s->arr_info);
 		}
 
 		/* assignment during variable initialization */

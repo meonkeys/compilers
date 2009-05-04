@@ -1383,15 +1383,24 @@ asm_emit_global_decl_list (var_decl * a)
 
         if (INT_ == a->type)
         {
-            asm_out ("\t_%s: .word", PII->init_id_u.name);
+            if(ARR_ == PII->type){
+                asm_out ("\t_%s: .space", PII->init_id_u.P_arr_s->name);
+            }
+            else{
+                asm_out ("\t_%s: .word", PII->init_id_u.name);
+            }
         }
         else if (FLOAT_ == a->type)
         {
-            asm_out ("\t_%s: .float", PII->init_id_u.name);
+            if(ARR_ == PII->type){
+                asm_out ("\t_%s: .space", PII->init_id_u.P_arr_s->name);
+            }
+            else{
+                asm_out ("\t_%s: .float", PII->init_id_u.name);
+            }
         }
-        else
+        else if (ARR_ == a->type)
         {
-            /* FIXME: asm_emit_global_decl_list only supports scalar values */
         }
 
         if (PII->assignment_during_initialization)
@@ -1411,13 +1420,24 @@ asm_emit_global_decl_list (var_decl * a)
              * zero (as recommended by Dr. Hsu) */
             if (INT_ == a->type)
             {
-                PII->val_u.intval = 0;
+                if(ARR_ != PII->type){
+                    PII->val_u.intval = 0;
+                    asm_out (" 0\t# line %d\n", linenumber);
+                }
+                else{
+                    asm_out (" %d\t# allocing %d*4 bytes, line %d\n", PII->init_id_u.P_arr_s->arr_info->size*4, PII->init_id_u.P_arr_s->arr_info->size, linenumber);
+                }
             }
             else if (FLOAT_ == a->type)
             {
-                PII->val_u.fval = 0.0;
+                if(ARR_ != PII->type){
+                    asm_out (" 0\t# line %d\n", linenumber);
+                    PII->val_u.fval = 0.0;
+                }
+                else{
+                    asm_out (" %d\t# allocing %d*4 bytes, line %d\n", PII->init_id_u.P_arr_s->arr_info->size * 4, PII->init_id_u.P_arr_s->arr_info->size, linenumber);
+                }
             }
-            asm_out (" 0\t# line %d\n", linenumber);
         }
     }
     while ((PIL = PIL->next));
@@ -1472,6 +1492,20 @@ set_var_decl_list_offsets (var_decl * v, int offset)
     while ((PIL = PIL->next));
 
     return offset;
+}
+
+void
+set_array_size(Type_arr* arr_info){
+    int i;
+    for (i=0; i<arr_info->dim; i++)
+    {
+        if(i == 0){
+            arr_info->size = arr_info->dim_limit[i];
+        }
+        else{
+            arr_info->size = arr_info->size * arr_info->dim_limit[i];
+        }
+    }
 }
 
 void
