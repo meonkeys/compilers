@@ -1754,10 +1754,6 @@ asm_emit_load_int(int reg, var_ref* v){
             asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
                      v->tmp_val_u.tmp_intval, linenumber);
         }
-        else if (1 == v->is_return)
-        {
-            reg = v->place;
-        }
         else
         {
             reg = v->place;
