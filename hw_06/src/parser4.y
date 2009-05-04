@@ -30,6 +30,7 @@ char* frame_data = NULL;
 
 int GLOBAL_DECLS_STARTED=0;
 int LABEL_NUM=0;
+char current_func_name[FUNC_NAME_MAXLEN];
 %}
 
 %defines
@@ -664,7 +665,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 					asm_out("\tmov.s\t$f0, $f%d\t# line %d\n", $2->place, linenumber);
 				}
 				$$=ZERO_;
-				/* FIXME: need to include a jump to epilogue? */
+				asm_out("j _end_%s\t# return statement, line %d\n", current_func_name, linenumber);
 			}
 			IS_RETURN=1;
 		}

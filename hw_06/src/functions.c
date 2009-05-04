@@ -1053,6 +1053,17 @@ MakeParamList (param_list * a, param * b)
     return d;
 }
 
+extern char current_func_name[FUNC_NAME_MAXLEN];
+
+void
+save_function_name (char *b)
+{
+    if (strlen(b) < (FUNC_NAME_MAXLEN - 2))
+        strcpy (current_func_name, b);
+    else
+        strncpy (current_func_name, b, FUNC_NAME_MAXLEN - 1);
+}
+
 TYPE
 func_enter_ST (TYPE a, char *b, param_list * c)
 {
@@ -1109,6 +1120,9 @@ func_enter_ST (TYPE a, char *b, param_list * c)
     }
 
     insert (b, FUNC_, PSF, 0);
+
+    /* save function name for jump to epilogue */
+    save_function_name (b);
 
     return ret;
 }
