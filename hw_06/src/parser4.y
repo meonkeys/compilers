@@ -615,6 +615,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 				PVR=check_function($1,$3);
 				/* TODO: save caller registers $t range iirc */
 				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
+				pop_params(PVR->num_params_to_pop);
 				$$=PVR->type;
 			}
 		}
