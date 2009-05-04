@@ -1,5 +1,9 @@
+<<<<<<< HEAD:hw_06/src/test_data/06_given/test03.c.out2
 enter a range, for example, 10 100 :  5  23
 5
+=======
+enter a range, for example, 5<ENTER> 23<ENTER>:5
+>>>>>>> 01b5c4c72c8c9e21401c70e2c93f8cca4b267662:hw_06/src/test_data/06_given/test03.c.out2
 7
 11
 13

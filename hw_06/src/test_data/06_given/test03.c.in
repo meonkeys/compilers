@@ -20,20 +20,23 @@ int main()
 {
   int i, num1, num2;
   
-  write("enter a range, for example, 800 900 ");
+  write("enter a range, for example, 5<ENTER> 23<ENTER>:");
   num1 = read();
   num2 = read();
  
   for (i =num1; i < num2; i = i + 1)
     {
-      if (is_prime(i))
+      if (is_prime(i)) {
 	write (i);
+	write ("\n");
+      }
     } 
   return 1; 
 }
 
-/* Expected output:
-   enter a range, for example, 10 100 :  5  23
+/* Expected output with given range 5 through 23:
+
+   enter a range, for example, 5<ENTER> 23<ENTER>:
    5
    7
    11

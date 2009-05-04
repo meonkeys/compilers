@@ -2,6 +2,7 @@
 #define HEADER_H
 
 #define REG_COUNT 32
+#define FUNC_NAME_MAXLEN 128
 
 /* Constant Types */
 typedef enum
