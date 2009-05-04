@@ -1,9 +1,1 @@
-Enter the integer number to be searched : 7
-
-The integer 7 is not present in the Array
-
-Expected output for 12:
-
-Enter the integer number to be searched : 12
-
-The integer is located at index : 6
+Enter the integer number to be searched : The integer is located at index : 6

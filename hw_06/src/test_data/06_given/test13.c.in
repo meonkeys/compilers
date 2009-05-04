@@ -30,7 +30,7 @@ int BinarySearch(int tofind)
 	
  }
 
- write("The integer ");
+ write("\nThe integer ");
  write(tofind); 
  write(" is not present in the Array\n");
  return 0;

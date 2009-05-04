@@ -29,15 +29,19 @@ int main()
 
  write("The Unsorted array = ");
 
- for (i =0; i < 20; i = i + 1)
+ for (i =0; i < 20; i = i + 1) {
    write(array[i]);
+   write(" ");
+ }
  write("\n");
  
  insertion_sort(array, 20);
 
  write("The sorted array = ");
- for (i =0; i < 20; i = i + 1)
+ for (i =0; i < 20; i = i + 1) {
    write(array[i]);
+   write(" ");
+ }
  write("\n");
  
  return 1;

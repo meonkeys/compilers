@@ -52,15 +52,19 @@ int main()
    }
 
  write("The Unsorted arrar = ");
- for (i =0; i < 20; i = i + 1)
+ for (i =0; i < 20; i = i + 1) {
    write(array[i]);
+   write(" ");
+ }
  write("\n");
 
  quicksort(array, 0, 19);
 
  write("The sorted arrar = ");
- for (i =0; i < 20; i = i + 1)
+ for (i =0; i < 20; i = i + 1) {
    write(array[i]);
+   write(" ");
+ }
  write("\n");
  
  return 1;

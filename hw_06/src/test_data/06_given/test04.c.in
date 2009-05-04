@@ -14,6 +14,7 @@ void print()
       for (j = 0; j < dim; j = j + 1)
 	{
 	  write(c[i][j]);
+          write(" ");
 	}
       write("\n"); 
     }
@@ -43,7 +44,7 @@ void arraymult()
 int main()
 {
   int i,j;
-  write("\nEnter matrix 1 of dim 4 x 4 :");
+  write("Enter matrix 1 of dim 4 x 4 : ");
 
   for (i = 0; i < dim; i = i +1)
     {
@@ -52,7 +53,7 @@ int main()
 	  a[i][j] = read();
 	}
     }
-  write("\nEnter matrix 2 of dim 4 x 4: ");
+  write("Enter matrix 2 of dim 4 x 4: ");
   for (i = 0; i < dim; i = i +1)
     {
       for (j = 0; j < dim; j = j +1)
