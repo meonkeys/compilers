@@ -51,10 +51,14 @@ int main()
   num = fread(); 
   
   write(absf(num));
+  write("\n");
   write(ceil(num));
+  write("\n");
   write(floor(num));
+  write("\n");
   midp = (ceil(num) + floor(num))/2.0;
   write(midp);
+  write("\n");
 
   return 1;
 }

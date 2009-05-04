@@ -30,7 +30,7 @@ int BinarySearch(int tofind)
 	
  }
 
- write("The integer ");
+ write("\nThe integer ");
  write(tofind); 
  write(" is not present in the Array\n");
  return 0;
@@ -68,4 +68,3 @@ Enter the integer number to be searched : 12
 The integer is located at index : 6
 
 */
-

@@ -1,3 +1,7 @@
 The Unsorted arrar = 23 4 5 -4 34 3 6 2 56 5 8 9 4 90 4 7 -7 -34 56 87 
+<<<<<<< HEAD:hw_06/src/test_data/06_given/test11.c.out2
 The sorted arrar = -34 -7 -4 2 3 4 4 4 5 5 6 7 8 9 23 34 56 56 87 90
 
+=======
+The sorted arrar = -34 -7 -4 2 3 4 4 4 5 5 6 7 8 9 23 34 56 56 87 90 
+>>>>>>> b68e3b60592966e82dacd6a0187468b4b3b1d707:hw_06/src/test_data/06_given/test11.c.out2

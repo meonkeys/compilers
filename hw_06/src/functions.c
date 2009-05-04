@@ -1572,7 +1572,7 @@ asm_emit_scoped_decl_list (var_decl * v)
                 if(ARR_ != PII->type){
                     PII->val_u.intval = 0;
                 }else{
-                    frame_data_out ("\t_%s_%d:\t.size\t%d\t# allocing %d*4 bytes, line %d\n", 
+                    frame_data_out ("\t_%s_%d:\t.space\t%d\t# allocing %d*4 bytes, line %d\n",
                             PII->init_id_u.P_arr_s->name, cur_const_val, 
                             PII->init_id_u.P_arr_s->arr_info->size*4, 
                             PII->init_id_u.P_arr_s->arr_info->size, linenumber);
@@ -1583,7 +1583,7 @@ asm_emit_scoped_decl_list (var_decl * v)
                 if(ARR_ != PII->type){
                     PII->val_u.fval = 0.0;
                 }else{
-                    frame_data_out ("\t_%s_%d:\t.size\t%d\t# allocing %d*4 bytes, line %d\n", 
+                    frame_data_out ("\t_%s_%d:\t.space\t%d\t# allocing %d*4 bytes, line %d\n",
                             PII->init_id_u.P_arr_s->name, cur_const_val, 
                             PII->init_id_u.P_arr_s->arr_info->size*4, 
                             PII->init_id_u.P_arr_s->arr_info->size, linenumber);
@@ -1916,7 +1916,7 @@ asm_emit_write (TypeList * idl)
         else
         {
             /* FIXME: I don't think this is right either */
-            asm_out ("\tmove.s\t$f12, $%d\n", idl->P_var_r->place);
+            asm_out ("\tmov.s\t$f12, $f%d\n", idl->P_var_r->place);
         }
     }
     else

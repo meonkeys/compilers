@@ -11,6 +11,7 @@ void print(int k)
       for (j = 0; j < dim; j = j + 1)
 	{
 	  write(a[k][j]);
+          write(" ");
 	}
       write("\n"); 
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD:hw_06/src/test_data/06_given/test12.c.out2
 Enter the integer number to be searched : 7
 
 The integer 7 is not present in the Array
@@ -8,3 +9,6 @@ Enter the integer number to be searched : 12
 
 The integer is located at index : 6
 
+=======
+Enter the integer number to be searched : The integer is located at index : 6
+>>>>>>> b68e3b60592966e82dacd6a0187468b4b3b1d707:hw_06/src/test_data/06_given/test12.c.out2
