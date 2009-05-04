@@ -1153,6 +1153,7 @@ check_function (char *a, TypeList * b)
 
     PVR = Allocate (VAR_REF);
     PVR->num_params_to_pop = 0;
+    PVR->name = NULL;
 
     if ((PST = lookup (a)) == NULL)
     {
