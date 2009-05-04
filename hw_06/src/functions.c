@@ -1113,6 +1113,18 @@ func_enter_ST (TYPE a, char *b, param_list * c)
     return ret;
 }
 
+int
+count_function_params (TypeList *t)
+{
+    int num_params = 0;
+    while (t)
+    {
+        num_params++;
+        t = t->next;
+    }
+    return num_params;
+}
+
 /*
  * Here is where we save caller registers
  * as well as set up jump routines and such 
@@ -1123,13 +1135,7 @@ check_function (char *a, TypeList * b)
 {
     symtab *PST;
     var_ref *PVR;
-    int i = 0;
-    TypeList *c = b;
-    while (c)
-    {
-        i++;
-        c = c->next;
-    }
+    int num_params = count_function_params (b);
 
     PVR = Allocate (VAR_REF);
 
@@ -1145,14 +1151,14 @@ check_function (char *a, TypeList * b)
         PVR->type = ERROR_;
         GLOBAL_ERROR = 1;
     }
-    else if (i > PST->symtab_u.st_func->params)
+    else if (num_params > PST->symtab_u.st_func->params)
     {
         printf ("error %d: too many arguments to function %s\n", linenumber,
                 a);
         PVR->type = ERROR_;
         GLOBAL_ERROR = 1;
     }
-    else if (i < PST->symtab_u.st_func->params)
+    else if (num_params < PST->symtab_u.st_func->params)
     {
         printf ("error %d: too few arguments to function %s\n", linenumber,
                 a);
@@ -1174,12 +1180,11 @@ check_function (char *a, TypeList * b)
     }
     else
     {
+        int reg = 9999;
+        int i = 0;
         var_ref *PVR1;
-        ST_func *x;
-        param_list *y;
-        x = PST->symtab_u.st_func;
-        y = x->PL;
-        i = 0;
+        ST_func *x = PST->symtab_u.st_func;
+        param_list *y = x->PL; /* param list iterator */
         PVR->type = PST->symtab_u.st_func->ret_type;
         while (y)
         {
@@ -1197,6 +1202,11 @@ check_function (char *a, TypeList * b)
             switch (y->PPAR->type)
             {
             case INT_:
+                reg = get_result_reg ();
+                asm_emit_load_int (reg, PVR1);
+                asm_out ("\tsw\t$%d, ($sp)\t# line %d\n", reg, linenumber);
+                asm_out ("\tsub\t$sp, $sp, 4\t# push int param onto stack\n");
+                break;
             case FLOAT_:
                 if ((PVR1->type != INT_) && (PVR1->type != FLOAT_))
                 {
@@ -1205,6 +1215,11 @@ check_function (char *a, TypeList * b)
                          linenumber, i, (PVR1->name) ? (PVR1->name) : "",
                          printtype (PVR1->type));
                     PVR->type = ERROR_;
+                } else {
+                    reg = get_result_reg ();
+                    asm_emit_load_float (reg, PVR1);
+                    asm_out ("\ts.s\t$f%d, ($sp)\t# line %d\n", reg, linenumber);
+                    asm_out ("\tsub\t$sp, $sp, 4\t# push float param onto stack\n");
                 }
                 break;
             case ARR_:

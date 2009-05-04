@@ -10,12 +10,19 @@
 	[X] add more comments to generated code
 	[X] fix return statements when constants are returned
 	[_] push args on the stack prior to emitting "jal" instruction
-		push params in reverse order: Nth, N-1, N-2 ... 1st
-			see examples/pass_one_arg.s
+		[X] push single int
+		[X] push single float
+		[_] push multiple values
+			push params in reverse order: Nth, N-1, N-2 ... 1st
+			or just reverse param list in check_function?
+	[_] returning values from functions: still broken?
+		function must properly set $v0 or $f0 before epilogue
 	[_] when value is returned (in $v0 or $f0), how should caller use it?
 		see assign_ex
 		func call with return value reduces to "factor" (which is a var_ref)
-		[_] how do we currently get the return value of read() and fread()?
+			this factor will have a "place", "type", etc.
+		[?] how do we currently get the return value of read() and fread()?
+	[_] using function return value as param for other function call
 	useful reference docs
 		lecture slides: Code Generation (funcs w/o args, understanding the stack)
 			"Simple Code Generation, Expressions, Register Tracking"
