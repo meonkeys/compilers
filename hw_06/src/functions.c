@@ -1463,7 +1463,8 @@ set_var_decl_list_offsets (var_decl * v, int offset)
 
     init_id *PII = NULL;
     id_list *PIL = NULL;
-    int i = 0;
+    
+    /*int i = 0;*/
 
     assert (NULL != v);
 
@@ -1485,12 +1486,14 @@ set_var_decl_list_offsets (var_decl * v, int offset)
             {
                 offset += 4;    /* to remove prior -4 */
                 /* FIXME: Handle variable length structures */
-                /* FIXME: going to need something trickier for multi dimensional */
+
+                /*
                 for (i = 0; i < PII->init_id_u.P_arr_s->arr_info->dim; i++)
                 {
+                */
                     offset -=
-                        (4 * PII->init_id_u.P_arr_s->arr_info->dim_limit[i]);
-                }
+                        (4 * PII->init_id_u.P_arr_s->arr_info->size);
+                /*}*/
             }
             else
             {
@@ -1540,7 +1543,7 @@ asm_emit_scoped_decl_list (var_decl * v)
 
         if (PII->assignment_during_initialization)
         {
-            if (INT_ == v->type)
+            if (INT_ == v->type && ARR_ != PII->type)
             {
                 int reg = get_result_reg ();
                 asm_out ("\tli\t$%d, %d\t# line %d\n", reg, PII->val_u.intval,
@@ -1548,7 +1551,7 @@ asm_emit_scoped_decl_list (var_decl * v)
                 asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, PII->offset,
                          linenumber);
             }
-            else if (FLOAT_ == v->type)
+            else if (FLOAT_ == v->type && ARR_ != PII->type)
             {
                 int reg = get_result_reg ();
                 /* asm_out ("\tli\t$%d, %f\t# line %d\n", reg, PII->val_u.fval, linenumber); */
@@ -1570,11 +1573,25 @@ asm_emit_scoped_decl_list (var_decl * v)
         {
             if (INT_ == v->type)
             {
-                PII->val_u.intval = 0;
+                if(ARR_ != PII->type){
+                    PII->val_u.intval = 0;
+                }else{
+                    frame_data_out ("\t_%s_%d:\t.size\t%d\t# allocing %d*4 bytes, line %d\n", 
+                            PII->init_id_u.P_arr_s->name, cur_const_val, 
+                            PII->init_id_u.P_arr_s->arr_info->size*4, 
+                            PII->init_id_u.P_arr_s->arr_info->size, linenumber);
+                }
             }
             else if (FLOAT_ == v->type)
             {
-                PII->val_u.fval = 0.0;
+                if(ARR_ != PII->type){
+                    PII->val_u.fval = 0.0;
+                }else{
+                    frame_data_out ("\t_%s_%d:\t.size\t%d\t# allocing %d*4 bytes, line %d\n", 
+                            PII->init_id_u.P_arr_s->name, cur_const_val, 
+                            PII->init_id_u.P_arr_s->arr_info->size*4, 
+                            PII->init_id_u.P_arr_s->arr_info->size, linenumber);
+                }
             }
         }
     }
