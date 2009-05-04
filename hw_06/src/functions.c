@@ -1152,6 +1152,8 @@ check_function (char *a, TypeList * b)
     int num_params = count_function_params (b);
 
     PVR = Allocate (VAR_REF);
+    PVR->num_params_to_pop = 0;
+    PVR->name = NULL;
 
     if ((PST = lookup (a)) == NULL)
     {
@@ -1220,6 +1222,7 @@ check_function (char *a, TypeList * b)
                 asm_emit_load_int (reg, PVR1);
                 asm_out ("\tsw\t$%d, ($sp)\t# line %d\n", reg, linenumber);
                 asm_out ("\tsub\t$sp, $sp, 4\t# push int param onto stack\n");
+                PVR->num_params_to_pop++;
                 break;
             case FLOAT_:
                 if ((PVR1->type != INT_) && (PVR1->type != FLOAT_))
@@ -1234,6 +1237,7 @@ check_function (char *a, TypeList * b)
                     asm_emit_load_float (reg, PVR1);
                     asm_out ("\ts.s\t$f%d, ($sp)\t# line %d\n", reg, linenumber);
                     asm_out ("\tsub\t$sp, $sp, 4\t# push float param onto stack\n");
+                    PVR->num_params_to_pop++;
                 }
                 break;
             case ARR_:
@@ -1272,6 +1276,18 @@ check_function (char *a, TypeList * b)
     }
 
     return PVR;
+}
+
+void
+pop_params (int num_params_to_pop)
+{
+    int i = 0;
+    assert (num_params_to_pop >= 0);
+    assert (num_params_to_pop < 10); /* arbitrary limit */
+    for (i = 0; i < num_params_to_pop; i++)
+    {
+        asm_out ("\tadd\t$sp, $sp, 4\t# pop a param\n");
+    }
 }
 
 void

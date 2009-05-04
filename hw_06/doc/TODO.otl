@@ -15,6 +15,7 @@
 		[_] push multiple values
 			push params in reverse order: Nth, N-1, N-2 ... 1st
 			or just reverse param list in check_function?
+		[X] pop params upon return
 	[_] returning values from functions: still broken?
 		function must properly set $v0 or $f0 before epilogue
 	[_] when value is returned (in $v0 or $f0), how should caller use it?

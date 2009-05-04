@@ -111,6 +111,7 @@ typedef struct var_ref_s
         float tmp_fval;         /* or store it in the symbol table. */
         char *tmp_str;
     } tmp_val_u;
+    int num_params_to_pop;
 } var_ref;
 
 struct TypeList
@@ -249,6 +250,7 @@ TYPE stmt_assign_ex (var_ref * a, var_ref * b);
 char *Add_Str (char *a, char *b);
 struct_semantic *search (char *a, char *b);
 var_ref *check_function (char *a, TypeList * b);
+void pop_params (int num_params_to_pop);
 TYPE func_enter_ST (TYPE a, char *b, param_list * c);
 param_list *MakeParamList (param_list * a, param * b);
 TYPE param_P (param * a, char *b);
