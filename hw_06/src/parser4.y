@@ -830,6 +830,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 		}
 		| CONST{
 			$$=Allocate(VAR_REF);
+			$$->place = 0;
 			if($1->const_type==INTEGERC) {
 				$$->type=INT_;
 				$$->tmp_val_u.tmp_intval=$1->const_u.intval;
@@ -882,6 +883,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 			$$=check_function($1,$3);
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
 				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
+				/* set location for return value */
 				if(INT_ == $$->type){
 					$$->place = 2; /* indicates $v0 */
 				}else if(FLOAT_ == $$->type){
