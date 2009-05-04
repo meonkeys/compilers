@@ -1478,10 +1478,6 @@ set_var_decl_list_offsets (var_decl * v, int offset)
 
         if (INT_ == v->type || FLOAT_ == v->type)
         {
-            /*
-               PII->offset = offset;
-               offset -= 4;
-             */
             if (ARR_ == PII->type)
             {
                 offset += 4;    /* to remove prior -4 */
