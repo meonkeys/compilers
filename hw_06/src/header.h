@@ -3,6 +3,7 @@
 
 #define REG_COUNT 32
 #define FUNC_NAME_MAXLEN 128
+#define MAX_FUNC_PARAMS 10
 
 /* Constant Types */
 typedef enum
