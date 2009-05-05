@@ -224,6 +224,11 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 {
     symtab *ptrA = NULL;
     symtab *ptrB = NULL;
+    int offsetA = 0;
+    int offsetB = 0;
+    int arr_offset = 0;
+    int reg;
+    int arr_reg = 0;
 
     /* fprintf (stderr, "%s vs. %s\n", printtype (a->type), printtype (b->type)); */
     if ((a->type == ERROR_) || (b->type == ERROR_))
@@ -245,11 +250,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
     else
         switch (a->type)
         {
-            int offsetA = 0;
-            int offsetB = 0;
-            int arr_offset = 0;
-            int reg;
-            int arr_reg;
 
         case STR_VAR_:
             if (a->var_ref_u.type_name != b->var_ref_u.type_name)
@@ -270,6 +270,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
             /*
+             * FIXME: I think I need to do some sort of LHS array access here
                if(ARR_ == ptrA->type){
                arr_offset = 4 * a->var_ref_u.arr_info->dim_limit[0];
                fprintf(stderr, "array dim = %d\n", a->var_ref_u.arr_info->dim);
@@ -280,7 +281,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                }
              */
             offsetA = ptrA->offset + arr_offset;
-            arr_offset = 0;
+            /*fprintf(stderr,"offset: %d\tarr_offset: %d\n", ptrA->offset, arr_offset);*/
             reg = get_reg (b);
 
             /* if it's null it's a constant */
@@ -374,6 +375,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else
                 {
+                    /* FIXME: asm_emit_array_write? */
                     arr_reg = asm_emit_array_access (a, 4);
                     asm_out ("\tsw\t$%d, 0($%d)\t# line%d\n", reg, arr_reg,
                              linenumber);
@@ -1570,6 +1572,7 @@ asm_emit_global_decl_list (var_decl * a)
                              PII->init_id_u.P_arr_s->arr_info->size * 4,
                              PII->init_id_u.P_arr_s->arr_info->size,
                              linenumber);
+                    PII->offset = (4 * PII->init_id_u.P_arr_s->arr_info->size);
                 }
             }
             else if (FLOAT_ == a->type)
@@ -1585,6 +1588,7 @@ asm_emit_global_decl_list (var_decl * a)
                              PII->init_id_u.P_arr_s->arr_info->size * 4,
                              PII->init_id_u.P_arr_s->arr_info->size,
                              linenumber);
+                    PII->offset = (4 * PII->init_id_u.P_arr_s->arr_info->size);
                 }
             }
         }
@@ -1642,6 +1646,33 @@ set_var_decl_list_offsets (var_decl * v, int offset)
 }
 
 void
+set_global_array_offsets(var_decl * v){
+    init_id *PII = NULL;
+    id_list *PIL = NULL;
+
+    assert (NULL != v);
+
+    PIL = v->P_id_l;
+    assert (NULL != PIL);
+
+    do
+    {
+        PII = PIL->P_ini_i;
+        assert (NULL != PII);
+
+        if (INT_ == v->type || FLOAT_ == v->type)
+        {
+            if (ARR_ == PII->type)
+            {
+                /* FIXME: Handle variable length structures */
+                PII->offset = (4 * PII->init_id_u.P_arr_s->arr_info->size);
+            }
+        }
+    }
+    while ((PIL = PIL->next));
+}
+
+void
 set_array_size (Type_arr * arr_info)
 {
     int i;
@@ -1671,13 +1702,15 @@ asm_emit_array_access (var_ref * a, int width)
     int dim_reg;
     int i;
     
-    base_reg = get_reg(a);
-    asm_out ("\tla\t$%d, _%s\t# line %d\n", base_reg, a->name, linenumber);
-
     SMT = NULL;
     SMT = lookup (a->name);
     assert (NULL != SMT);
     res_reg = get_result_reg ();
+
+    base_reg = get_reg(a);
+    asm_out ("\tla\t$%d, _%s\t# line %d\n", base_reg, a->name, linenumber);
+    /*fprintf(stderr, "array offset = %d\n", SMT->offset);*/
+    asm_out("\tadd\t$%d, $%d, %d\t# line %d\n", base_reg, base_reg, SMT->offset);
 
     /* FIXME: clean this up */
     for (i = 0; i < SMT->symtab_u.st_arr->dim - 1; i++)
@@ -1724,7 +1757,7 @@ asm_emit_array_access (var_ref * a, int width)
     free_reg(dim_reg);
 
     /* res_reg = res_reg + base_addr */
-    asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, res_reg, base_reg);
+    asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, base_reg, res_reg);
     free_reg (base_reg);
     return res_reg;
 }
