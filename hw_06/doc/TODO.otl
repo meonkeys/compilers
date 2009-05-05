@@ -9,10 +9,10 @@
 		$sp is set to the top of the stack
 	[X] add more comments to generated code
 	[X] fix return statements when constants are returned
-	[_] push args on the stack prior to emitting "jal" instruction
+	[X] push args on the stack prior to emitting "jal" instruction
 		[X] push single int
 		[X] push single float
-		[_] push multiple values
+		[X] push multiple values
 			push params in reverse order: Nth, N-1, N-2 ... 1st
 			or just reverse param list in check_function?
 		[X] pop params upon return
