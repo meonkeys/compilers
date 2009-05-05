@@ -1150,6 +1150,7 @@ check_function (char *a, TypeList * b)
     symtab *PST;
     var_ref *PVR;
     int num_params = count_function_params (b);
+    assert (num_params <= MAX_FUNC_PARAMS);
 
     PVR = Allocate (VAR_REF);
     PVR->num_params_to_pop = 0;
@@ -1283,7 +1284,7 @@ pop_params (int num_params_to_pop)
 {
     int i = 0;
     assert (num_params_to_pop >= 0);
-    assert (num_params_to_pop < 10); /* arbitrary limit */
+    assert (num_params_to_pop <= MAX_FUNC_PARAMS);
     for (i = 0; i < num_params_to_pop; i++)
     {
         asm_out ("\tadd\t$sp, $sp, 4\t# pop a param\n");
