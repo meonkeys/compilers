@@ -452,7 +452,7 @@ init_id_list	: init_id{
 			$$->next=NULL;
 		}
 		| init_id_list MK_COMMA init_id{
-			/*append at the beginging of list, need not preserve order*/
+			/*append at the beginning of list, need not preserve order*/
 			id_list * PIL;
 			PIL=Allocate(ID_LIST);
 			PIL->next=$1;
@@ -557,7 +557,12 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 		}
 
 		/* simple assignment statement */
-		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON{$$=stmt_assign_ex($1,$3);}
+		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
+			{
+				$$=stmt_assign_ex($1,$3);
+				free_reg($3->place);
+				$3->place = -1;
+			}
 		| IF MK_LPAREN test MK_RPAREN stmt{
 			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
 				printf("error %d: condition not a basic type in if statement\n",linenumber);
@@ -702,7 +707,12 @@ test            : {
                 ;
 
 		/* assignment in initializer of "for loop" control expression */
-assign_expr     : ID OP_ASSIGN relop_expr {$$=assign_ex($1,$3);}
+assign_expr     : ID OP_ASSIGN relop_expr 
+			{
+				$$=assign_ex($1,$3);
+				free_reg($3->place);
+				$3->place=-1;
+			}
                 | relop_expr{$$=$1;}
 
 
@@ -776,6 +786,8 @@ expr		: expr add_op term{
 			}
 			$$=$1;
 			$$->name=NULL;
+			free_reg($3->place);
+			$3->place=-1;
 		}
 		| term{$$=$1;}
 		;
@@ -801,6 +813,8 @@ term		: term mul_op factor{
 			}
 			$1->name=NULL;
 			$$=$1;
+			free_reg($3->place);
+			$3->place = -1;
 		}
 		| factor {$$=$1;}
 		;
@@ -950,6 +964,8 @@ var_ref		: ID{
 				$$->type=STP->type;
 				$$->name=$1;
 
+				/*fprintf(stderr, "reffed %s w/ type %s\n", $1, printtype($$->type));*/
+
 				if($$->type==STR_VAR_){
 					$$->var_ref_u.type_name=STP->symtab_u.type_name;
 				}
@@ -990,11 +1006,18 @@ var_ref		: ID{
 				}
 				else{
 					int i;
-					/*
+					/*	
 					fprintf(stderr, "var_ref tmp_intval = %d\n", $2->tmp_val_u.tmp_intval);
 					fprintf(stderr, "setting arr[%d] to %d\n", $1->var_ref_u.arr_info->dim, $2->tmp_val_u.tmp_intval);
 					*/
-					$1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim - 1] = $2->tmp_val_u.tmp_intval;
+					/* must be const access */
+					if($2->place < 2 || $2->place > 25){
+						$1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim - 1] = $2->tmp_val_u.tmp_intval;
+						$1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1] = -1;
+					}
+					else{
+						$1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1] = $2->place;
+					}
 					i=--$1->var_ref_u.arr_info->dim;
 
 					if(i==0){
@@ -1002,6 +1025,7 @@ var_ref		: ID{
 						/*we have reached the variable in the array*/
 
 						$1->type=$1->var_ref_u.arr_info->arrtype;
+						$1->is_array = 1;
 						if($1->type==STR_){
 							$1->type=STR_VAR_;
 							$1->var_ref_u.type_name=$1->var_ref_u.arr_info->type_name;
@@ -1009,8 +1033,8 @@ var_ref		: ID{
 					}
 					else
 						;
-			}
-			$$=$1;
+				}
+				$$=$1;
 			}
 		}
 

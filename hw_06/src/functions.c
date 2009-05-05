@@ -164,10 +164,10 @@ assign_ex (char *a, var_ref * b)
 
                 if (PST->scope > 0)
                 {
-                    reg = asm_emit_load_int(reg, b);
+                    reg = asm_emit_load_int (reg, b);
                     PST->place = reg;
-                    asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, PST->offset,
-                             linenumber);
+                    asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg,
+                             PST->offset, linenumber);
                     ns_reg (reg);
                 }
                 else
@@ -182,13 +182,14 @@ assign_ex (char *a, var_ref * b)
                         }
                         else
                         {
-                            asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, b->name,
-                                     linenumber);
+                            asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg,
+                                     b->name, linenumber);
                         }
                     }
                     else if (2 == b->place)
                     {
-                        asm_out ("\tmove\t$%d, $v0\t# line %d\n", reg, linenumber);
+                        asm_out ("\tmove\t$%d, $v0\t# line %d\n", reg,
+                                 linenumber);
                     }
                     else if (0 == b->place)
                     {
@@ -208,7 +209,7 @@ assign_ex (char *a, var_ref * b)
             }
             break;
         case FLOAT_:
-            assert(0); /* we should also implement floating-point iterators */
+            assert (0);         /* we should also implement floating-point iterators */
             break;
         default:
             printf ("CHECKER ERROR: unknown types, line %d\n", linenumber);
@@ -223,6 +224,8 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 {
     symtab *ptrA = NULL;
     symtab *ptrB = NULL;
+
+    /* fprintf (stderr, "%s vs. %s\n", printtype (a->type), printtype (b->type)); */
     if ((a->type == ERROR_) || (b->type == ERROR_))
         return ERROR_;
     if (a->type != b->type)
@@ -246,6 +249,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             int offsetB = 0;
             int arr_offset = 0;
             int reg;
+            int arr_reg;
 
         case STR_VAR_:
             if (a->var_ref_u.type_name != b->var_ref_u.type_name)
@@ -265,7 +269,18 @@ stmt_assign_ex (var_ref * a, var_ref * b)
         case INT_:
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
-            offsetA = ptrA->offset;
+            /*
+               if(ARR_ == ptrA->type){
+               arr_offset = 4 * a->var_ref_u.arr_info->dim_limit[0];
+               fprintf(stderr, "array dim = %d\n", a->var_ref_u.arr_info->dim);
+               fprintf(stderr, "array assign to limit[%d]\n", a->var_ref_u.arr_info->dim_limit[0]);
+               }
+               else{
+               arr_offset = 0;
+               }
+             */
+            offsetA = ptrA->offset + arr_offset;
+            arr_offset = 0;
             reg = get_reg (b);
 
             /* if it's null it's a constant */
@@ -273,40 +288,71 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
-                if (ARR_ == ptrB->type)
-                {
-                    /* FIXME: Only 1 d right now */
-                    arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
-                }
-                else
-                {
-                    arr_offset = 0;
-                }
+                /*
+                   if (ARR_ == ptrB->type)
+                   {
+                   arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
+                   fprintf(stderr, "array assign to limit[%d]\n", b->var_ref_u.arr_info->dim_limit[0]);
+                   }
+                   else
+                   {
+                   arr_offset = 0;
+                   }
+                 */
                 offsetB = ptrB->offset + arr_offset;
             }
 
             if (ptrA->scope > 0)
             {
-                reg = asm_emit_load_int(reg, b);
-                ptrA->place = reg;
-                asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
-                         linenumber);
-                ns_reg (reg);
+                if (b->is_array != 1)
+                {
+                    reg = asm_emit_load_int (reg, b);
+                }
+                else
+                {
+                    free_reg (reg);
+                    reg = asm_emit_array_access (b, 4);
+                    asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
+                }
+
+                if (ARR_ != ptrA->type)
+                {
+                    ptrA->place = reg;
+                    asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
+                             linenumber);
+                    ns_reg (reg);
+                }
+                else
+                {
+                    arr_reg = asm_emit_array_access (a, 4);
+                    asm_out ("\tsw\t$%d, 0($%d)\t# line%d\n", reg, arr_reg,
+                             linenumber);
+                    free_reg (arr_reg);
+                }
             }
             else
             {
                 if (NULL != b->name)
                 {
                     /*  FIXME: I don't think this is right */
-                    if (ptrB->scope > 0)
+                    if (b->is_array != 1)
                     {
-                        asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
-                                 offsetB, linenumber);
+                        if (ptrB->scope > 0)
+                        {
+                            asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
+                                     offsetB, linenumber);
+                        }
+                        else
+                        {
+                            asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg,
+                                     b->name, linenumber);
+                        }
                     }
                     else
                     {
-                        asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, b->name,
-                                 linenumber);
+                        free_reg (reg);
+                        reg = asm_emit_array_access (b, 4);
+                        asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                     }
                 }
                 else if (1 == b->is_return)
@@ -318,10 +364,22 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
                              b->tmp_val_u.tmp_intval, linenumber);
                 }
-                ptrA->place = reg;
-                asm_out ("\tsw\t$%d, _%s\t# line %d\n", reg, a->name,
-                         linenumber);
-                ns_reg (reg);
+
+                if (ARR_ != ptrA->type)
+                {
+                    ptrA->place = reg;
+                    asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
+                             linenumber);
+                    ns_reg (reg);
+                }
+                else
+                {
+                    arr_reg = asm_emit_array_access (a, 4);
+                    asm_out ("\tsw\t$%d, 0($%d)\t# line%d\n", reg, arr_reg,
+                             linenumber);
+                    free_reg (arr_reg);
+                }
+
             }
             break;
         case FLOAT_:
@@ -755,8 +813,8 @@ type_decl_enter_ST1 (int a, id_list * b)
     {
         name =
             (b->P_ini_i->type ==
-             ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->P_ini_i->
-            init_id_u.name;
+             ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->
+            P_ini_i->init_id_u.name;
         if ((entry = lookup (name)))
             if ((entry) && (entry->scope >= scope))
             {
@@ -797,8 +855,8 @@ type_decl_enter_ST2 (char *a, id_list * b)
         {
             name =
                 (b->P_ini_i->type ==
-                 ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->P_ini_i->
-                init_id_u.name;
+                 ARR_) ? b->P_ini_i->init_id_u.P_arr_s->name : b->
+                P_ini_i->init_id_u.name;
             if (b->P_ini_i->type == ARR_)
             {
                 b->P_ini_i->init_id_u.P_arr_s->arr_info->arrtype = STR_;
@@ -965,8 +1023,8 @@ search (char *a, char *b)
             if (!strcmp (c, PSS1->struct_semantic_u.str_info.str_var_name))
             {
                 if (((PST1 =
-                      lookup (PSS1->struct_semantic_u.str_info.
-                              struct_type_name)) == NULL)
+                      lookup (PSS1->struct_semantic_u.
+                              str_info.struct_type_name)) == NULL)
                     || (PST1->scope > scope))
                     return NULL;
                 else
@@ -1058,7 +1116,7 @@ extern char current_func_name[FUNC_NAME_MAXLEN];
 void
 save_function_name (char *b)
 {
-    if (strlen(b) < (FUNC_NAME_MAXLEN - 2))
+    if (strlen (b) < (FUNC_NAME_MAXLEN - 2))
         strcpy (current_func_name, b);
     else
         strncpy (current_func_name, b, FUNC_NAME_MAXLEN - 1);
@@ -1128,7 +1186,7 @@ func_enter_ST (TYPE a, char *b, param_list * c)
 }
 
 int
-count_function_params (TypeList *t)
+count_function_params (TypeList * t)
 {
     int num_params = 0;
     while (t)
@@ -1201,7 +1259,7 @@ check_function (char *a, TypeList * b)
         int i = 0;
         var_ref *PVR1;
         ST_func *x = PST->symtab_u.st_func;
-        param_list *y = x->PL; /* param list iterator */
+        param_list *y = x->PL;  /* param list iterator */
         PVR->type = PST->symtab_u.st_func->ret_type;
         while (y)
         {
@@ -1233,11 +1291,15 @@ check_function (char *a, TypeList * b)
                          linenumber, i, (PVR1->name) ? (PVR1->name) : "",
                          printtype (PVR1->type));
                     PVR->type = ERROR_;
-                } else {
+                }
+                else
+                {
                     reg = get_result_reg ();
                     asm_emit_load_float (reg, PVR1);
-                    asm_out ("\ts.s\t$f%d, ($sp)\t# line %d\n", reg, linenumber);
-                    asm_out ("\tsub\t$sp, $sp, 4\t# push float param onto stack\n");
+                    asm_out ("\ts.s\t$f%d, ($sp)\t# line %d\n", reg,
+                             linenumber);
+                    asm_out
+                        ("\tsub\t$sp, $sp, 4\t# push float param onto stack\n");
                     PVR->num_params_to_pop++;
                 }
                 break;
@@ -1414,19 +1476,23 @@ asm_emit_global_decl_list (var_decl * a)
 
         if (INT_ == a->type)
         {
-            if(ARR_ == PII->type){
+            if (ARR_ == PII->type)
+            {
                 asm_out ("\t_%s: .space", PII->init_id_u.P_arr_s->name);
             }
-            else{
+            else
+            {
                 asm_out ("\t_%s: .word", PII->init_id_u.name);
             }
         }
         else if (FLOAT_ == a->type)
         {
-            if(ARR_ == PII->type){
+            if (ARR_ == PII->type)
+            {
                 asm_out ("\t_%s: .space", PII->init_id_u.P_arr_s->name);
             }
-            else{
+            else
+            {
                 asm_out ("\t_%s: .float", PII->init_id_u.name);
             }
         }
@@ -1451,22 +1517,32 @@ asm_emit_global_decl_list (var_decl * a)
              * zero (as recommended by Dr. Hsu) */
             if (INT_ == a->type)
             {
-                if(ARR_ != PII->type){
+                if (ARR_ != PII->type)
+                {
                     PII->val_u.intval = 0;
                     asm_out (" 0\t# line %d\n", linenumber);
                 }
-                else{
-                    asm_out (" %d\t# allocing %d*4 bytes, line %d\n", PII->init_id_u.P_arr_s->arr_info->size*4, PII->init_id_u.P_arr_s->arr_info->size, linenumber);
+                else
+                {
+                    asm_out (" %d\t# allocing %d*4 bytes, line %d\n",
+                             PII->init_id_u.P_arr_s->arr_info->size * 4,
+                             PII->init_id_u.P_arr_s->arr_info->size,
+                             linenumber);
                 }
             }
             else if (FLOAT_ == a->type)
             {
-                if(ARR_ != PII->type){
+                if (ARR_ != PII->type)
+                {
                     asm_out (" 0\t# line %d\n", linenumber);
                     PII->val_u.fval = 0.0;
                 }
-                else{
-                    asm_out (" %d\t# allocing %d*4 bytes, line %d\n", PII->init_id_u.P_arr_s->arr_info->size * 4, PII->init_id_u.P_arr_s->arr_info->size, linenumber);
+                else
+                {
+                    asm_out (" %d\t# allocing %d*4 bytes, line %d\n",
+                             PII->init_id_u.P_arr_s->arr_info->size * 4,
+                             PII->init_id_u.P_arr_s->arr_info->size,
+                             linenumber);
                 }
             }
         }
@@ -1480,8 +1556,8 @@ set_var_decl_list_offsets (var_decl * v, int offset)
 
     init_id *PII = NULL;
     id_list *PIL = NULL;
-    
-    /*int i = 0;*/
+
+    /*int i = 0; */
 
     assert (NULL != v);
 
@@ -1501,12 +1577,11 @@ set_var_decl_list_offsets (var_decl * v, int offset)
                 /* FIXME: Handle variable length structures */
 
                 /*
-                for (i = 0; i < PII->init_id_u.P_arr_s->arr_info->dim; i++)
-                {
-                */
-                    offset -=
-                        (4 * PII->init_id_u.P_arr_s->arr_info->size);
-                /*}*/
+                   for (i = 0; i < PII->init_id_u.P_arr_s->arr_info->dim; i++)
+                   {
+                 */
+                offset -= (4 * PII->init_id_u.P_arr_s->arr_info->size);
+                /*} */
             }
             else
             {
@@ -1525,17 +1600,91 @@ set_var_decl_list_offsets (var_decl * v, int offset)
 }
 
 void
-set_array_size(Type_arr* arr_info){
+set_array_size (Type_arr * arr_info)
+{
     int i;
-    for (i=0; i<arr_info->dim; i++)
+    for (i = 0; i < arr_info->dim; i++)
     {
-        if(i == 0){
+        if (i == 0)
+        {
             arr_info->size = arr_info->dim_limit[i];
         }
-        else{
+        else
+        {
             arr_info->size = arr_info->size * arr_info->dim_limit[i];
         }
     }
+}
+
+/* returns reg where access is */
+int
+asm_emit_array_access (var_ref * a, int width)
+{
+    symtab *SMT;
+
+    /* emit base address load */
+    int base_reg;
+    int res_reg;
+    int access_reg;
+    int dim_reg;
+    int i;
+    
+    base_reg = get_reg(a);
+    asm_out ("\tla\t$%d, _%s\t# line %d\n", base_reg, a->name, linenumber);
+
+    SMT = NULL;
+    SMT = lookup (a->name);
+    assert (NULL != SMT);
+    res_reg = get_result_reg ();
+
+    /* FIXME: clean this up */
+    for (i = 0; i < SMT->symtab_u.st_arr->dim - 1; i++)
+    {
+        /* res_reg = dim_access[i] * dim_lim[i+1] */
+        if (a->var_ref_u.arr_info->dim_place[i] == -1)
+        {
+            access_reg = get_result_reg ();
+            asm_out ("\tli\t$%d, %d\n", access_reg,
+                     a->var_ref_u.arr_info->dim_limit[i]);
+        }
+        else
+        {
+            access_reg = a->var_ref_u.arr_info->dim_place[i];
+        }
+
+        dim_reg = get_result_reg();
+        asm_out ("\tli\t$%d, %d\t# line %d\n", dim_reg, SMT->symtab_u.st_arr->dim_limit[i + 1], linenumber);
+        asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, access_reg, dim_reg);
+        free_reg (access_reg);
+        free_reg(dim_reg);
+
+        /* res_reg = res_reg + dim_access[i+1] */
+        if (a->var_ref_u.arr_info->dim_place[i + 1] == -1)
+        {
+            access_reg = get_result_reg ();
+            asm_out ("\tli\t$%d, %d\n", access_reg,
+                     a->var_ref_u.arr_info->dim_limit[i + 1]);
+            asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, access_reg, res_reg);
+            free_reg (access_reg);
+        }
+        else
+        {
+            access_reg = a->var_ref_u.arr_info->dim_place[i + 1];
+            asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, access_reg, res_reg);
+            free_reg (access_reg);
+        }
+    }
+
+    /* res_reg = res_reg * 4 */
+    dim_reg = get_result_reg();
+    asm_out("\tli\t$%d, %d\t# line %d\n", dim_reg, width, linenumber);
+    asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, res_reg, dim_reg);
+    free_reg(dim_reg);
+
+    /* res_reg = res_reg + base_addr */
+    asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, res_reg, base_reg);
+    free_reg (base_reg);
+    return res_reg;
 }
 
 void
@@ -1586,24 +1735,32 @@ asm_emit_scoped_decl_list (var_decl * v)
         {
             if (INT_ == v->type)
             {
-                if(ARR_ != PII->type){
+                if (ARR_ != PII->type)
+                {
                     PII->val_u.intval = 0;
-                }else{
-                    frame_data_out ("\t_%s_%d:\t.space\t%d\t# allocing %d*4 bytes, line %d\n",
-                            PII->init_id_u.P_arr_s->name, cur_const_val, 
-                            PII->init_id_u.P_arr_s->arr_info->size*4, 
-                            PII->init_id_u.P_arr_s->arr_info->size, linenumber);
+                }
+                else
+                {
+                    frame_data_out
+                        ("\t_%s_%d:\t.space\t%d\t# allocing %d*4 bytes, line %d\n",
+                         PII->init_id_u.P_arr_s->name, cur_const_val,
+                         PII->init_id_u.P_arr_s->arr_info->size * 4,
+                         PII->init_id_u.P_arr_s->arr_info->size, linenumber);
                 }
             }
             else if (FLOAT_ == v->type)
             {
-                if(ARR_ != PII->type){
+                if (ARR_ != PII->type)
+                {
                     PII->val_u.fval = 0.0;
-                }else{
-                    frame_data_out ("\t_%s_%d:\t.space\t%d\t# allocing %d*4 bytes, line %d\n",
-                            PII->init_id_u.P_arr_s->name, cur_const_val, 
-                            PII->init_id_u.P_arr_s->arr_info->size*4, 
-                            PII->init_id_u.P_arr_s->arr_info->size, linenumber);
+                }
+                else
+                {
+                    frame_data_out
+                        ("\t_%s_%d:\t.space\t%d\t# allocing %d*4 bytes, line %d\n",
+                         PII->init_id_u.P_arr_s->name, cur_const_val,
+                         PII->init_id_u.P_arr_s->arr_info->size * 4,
+                         PII->init_id_u.P_arr_s->arr_info->size, linenumber);
                 }
             }
         }
@@ -1632,22 +1789,22 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        regA = asm_emit_load_int(regA, a);
+        regA = asm_emit_load_int (regA, a);
 
         /* if b is null, this is an expr-to-relop_factor reduction */
         if (NULL != b)
         {
-            regB = asm_emit_load_int(regB, b);
+            regB = asm_emit_load_int (regB, b);
         }
     }
     else
-    { /* FLOAT_ */
-        regA = asm_emit_load_float(regA, a);
+    {                           /* FLOAT_ */
+        regA = asm_emit_load_float (regA, a);
 
         /* if b is null, this is an expr-to-relop_factor reduction */
         if (NULL != b)
         {
-            regB = asm_emit_load_float(regB, b);
+            regB = asm_emit_load_float (regB, b);
         }
     }
 
@@ -1708,18 +1865,19 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        regA = asm_emit_load_int(regA, a);
+        regA = asm_emit_load_int (regA, a);
 
         if (regB != regA)
         {
-            regB = asm_emit_load_int(regB, b);
+            regB = asm_emit_load_int (regB, b);
         }
     }
     else
-    {   /* FLOAT_ */
-        regA = asm_emit_load_float(regA, a);
-        if(regB != regA){
-            regB = asm_emit_load_float(regB, b);
+    {                           /* FLOAT_ */
+        regA = asm_emit_load_float (regA, a);
+        if (regB != regA)
+        {
+            regB = asm_emit_load_float (regB, b);
         }
     }
 
@@ -1750,8 +1908,17 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
     }
 
-    free_reg (regA);
-    free_reg (regB);
+    /* if(a->place <8 || a->place > 25){ */
+    if (NULL == a->name)
+    {
+        free_reg (regA);
+    }
+
+    /* if(b->place < 8 || b->place > 25){ */
+    if (NULL == b->name)
+    {
+        free_reg (regB);
+    }
     save_reg (res_reg);
     return res_reg;
 }
@@ -1768,20 +1935,20 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        regA = asm_emit_load_int(regA, a);
+        regA = asm_emit_load_int (regA, a);
 
         if (regB != regA)
         {
-            regB = asm_emit_load_int(regB, b);
+            regB = asm_emit_load_int (regB, b);
         }
     }
     else
-    { /* FLOAT_ */
-        regA = asm_emit_load_float(regA, a);
+    {                           /* FLOAT_ */
+        regA = asm_emit_load_float (regA, a);
 
         if (regB != regA)
         {
-            regB = asm_emit_load_float(regB, b);
+            regB = asm_emit_load_float (regB, b);
         }
     }
 
@@ -1812,16 +1979,26 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
         }
     }
 
-    free_reg (regA);
-    free_reg (regB);
+    /*if(a->place < 8 || a->place > 25){ */
+    if (NULL == a->name)
+    {
+        free_reg (regA);
+    }
+
+    /* if(b->place < 8 || b->place > 25){ */
+    if (NULL == b->name)
+    {
+        free_reg (regB);
+    }
     save_reg (res_reg);
     return res_reg;
 }
 
 /* returns register */
 int
-asm_emit_load_int(int reg, var_ref* v){
-    symtab* ptr = NULL;
+asm_emit_load_int (int reg, var_ref * v)
+{
+    symtab *ptr = NULL;
 
     if (NULL != v->name)
     {
@@ -1836,8 +2013,7 @@ asm_emit_load_int(int reg, var_ref* v){
         }
         else
         {
-            asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, v->name,
-                     linenumber);
+            asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, v->name, linenumber);
         }
     }
     else
@@ -1857,8 +2033,9 @@ asm_emit_load_int(int reg, var_ref* v){
 }
 
 int
-asm_emit_load_float(int reg, var_ref* v){
-    symtab* ptr = NULL;
+asm_emit_load_float (int reg, var_ref * v)
+{
+    symtab *ptr = NULL;
 
     /* if it's null it's a constant */
     if (NULL != v->name)
@@ -1975,7 +2152,8 @@ gen_prologue (const char *name)
     asm_out ("\tsw\t$ra, ($sp)\t# store return address\n");
 
     asm_out ("\tsw\t$fp, -4($sp)\t# save old frame pointer\n");
-    asm_out ("\tadd\t$fp, $sp, -4\t# move frame pointer to start of new activation record\n");
+    asm_out
+        ("\tadd\t$fp, $sp, -4\t# move frame pointer to start of new activation record\n");
     asm_out ("\tadd\t$sp, $sp, -8\t# move stack pointer to new stack top\n");
     asm_out ("\tlw\t$v0, _framesize_%s\n", name);
     asm_out ("\tsub\t$sp, $sp, $v0\t# push new activation record on stack\n");
@@ -2013,7 +2191,8 @@ gen_epilogue (const char *name)
 
     asm_out ("\tlw\t$ra, 4($fp)\t# restore return address\n");
     asm_out ("\tadd\t$sp, $fp, 4\t# pop activation record\n");
-    asm_out ("\tlw\t$fp, 0($fp)\t# restore frame pointer to caller's setting\n");
+    asm_out
+        ("\tlw\t$fp, 0($fp)\t# restore frame pointer to caller's setting\n");
 
     if (strcmp (name, "main") == 0)
     {
@@ -2070,10 +2249,13 @@ gen_control_test (var_ref * a, int exit_label_num)
         switch (a->type)
         {
         case INT_:
-            if(1 > a->place || REG_COUNT <= a->place){
+            if (1 > a->place || REG_COUNT <= a->place)
+            {
                 asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
-                     a->tmp_val_u.tmp_intval, linenumber);
-            }else{
+                         a->tmp_val_u.tmp_intval, linenumber);
+            }
+            else
+            {
                 reg = a->place;
             }
             break;
@@ -2088,7 +2270,7 @@ gen_control_test (var_ref * a, int exit_label_num)
         }
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
     }
-    else if (a->place > 0 && a->place < REG_COUNT)     /* FIXME: this is a bad way to check if place is initialized */
+    else if (a->place > 0 && a->place < REG_COUNT)      /* FIXME: this is a bad way to check if place is initialized */
     {
         int testreg = get_reg (NULL);
         asm_out ("\tmove\t$%d, $%d\t# line %d\n", testreg, a->place,

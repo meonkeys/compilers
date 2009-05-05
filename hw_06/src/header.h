@@ -61,6 +61,7 @@ typedef struct
 {
     int dim;
     int dim_limit[10];
+    int dim_place[10];
     int size;
     TYPE arrtype;
     char *type_name;            /*in case of array of structs */
@@ -113,6 +114,7 @@ typedef struct var_ref_s
         char *tmp_str;
     } tmp_val_u;
     int num_params_to_pop;
+    int is_array;
 } var_ref;
 
 struct TypeList
@@ -258,7 +260,8 @@ TYPE param_P (param * a, char *b);
 void put_read_ST (void);
 TYPE check_return (int flag);
 
-void set_array_size(Type_arr* arr_info);
+void set_array_size (Type_arr * arr_info);
+int asm_emit_array_access (var_ref * arr_ref, int width);
 
 void asm_out (char const *fmt, ...);
 void asm_emit_global_decls_start (void);
@@ -269,8 +272,8 @@ int asm_emit_expr (var_ref * a, var_ref * b, int opval);
 int asm_emit_term (var_ref * a, var_ref * b, int opval);
 int asm_emit_relop_factor (var_ref * a, var_ref * b, int opval);
 
-int asm_emit_load_int(int reg, var_ref* v);
-int asm_emit_load_float(int reg, var_ref* v);
+int asm_emit_load_int (int reg, var_ref * v);
+int asm_emit_load_float (int reg, var_ref * v);
 
 void asm_emit_write (TypeList * idl);
 void asm_emit_read (void);

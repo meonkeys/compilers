@@ -20,11 +20,11 @@ get_reg (var_ref * vr)
 {
     if (NULL == vr || vr->place < 1 || vr->place > REG_COUNT)
     {
-        return get_result_reg();
+        return get_result_reg ();
     }
-    else if (NULL != vr && vr->place < REG_COUNT && vr->place > 0)
+    else if (NULL != vr && vr->place < 26 && vr->place > 1)
     {
-        reg_costs[vr->place] = NOTSAVED;       /* I think this is the right cost to set */
+        reg_costs[vr->place] = NOTSAVED;        /* I think this is the right cost to set */
         return vr->place;
     }
     else
@@ -53,6 +53,8 @@ get_result_reg (void)
     {
         if (reg_costs[i] == NOTSAVED)
         {
+            /* FIXME: don't set SAVED */
+            reg_costs[i] = SAVED;
             return i;
         }
     }
