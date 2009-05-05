@@ -194,11 +194,11 @@ assign_ex (char *a, var_ref * b)
                     {
                         asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
                                  b->tmp_val_u.tmp_intval, linenumber);
+                        free_reg (reg);
                     }
                     PST->place = reg;
                     asm_out ("\tsw\t$%d, _%s\t# line %d\n", reg, PST->lexeme,
                              linenumber);
-                    ns_reg (reg);
                 }
             }
             else
