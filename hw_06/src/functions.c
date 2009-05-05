@@ -337,7 +337,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 assert (NULL != ptrB);
                 if (ARR_ == ptrB->type)
                 {
-                    /* FIXME: Only 1 d right now */
+                    /* FIXME: array Only 1 d right now */
                     arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
                 }
                 offsetB = ptrB->offset + arr_offset;
