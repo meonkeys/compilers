@@ -9,10 +9,10 @@
 		$sp is set to the top of the stack
 	[X] add more comments to generated code
 	[X] fix return statements when constants are returned
-	[_] push args on the stack prior to emitting "jal" instruction
+	[X] push args on the stack prior to emitting "jal" instruction
 		[X] push single int
 		[X] push single float
-		[_] push multiple values
+		[X] push multiple values
 			push params in reverse order: Nth, N-1, N-2 ... 1st
 			or just reverse param list in check_function?
 		[X] pop params upon return
@@ -24,6 +24,7 @@
 			this factor will have a "place", "type", etc.
 		[?] how do we currently get the return value of read() and fread()?
 	[_] using function return value as param for other function call
+		test_data/06_given/test01.c.in
 	useful reference docs
 		lecture slides: Code Generation (funcs w/o args, understanding the stack)
 			"Simple Code Generation, Expressions, Register Tracking"

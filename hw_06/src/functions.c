@@ -1197,6 +1197,34 @@ count_function_params (TypeList * t)
     return num_params;
 }
 
+param_list *
+reverse_param_list (param_list *p)
+{
+    param_list *rv = NULL;
+    while (p)
+    {
+        param_list *tmp = p->next;
+        p->next = rv;
+        rv = p;
+        p = tmp;
+    }
+    return rv;
+}
+
+TypeList *
+reverse_TypeList (TypeList *t)
+{
+    TypeList *rv = NULL;
+    while (t)
+    {
+        TypeList *tmp = t->next;
+        t->next = rv;
+        rv = t;
+        t = tmp;
+    }
+    return rv;
+}
+
 /*
  * Here is where we save caller registers
  * as well as set up jump routines and such 
@@ -1256,23 +1284,29 @@ check_function (char *a, TypeList * b)
     else
     {
         int reg = 9999;
-        int i = 0;
+        int i = 0; /* current param index */
+
+        /* var_ref (from parser stack) corresponding to current param */
         var_ref *PVR1;
-        ST_func *x = PST->symtab_u.st_func;
-        param_list *y = x->PL;  /* param list iterator */
+
+        /* "param" structure (from symbol table) for current function parameter */
+        param_list *y = reverse_param_list (PST->symtab_u.st_func->PL);
+
+        TypeList *t = reverse_TypeList (b);
+
+        /* type of var_ref return value */
         PVR->type = PST->symtab_u.st_func->ret_type;
         while (y)
         {
-            PVR1 = b->P_var_r;
+            PVR1 = t->P_var_r;
             if ((y->PPAR == NULL) || (PVR1->type == ERROR_))
             {
                 y = y->next;
-                b = b->next;
+                t = t->next;
                 PVR->type = ERROR_;
                 i++;
                 continue;
             }
-
 
             switch (y->PPAR->type)
             {
@@ -1334,7 +1368,7 @@ check_function (char *a, TypeList * b)
             }
             i++;
             y = y->next;
-            b = b->next;
+            t = t->next;
         }
     }
 
