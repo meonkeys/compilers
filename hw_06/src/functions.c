@@ -1253,8 +1253,12 @@ check_function (char *a, TypeList * b)
             switch (y->PPAR->type)
             {
             case INT_:
-                reg = get_result_reg ();
-                asm_emit_load_int (reg, PVR1);
+                if (0 == PVR1->place) {
+                    reg = get_result_reg ();
+                    asm_emit_load_int (reg, PVR1);
+                } else {
+                    reg = PVR1->place;
+                }
                 asm_out ("\tsw\t$%d, ($sp)\t# line %d\n", reg, linenumber);
                 asm_out ("\tsub\t$sp, $sp, 4\t# push int param onto stack\n");
                 PVR->num_params_to_pop++;
@@ -1268,8 +1272,12 @@ check_function (char *a, TypeList * b)
                          printtype (PVR1->type));
                     PVR->type = ERROR_;
                 } else {
-                    reg = get_result_reg ();
-                    asm_emit_load_float (reg, PVR1);
+                    if (0 == PVR1->place) {
+                        reg = get_result_reg ();
+                        asm_emit_load_float (reg, PVR1);
+                    } else {
+                        reg = PVR1->place;
+                    }
                     asm_out ("\ts.s\t$f%d, ($sp)\t# line %d\n", reg, linenumber);
                     asm_out ("\tsub\t$sp, $sp, 4\t# push float param onto stack\n");
                     PVR->num_params_to_pop++;
