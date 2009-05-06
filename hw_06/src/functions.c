@@ -2003,8 +2003,16 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     free_reg (regA);
     if (-9999 != regB)
         free_reg (regB);
-    save_reg (res_reg);
 
+    if (NULL != b)
+    {
+        /* we printed out a comparison */
+        free_reg (res_reg);
+        return res_reg;
+    }
+
+    /* we didn't print a comparison */
+    save_reg (res_reg);
     return res_reg;
 }
 
