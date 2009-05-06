@@ -1305,8 +1305,10 @@ check_function (char *a, TypeList * b)
 
         /* "param" structure (from symbol table) for current function parameter */
         param_list *y = reverse_param_list (PST->symtab_u.st_func->PL);
+        param_list *new_param_head = y;
 
         TypeList *t = reverse_TypeList (b);
+        TypeList *new_typelist_head = t;
 
         /* type of var_ref return value */
         PVR->type = PST->symtab_u.st_func->ret_type;
@@ -1397,6 +1399,10 @@ check_function (char *a, TypeList * b)
             y = y->next;
             t = t->next;
         }
+
+        /* restore ordering for linked lists */
+        reverse_param_list (new_param_head);
+        reverse_TypeList (new_typelist_head);
     }
 
     return PVR;
