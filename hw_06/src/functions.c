@@ -289,8 +289,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                }
              */
             offsetA = ptrA->offset + arr_offset;
-            /*fprintf(stderr,"offset: %d\tarr_offset: %d\n", ptrA->offset, arr_offset);*/
-            /*reg = get_reg (b);*/
 
             /* if it's null it's a constant */
             if (NULL != b->name)
@@ -320,7 +318,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else
                 {
-                    /*fprintf(stderr, "calling RHS array access\n");*/
                     reg = asm_emit_array_access (b, 4);
                     asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                 }
@@ -407,11 +404,12 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
+                /*
                 if (ARR_ == ptrB->type)
                 {
-                    /* FIXME: array Only 1 d right now */
                     arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
                 }
+                */
                 offsetB = ptrB->offset + arr_offset;
             }
 
