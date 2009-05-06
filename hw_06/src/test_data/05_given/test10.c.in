@@ -39,15 +39,5 @@ void main()
 }
 
 /*
-
 Expected result: for n = 5 is 120
-
 */
-
-
-
-
-
-
-
-
