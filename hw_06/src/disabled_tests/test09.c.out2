@@ -1,7 +1,2 @@
 The Unsorted array = 100 10 98 14 96 18 94 22 92 26 90 30 88 34 86 38 84 42 82 46 
-<<<<<<< HEAD:hw_06/src/test_data/06_given/test09.c.out2
-The sorted array = 10 14 18 22 26 30 34 38 42 46 82 84 86 88 90 92 94 96 98 100
-
-=======
 The sorted array = 10 14 18 22 26 30 34 38 42 46 82 84 86 88 90 92 94 96 98 100 
->>>>>>> b68e3b60592966e82dacd6a0187468b4b3b1d707:hw_06/src/disabled_tests/test09.c.out2
