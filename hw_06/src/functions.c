@@ -168,7 +168,10 @@ assign_ex (char *a, var_ref * b)
                     PST->place = reg;
                     asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg,
                              PST->offset, linenumber);
-                    ns_reg (reg);
+                    /*
+                    free_reg (reg);
+                    PST->place = -1;
+                    */
                 }
                 else
                 {
@@ -200,6 +203,11 @@ assign_ex (char *a, var_ref * b)
                     PST->place = reg;
                     asm_out ("\tsw\t$%d, _%s\t# line %d\n", reg, PST->lexeme,
                              linenumber);
+                    /* it's stored, free it */
+                    /*
+                    free_reg(reg);
+                    PST->place = -1;
+                    */
                 }
             }
             else
@@ -230,7 +238,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
     int reg;
     int arr_reg = 0;
 
-    /* fprintf (stderr, "%s vs. %s\n", printtype (a->type), printtype (b->type)); */
+    /*fprintf (stderr, "IS_ARRAY %d vs. %d\n", a->is_array, b->is_array); */
     if ((a->type == ERROR_) || (b->type == ERROR_))
         return ERROR_;
     if (a->type != b->type)
@@ -282,7 +290,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
              */
             offsetA = ptrA->offset + arr_offset;
             /*fprintf(stderr,"offset: %d\tarr_offset: %d\n", ptrA->offset, arr_offset);*/
-            reg = get_reg (b);
+            /*reg = get_reg (b);*/
 
             /* if it's null it's a constant */
             if (NULL != b->name)
@@ -307,11 +315,12 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 if (b->is_array != 1)
                 {
+                    reg = get_reg(b);
                     reg = asm_emit_load_int (reg, b);
                 }
                 else
                 {
-                    free_reg (reg);
+                    /*fprintf(stderr, "calling RHS array access\n");*/
                     reg = asm_emit_array_access (b, 4);
                     asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                 }
@@ -321,7 +330,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     ptrA->place = reg;
                     asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
                              linenumber);
-                    ns_reg (reg);
+                    free_reg (reg);
                 }
                 else
                 {
@@ -338,6 +347,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     /*  FIXME: I don't think this is right */
                     if (b->is_array != 1)
                     {
+                        reg = get_reg(b);
                         if (ptrB->scope > 0)
                         {
                             asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
@@ -351,7 +361,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     }
                     else
                     {
-                        free_reg (reg);
+                        /*fprintf(stderr, "calling RHS array access\n");*/
                         reg = asm_emit_array_access (b, 4);
                         asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                     }
@@ -362,6 +372,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else if (0 == b->place)
                 {
+                    reg = get_result_reg();
                     asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
                              b->tmp_val_u.tmp_intval, linenumber);
                 }
@@ -371,7 +382,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     ptrA->place = reg;
                     asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
                              linenumber);
-                    ns_reg (reg);
+                    free_reg(reg);
                 }
                 else
                 {
@@ -379,6 +390,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     arr_reg = asm_emit_array_access (a, 4);
                     asm_out ("\tsw\t$%d, 0($%d)\t# line%d\n", reg, arr_reg,
                              linenumber);
+                    free_reg(reg);
                     free_reg (arr_reg);
                 }
 
@@ -470,7 +482,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 ptrA->place = reg;
                 asm_out ("\tsw\t$f%d, _%s\t# line %d\n", reg, a->name,
                          linenumber);
-                ns_reg (reg);
+                free_reg (reg);
             }
             return ZERO_;
             break;
@@ -1298,11 +1310,13 @@ check_function (char *a, TypeList * b)
 
         /* type of var_ref return value */
         PVR->type = PST->symtab_u.st_func->ret_type;
+        fprintf(stderr, "num_params = %d\n", num_params);
         while (y)
         {
             PVR1 = t->P_var_r;
             if ((y->PPAR == NULL) || (PVR1->type == ERROR_))
             {
+                fprintf(stderr, "what?\n");
                 y = y->next;
                 t = t->next;
                 PVR->type = ERROR_;
@@ -1310,6 +1324,7 @@ check_function (char *a, TypeList * b)
                 continue;
             }
 
+            fprintf(stderr, "%d type: %s\n", i, printtype(y->PPAR->type));
             switch (y->PPAR->type)
             {
             case INT_:
@@ -1320,6 +1335,8 @@ check_function (char *a, TypeList * b)
                     reg = PVR1->place;
                 }
                 asm_out ("\tsw\t$%d, ($sp)\t# line %d\n", reg, linenumber);
+                free_reg(reg);
+                PVR1->place = -1;
                 asm_out ("\tsub\t$sp, $sp, 4\t# push int param onto stack\n");
                 PVR->num_params_to_pop++;
                 break;
@@ -1701,16 +1718,18 @@ asm_emit_array_access (var_ref * a, int width)
     int access_reg;
     int dim_reg;
     int i;
-    
+
+    /*
+    fprintf(stderr, "\nstarting array access\n");
+    print_regs();
+    */
+
     SMT = NULL;
     SMT = lookup (a->name);
     assert (NULL != SMT);
     res_reg = get_result_reg ();
 
-    base_reg = get_reg(a);
-    asm_out ("\tla\t$%d, _%s\t# line %d\n", base_reg, a->name, linenumber);
-    /*fprintf(stderr, "array offset = %d\n", SMT->offset);*/
-    asm_out("\tadd\t$%d, $%d, %d\t# line %d\n", base_reg, base_reg, SMT->offset);
+    /* delay base_reg load until necessary */
 
     /* FIXME: clean this up */
     for (i = 0; i < SMT->symtab_u.st_arr->dim - 1; i++)
@@ -1719,17 +1738,19 @@ asm_emit_array_access (var_ref * a, int width)
         if (a->var_ref_u.arr_info->dim_place[i] == -1)
         {
             access_reg = get_result_reg ();
-            asm_out ("\tli\t$%d, %d\n", access_reg,
-                     a->var_ref_u.arr_info->dim_limit[i]);
+            asm_out ("\tli\t$%d, %d\t\t\t#access_reg = dim_access[i] * dim_lim[i+1], line: %d\n", access_reg,
+                     a->var_ref_u.arr_info->dim_limit[i]), linenumber;
         }
         else
         {
+            asm_out("\t#access_reg = dim_place[i]\n");
             access_reg = a->var_ref_u.arr_info->dim_place[i];
         }
 
         dim_reg = get_result_reg();
-        asm_out ("\tli\t$%d, %d\t# line %d\n", dim_reg, SMT->symtab_u.st_arr->dim_limit[i + 1], linenumber);
-        asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, access_reg, dim_reg);
+        /*fprintf(stderr, "first mul: access_reg: %d\tdim_reg: %d\n", access_reg, dim_reg);*/
+        asm_out ("\tli\t$%d, %d\t\t\t#dim_reg = dim_lim[i+1], line %d\n", dim_reg, SMT->symtab_u.st_arr->dim_limit[i + 1], linenumber);
+        asm_out ("\tmul\t$%d, $%d, $%d\t#res_reg = access_reg * dim_reg, line %d\n", res_reg, access_reg, dim_reg, linenumber);
         free_reg (access_reg);
         free_reg(dim_reg);
 
@@ -1737,28 +1758,56 @@ asm_emit_array_access (var_ref * a, int width)
         if (a->var_ref_u.arr_info->dim_place[i + 1] == -1)
         {
             access_reg = get_result_reg ();
-            asm_out ("\tli\t$%d, %d\n", access_reg,
-                     a->var_ref_u.arr_info->dim_limit[i + 1]);
-            asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, access_reg, res_reg);
-            free_reg (access_reg);
+            asm_out ("\tli\t$%d, %d\t\t\t#access_reg = dim_lim[i+1], line %d\n", access_reg,
+                     a->var_ref_u.arr_info->dim_limit[i + 1], linenumber);
         }
         else
         {
+            asm_out("\t#access_reg = dim_place[i+1]\n");
             access_reg = a->var_ref_u.arr_info->dim_place[i + 1];
-            asm_out ("\tadd\t$%d, $%d, $%d\n", res_reg, access_reg, res_reg);
-            free_reg (access_reg);
         }
+        /*fprintf(stderr, "first add: access_reg: %d\tres_reg: %d\n", access_reg, res_reg);*/
+        asm_out ("\tadd\t$%d, $%d, $%d\t#res_reg=access_reg + res_reg, line %d\n", res_reg, access_reg, res_reg, linenumber);
+        free_reg (access_reg);
     }
+
+    /*
+    print_regs();
+    */
 
     /* res_reg = res_reg * 4 */
     dim_reg = get_result_reg();
-    asm_out("\tli\t$%d, %d\t# line %d\n", dim_reg, width, linenumber);
-    asm_out ("\tmul\t$%d, $%d, $%d\n", res_reg, res_reg, dim_reg);
+    asm_out("\tli\t$%d, %d\t\t\t#dim_reg = width line %d\n", dim_reg, width, linenumber);
+    /*fprintf(stderr, "second mul: res_reg: %d\tdim_reg: %d\n", res_reg, dim_reg);*/
+    asm_out ("\tmul\t$%d, $%d, $%d\t#res_reg = res_reg * width\n", res_reg, res_reg, dim_reg);
     free_reg(dim_reg);
 
+    /* delay base_reg load until needed */
+    base_reg = get_reg(a);
+    if(SMT->scope == 0){
+        asm_out ("\tla\t$%d, _%s\t# line %d\n", base_reg, a->name, linenumber);
+    }
+    else{
+        asm_out ("\tla\t$%d, %d($fp)\t# line %d\n", base_reg, SMT->offset, linenumber);
+    }
+    /*fprintf(stderr, "array offset = %d\n", SMT->offset);*/
+    asm_out("\tadd\t$%d, $%d, %d\t#base_reg + offset, line: %d\n", base_reg, base_reg, SMT->offset, linenumber);
+
+
     /* res_reg = res_reg + base_addr */
-    asm_out ("\tsub\t$%d, $%d, $%d\n", res_reg, base_reg, res_reg);
+    asm_out ("\tsub\t$%d, $%d, $%d\t#res_reg = base_addr - offset\n", res_reg, base_reg, res_reg);
     free_reg (base_reg);
+
+    /*do clean up*/
+    for(i = 0; i < 10; i++){
+        if(a->var_ref_u.arr_info->dim_place[i] > 0){
+            free_reg(a->var_ref_u.arr_info->dim_place[i]);
+        }
+        a->var_ref_u.arr_info->dim_place[i] = 0;
+    }
+
+    /*fprintf(stderr, "ending array access\n\n");*/
+
     return res_reg;
 }
 
@@ -1787,6 +1836,7 @@ asm_emit_scoped_decl_list (var_decl * v)
                          linenumber);
                 asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, PII->offset,
                          linenumber);
+                free_reg(reg);
             }
             else if (FLOAT_ == v->type && ARR_ != PII->type)
             {
@@ -1800,6 +1850,7 @@ asm_emit_scoped_decl_list (var_decl * v)
                 cur_const_val++;
                 asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, PII->offset,
                          linenumber);
+                free_reg(reg);
             }
             else
             {
@@ -1983,13 +2034,11 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
         }
     }
 
-    /* if(a->place <8 || a->place > 25){ */
     if (NULL == a->name)
     {
         free_reg (regA);
     }
 
-    /* if(b->place < 8 || b->place > 25){ */
     if (NULL == b->name)
     {
         free_reg (regB);
@@ -2151,6 +2200,8 @@ void
 asm_emit_write (TypeList * idl)
 {
     symtab *symptr = NULL;
+    int arr_reg;
+
     if (NULL != idl->P_var_r->name)
     {
         symptr = lookup (idl->P_var_r->name);
@@ -2160,13 +2211,19 @@ asm_emit_write (TypeList * idl)
         asm_out ("\tli\t$v0, 1\n");
         if (NULL != symptr)
         {
-            if (symptr->scope > 0)
-            {
-                asm_out ("\tlw\t$a0, %d($fp)\n", symptr->offset);
+            if(ARR_ != symptr->type){
+                if (symptr->scope > 0)
+                {
+                    asm_out ("\tlw\t$a0, %d($fp)\n", symptr->offset);
+                }
+                else
+                {
+                    asm_out ("\tlw\t$a0, _%s\n", idl->P_var_r->name);
+                }
             }
-            else
-            {
-                asm_out ("\tlw\t$a0, _%s\n", idl->P_var_r->name);
+            else{
+                arr_reg = asm_emit_array_access(idl->P_var_r, 4);
+                asm_out ("\tlw\t$a0, 0($%d)\n", arr_reg);
             }
         }
         else
@@ -2180,7 +2237,13 @@ asm_emit_write (TypeList * idl)
         asm_out ("\tli\t$v0, 2\n");
         if (NULL != symptr)
         {
-            asm_out ("\tl.s\t$f12, %d($fp)\n", symptr->offset);
+            if(ARR_ != symptr->type){
+                asm_out ("\tl.s\t$f12, %d($fp)\n", symptr->offset);
+            }
+            else{
+                arr_reg = asm_emit_array_access(idl->P_var_r, 4);
+                asm_out ("\tl.s\t$f12, 0($%d)\n", arr_reg);
+            }
         }
         else
         {
@@ -2240,6 +2303,7 @@ gen_prologue (const char *name)
         {
             asm_out ("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
             asm_out ("\tsw\t$s%d, ($sp)\n", i);
+            free_reg(i);
         }
     }
 
@@ -2260,6 +2324,7 @@ gen_epilogue (const char *name)
         for (i = 7; i >= 0; i--)
         {
             asm_out ("\tlw\t$s%d, ($sp)\t#pop $s%d\n", i, i);
+            ns_reg(i);
             asm_out ("\tadd\t$sp, $sp, 4\n", i);
         }
     }
@@ -2344,6 +2409,7 @@ gen_control_test (var_ref * a, int exit_label_num)
             assert (0);
         }
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", reg, exit_label_num);
+        free_reg(reg);
     }
     else if (a->place > 0 && a->place < REG_COUNT)      /* FIXME: this is a bad way to check if place is initialized */
     {
@@ -2351,6 +2417,7 @@ gen_control_test (var_ref * a, int exit_label_num)
         asm_out ("\tmove\t$%d, $%d\t# line %d\n", testreg, a->place,
                  linenumber);
         asm_out ("\tbeqz\t$%d, _Lexit%d\n", testreg, exit_label_num);
+        free_reg(testreg);
     }
     else
     {

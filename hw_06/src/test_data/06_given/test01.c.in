@@ -3,10 +3,19 @@
 
 int func(int a, int b)
 {
-  if (a>1)
+	write("funca: ");
+	write(a);
+	write("\nfuncb: ");
+	write(b);
+	write("\n");
+  if (a>1){
+	  write("f\n");
     return a*b-3;
-  else
+  }
+  else{
+	  write("b\n");
     return a*(b-3);
+  }
 }
 
 int main()
@@ -15,9 +24,14 @@ int main()
   int result;
   
   c=a*b;
-  
+
+ write("c: "); 
+  write(c);
+  write("\n");
+
   if (b>1)
     {
+		write("foo\n");
       c=a*b;
       d=c;
       a=b+c;
@@ -25,13 +39,31 @@ int main()
     }
   else
     {
+		write("bar\n");
       a=b-c;
       b=a;
       d=c;
     }
   
   result=func(a,b)-3;
+  
+  write("res: ");
+  write(result);
+  write("\n");
+
+  write("a: ");
+  write(a);
+  write("\n");
+
+  write("b: ");
+  write(b);
+  write("\n");
+
+
   result=func(a - 1, b * 2)*result;
+  write("res: ");
+  write(result);
+  write("\n");
   
   write(result);
   write("\n");

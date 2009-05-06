@@ -2,6 +2,7 @@
 #define HEADER_H
 
 #define REG_COUNT 32
+#define MAX_REG 26
 #define FUNC_NAME_MAXLEN 128
 #define MAX_FUNC_PARAMS 10
 
@@ -307,6 +308,8 @@ void frame_data_out (char const *fmt, ...);
 void free_reg (int r);
 void ns_reg (int r);
 void save_reg (int r);
+
+void print_regs();
 #endif
 
 /*

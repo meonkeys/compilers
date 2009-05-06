@@ -537,11 +537,25 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			}
 		}
 	        | FOR MK_LPAREN assign_expr_list MK_SEMICOLON test {
+			/*
+			fprintf(stderr, "\nstarting for loop\n");
+			print_regs();
+			*/
 			asm_out ("\tj\t_ForLoopBody%d\t# line %d\n", $5->label_num, linenumber);
 			asm_out ("_Increment%d:\t# line %d\n", $5->label_num, linenumber);
+			/*
+			print_regs();
+			*/
 		} MK_SEMICOLON assign_expr_list MK_RPAREN {
+			/*
+			print_regs();
+			*/
 			gen_control_iterate ($5->label_num);
 			asm_out ("_ForLoopBody%d:\t# line %d\n", $5->label_num, linenumber);
+			/*
+			print_regs();
+			fprintf(stderr, "ending for loop part\n\n");
+			*/
 		}
 		stmt
 		{
@@ -562,9 +576,15 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 		/* simple assignment statement */
 		| var_ref OP_ASSIGN relop_expr MK_SEMICOLON
 			{
+				/*
+				print_regs();
+				*/
 				$$=stmt_assign_ex($1,$3);
 				free_reg($3->place);
 				$3->place = -1;
+				/*
+				print_regs();
+				*/
 			}
 		| IF MK_LPAREN test MK_RPAREN stmt{
 			if(($3->type!=INT_)&&($3->type!=FLOAT_)){
@@ -715,6 +735,8 @@ assign_expr     : ID OP_ASSIGN relop_expr
 				$$=assign_ex($1,$3);
 				free_reg($3->place);
 				$3->place=-1;
+				free_reg($$->place);
+				$$->place = -1;
 			}
                 | relop_expr{$$=$1;}
 
@@ -1014,12 +1036,15 @@ var_ref		: ID{
 					fprintf(stderr, "setting arr[%d] to %d\n", $1->var_ref_u.arr_info->dim, $2->tmp_val_u.tmp_intval);
 					*/
 					/* must be const access */
-					if($2->place < 2 || $2->place > 25){
+					/*fprintf(stderr, "i: %d\tplace: %d\n", i, $2->place);*/
+					/*if($2->place < 2 || $2->place > 25){*/
+					if(NULL == $2->name){
 						$1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim - 1] = $2->tmp_val_u.tmp_intval;
 						$1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1] = -1;
 					}
 					else{
-						$1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1] = $2->place;
+						$1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1] 
+							= asm_emit_load_int(get_result_reg(), $2);
 					}
 					i=--$1->var_ref_u.arr_info->dim;
 
