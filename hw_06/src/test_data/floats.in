@@ -1,5 +1,0 @@
-void main(){
-	float lid;
-	lid = 1.602;
-	write("hi mom");
-}

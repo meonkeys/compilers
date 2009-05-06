@@ -1,8 +1,0 @@
-bar foo(int a){
-}
-
-int main()
-{
-   bar a;
-   a = foo(5);
-}

@@ -78,8 +78,7 @@ get_result_reg (void)
 void
 free_reg (int r)
 {
-    if(r >=8){
-        assert(r < MAX_REG);
+    if(r >=8 && r < MAX_REG){
         /*fprintf(stderr, "freeing $%d\n", r);*/
         reg_costs[r] = FREE;
     }

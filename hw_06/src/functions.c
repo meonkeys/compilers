@@ -1285,6 +1285,7 @@ check_function (char *a, TypeList * b)
     else if (0 == strcmp (a, "read"))
     {
         asm_emit_read ();
+        PVR->is_return = 1;
         PVR->place = 2;
         PVR->type = INT_;
     }
@@ -1292,6 +1293,7 @@ check_function (char *a, TypeList * b)
     {
 
         asm_emit_fread ();
+        PVR->is_return = 1;
         PVR->place = 0;
         PVR->type = FLOAT_;
     }
@@ -1310,7 +1312,7 @@ check_function (char *a, TypeList * b)
 
         /* type of var_ref return value */
         PVR->type = PST->symtab_u.st_func->ret_type;
-        fprintf(stderr, "num_params = %d\n", num_params);
+        /*fprintf(stderr, "num_params = %d\n", num_params);*/
         while (y)
         {
             PVR1 = t->P_var_r;
@@ -1324,7 +1326,7 @@ check_function (char *a, TypeList * b)
                 continue;
             }
 
-            fprintf(stderr, "%d type: %s\n", i, printtype(y->PPAR->type));
+            /*fprintf(stderr, "%d type: %s\n", i, printtype(y->PPAR->type));*/
             switch (y->PPAR->type)
             {
             case INT_:
@@ -1743,7 +1745,7 @@ asm_emit_array_access (var_ref * a, int width)
         }
         else
         {
-            asm_out("\t#access_reg = dim_place[i]\n");
+            /*asm_out("\t#access_reg = dim_place[i]\n");*/
             access_reg = a->var_ref_u.arr_info->dim_place[i];
         }
 
@@ -1763,7 +1765,7 @@ asm_emit_array_access (var_ref * a, int width)
         }
         else
         {
-            asm_out("\t#access_reg = dim_place[i+1]\n");
+            /*asm_out("\t#access_reg = dim_place[i+1]\n");*/
             access_reg = a->var_ref_u.arr_info->dim_place[i + 1];
         }
         /*fprintf(stderr, "first add: access_reg: %d\tres_reg: %d\n", access_reg, res_reg);*/
@@ -1785,10 +1787,10 @@ asm_emit_array_access (var_ref * a, int width)
     /* delay base_reg load until needed */
     base_reg = get_reg(a);
     if(SMT->scope == 0){
-        asm_out ("\tla\t$%d, _%s\t# line %d\n", base_reg, a->name, linenumber);
+        asm_out ("\tla\t$%d, _%s\t\t\t#line %d\n", base_reg, a->name, linenumber);
     }
     else{
-        asm_out ("\tla\t$%d, %d($fp)\t# line %d\n", base_reg, SMT->offset, linenumber);
+        asm_out ("\tla\t$%d, %d($fp)\t#line %d\n", base_reg, SMT->offset, linenumber);
     }
     /*fprintf(stderr, "array offset = %d\n", SMT->offset);*/
     asm_out("\tadd\t$%d, $%d, %d\t#base_reg + offset, line: %d\n", base_reg, base_reg, SMT->offset, linenumber);
@@ -2224,6 +2226,7 @@ asm_emit_write (TypeList * idl)
             else{
                 arr_reg = asm_emit_array_access(idl->P_var_r, 4);
                 asm_out ("\tlw\t$a0, 0($%d)\n", arr_reg);
+                free_reg(arr_reg);
             }
         }
         else
@@ -2243,6 +2246,7 @@ asm_emit_write (TypeList * idl)
             else{
                 arr_reg = asm_emit_array_access(idl->P_var_r, 4);
                 asm_out ("\tl.s\t$f12, 0($%d)\n", arr_reg);
+                free_reg(arr_reg);
             }
         }
         else

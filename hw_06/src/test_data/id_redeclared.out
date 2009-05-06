@@ -1,4 +1,0 @@
-error 4:redeclaration of variable i declared previously at line 3
-error 5:redeclaration of variable i declared previously at line 3
-error:  Semantic Analysis failed due to errors
-Error found in Line 	8	next token: 	

@@ -1,7 +1,0 @@
-void main(){
-	int a;
-	int b = 2;
-	int c = 2;
-
-	a = b + c;
-}

@@ -1,4 +1,0 @@
-struct foo func() { }
-int main() {
-    return 0;
-}

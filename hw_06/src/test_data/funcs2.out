@@ -1,3 +1,0 @@
-error 5: redeclaration of symbol foo  as function, declared previously as function on line 1
-error:  Semantic Analysis failed due to errors
-Error found in Line 	15	next token: 	
