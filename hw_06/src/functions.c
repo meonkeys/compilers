@@ -311,7 +311,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
             if (ptrA->scope > 0)
             {
-                if (b->is_array != 1)
+                if (1 != b->is_array)
                 {
                     reg = get_reg(b);
                     reg = asm_emit_load_int (reg, b);
@@ -363,11 +363,11 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                         asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                     }
                 }
-                else if (1 == b->is_return)
+                else if (1 == b->is_return || (b->place >=8 && b->place < MAX_REG))
                 {
                     reg = b->place;
                 }
-                else if (0 == b->place)
+                else if (b->place < 8 || b->place > MAX_REG)
                 {
                     reg = get_result_reg();
                     asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
@@ -381,6 +381,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
                              linenumber);
                     free_reg(reg);
+                    free_reg(arr_reg);
                 }
                 else
                 {
@@ -1806,9 +1807,9 @@ asm_emit_array_access (var_ref * a, int width)
 
     /* res_reg = res_reg * 4 */
     dim_reg = get_result_reg();
-    asm_out("\tli\t$%d, %d\t\t\t#dim_reg = width line %d\n", dim_reg, width, linenumber);
+    asm_out("\tli\t$%d, %d\t\t\t#dim_reg = width, line %d\n", dim_reg, width, linenumber);
     /*fprintf(stderr, "second mul: res_reg: %d\tdim_reg: %d\n", res_reg, dim_reg);*/
-    asm_out ("\tmul\t$%d, $%d, $%d\t#res_reg = res_reg * width\n", res_reg, res_reg, dim_reg);
+    asm_out ("\tmul\t$%d, $%d, $%d\t#res_reg = res_reg * width, line %d\n", res_reg, res_reg, dim_reg, linenumber);
     free_reg(dim_reg);
 
     /* delay base_reg load until needed */
@@ -2003,7 +2004,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     free_reg (regA);
     if (-9999 != regB)
         free_reg (regB);
-    save_reg (res_reg);
+    /*save_reg (res_reg);*/
 
     return res_reg;
 }
@@ -2072,7 +2073,7 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
     {
         free_reg (regB);
     }
-    save_reg (res_reg);
+    /*save_reg (res_reg);*/
     return res_reg;
 }
 
@@ -2143,7 +2144,7 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
     {
         free_reg (regB);
     }
-    save_reg (res_reg);
+    /*save_reg (res_reg);*/
     return res_reg;
 }
 
@@ -2161,11 +2162,13 @@ asm_emit_load_int (int reg, var_ref * v)
         /*  FIXME: I don't think this is right */
         if (ptr->scope > 0)
         {
+            asm_out("#fooooooooooo\n");
             asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
                      ptr->offset, linenumber);
         }
         else
         {
+            asm_out("#pppppppppppp\n");
             asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, v->name, linenumber);
         }
     }
@@ -2355,7 +2358,7 @@ gen_epilogue (const char *name)
         for (i = 7; i >= 0; i--)
         {
             asm_out ("\tlw\t$s%d, ($sp)\t#pop $s%d\n", i, i);
-            ns_reg(i);
+            ns_reg(i+8);
             asm_out ("\tadd\t$sp, $sp, 4\n", i);
         }
     }

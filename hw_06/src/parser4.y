@@ -1054,6 +1054,7 @@ var_ref		: ID{
 
 						$1->type=$1->var_ref_u.arr_info->arrtype;
 						$1->is_array = 1;
+						/*$1->place = -1;*/
 						if($1->type==STR_){
 							$1->type=STR_VAR_;
 							$1->var_ref_u.type_name=$1->var_ref_u.arr_info->type_name;
