@@ -376,7 +376,8 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
                 if (ARR_ != ptrA->type)
                 {
-                    ptrA->place = reg;
+                    /*ptrA->place = reg;*/
+                    ptrA->place = -1;
                     asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
                              linenumber);
                     free_reg(reg);
@@ -397,7 +398,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
             offsetA = ptrA->offset;
-            reg = get_reg (b);
+            /*reg = get_reg (b);*/
 
             /* if it's null it's a constant */
             if (NULL != b->name)
@@ -419,7 +420,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 if (NULL != b->name)
                 {
                     /*asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg, offsetB, linenumber); */
-
+                    reg = get_result_reg();
                     asm_out ("\tl.s\t$f%d, _%s_%d\t# line %d\n", reg, b->name,
                              cur_const_val, linenumber);
                     frame_data_out ("\t_%s_%d: .float %f\t# line %d\n",
@@ -429,7 +430,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else if (0 <= b->place && REG_COUNT > b->place)
                 {
-                    /*fprintf(stderr, "line: %d b->tmp: %f\tb->place: %d\n", linenumber, b->tmp_val_u.tmp_fval, b->place); */
                     /* 
                      * if 0 <= place < REG_COUNT, then it was stored in $fN 
                      * so we need to store from $fN
@@ -442,6 +442,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     }
                     else if (0.0 != b->tmp_val_u.tmp_fval && b->place == 0)
                     {
+                        reg = get_result_reg();
                         asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", reg,
                                  cur_const_val, linenumber);
                         frame_data_out ("\t_f_%d: .float %f\t# line %d\n",
@@ -463,13 +464,24 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 if (NULL != b->name)
                 {
-                    /* asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, b->name, linenumber); */
-                    asm_out ("\tl.s\t$f%d, _%s_%d\t# line %d\n", reg, b->name,
-                             cur_const_val, linenumber);
-                    frame_data_out ("\t_%s_%d: .float %f\t# line %d\n",
-                                    b->name, cur_const_val,
-                                    b->tmp_val_u.tmp_fval, linenumber);
-                    cur_const_val++;
+                    if (b->is_array != 1)
+                    {
+                        reg = get_result_reg();
+                        asm_out ("\tl.s\t$f%d, _%s_%d\t# line %d\n", reg, b->name,
+                                 cur_const_val, linenumber);
+                        frame_data_out ("\t_%s_%d: .float %f\t# line %d\n",
+                                        b->name, cur_const_val,
+                                        b->tmp_val_u.tmp_fval, linenumber);
+                        cur_const_val++;
+                    }
+                    else{
+                        reg = asm_emit_array_access (b, 4);
+                        asm_out ("\tlw\t$f%d, 0($%d)\n", reg, reg);
+                    }
+                }
+                else if (1 == b->is_return)
+                {
+                    reg = b->place;
                 }
                 else if (0 == b->place)
                 {
@@ -477,10 +489,21 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", reg, b->name,
                              linenumber);
                 }
-                ptrA->place = reg;
-                asm_out ("\tsw\t$f%d, _%s\t# line %d\n", reg, a->name,
+
+                if(ARR_ != ptrA->type){
+                    /*ptrA->place = reg;*/
+                    ptrA->place = -1;
+                    asm_out ("\tsw\t$f%d, _%s\t# line %d\n", reg, a->name,
                          linenumber);
-                free_reg (reg);
+                    free_reg (reg);
+                }
+                else{
+                    arr_reg = asm_emit_array_access (a, 4);
+                    asm_out ("\tsw\t$f%d, 0($%d)\t# line%d\n", reg, arr_reg,
+                             linenumber);
+                    free_reg(reg);
+                    free_reg (arr_reg);
+                }
             }
             return ZERO_;
             break;
