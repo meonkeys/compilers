@@ -1,0 +1,48 @@
+/* TestCase 7: nested While statements */
+
+void main()
+{
+ int b,c,a,d;
+
+ a = 0;
+ c = 3;
+ d = 5;
+ 
+ b = d;
+ while( 1 < b) 
+ {
+  int a;
+
+  a = b;
+  c = d/2;
+  
+  while ( 1 < c) 
+    {
+      int b;
+      
+      b = c;
+      c = c - 1;
+      d = d + a;
+    }
+  b = b - 1;
+ }
+
+ write("The answer is = ");
+ write (a);
+ write("\n");
+ write (d);
+ write("\n");
+
+}
+
+
+/*
+
+Expected Output: The answer is = 0
+                                 122
+*/
+
+
+
+
+

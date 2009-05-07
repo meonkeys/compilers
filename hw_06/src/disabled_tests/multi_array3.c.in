@@ -1,0 +1,33 @@
+
+void main(){
+	int i, j;
+
+	int a[2][2];
+
+	int k = 0;
+	for (i = 0; i < 2; i = i +1)
+	{
+		for(j = 0; j < 2; j = j +1)
+		{
+			a[i][j] = k;
+			k = k + 1;
+		}
+	}
+
+	write("\n");
+
+	for (i = 0; i < 2; i = i +1)
+	{
+	    for(j = 0; j < 2; j = j +1)
+		{
+			k = a[i][j];
+			write("\ni: ");
+			write(i);
+			write("\nj: ");
+			write(j);
+			write("\nk: ");
+			write(k);
+			write("\n");
+	    }
+	}
+}

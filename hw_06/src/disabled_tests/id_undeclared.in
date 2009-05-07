@@ -1,0 +1,6 @@
+int main()
+{
+   i  = i + 2;
+   i = 3 + 4;
+   return 0;
+}

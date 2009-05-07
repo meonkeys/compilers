@@ -1,0 +1,13 @@
+int main() {
+    int j, i;
+
+    i = read();
+    write(i);
+    write("\n");
+
+    j = read();
+    write(j);
+    write("\n");
+
+    return 0;
+}
