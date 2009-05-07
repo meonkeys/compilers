@@ -1821,8 +1821,8 @@ asm_emit_array_access (var_ref * a, int width)
         asm_out ("\tla\t$%d, %d($fp)\t#line %d\n", base_reg, SMT->offset, linenumber);
     }
     /*fprintf(stderr, "array offset = %d\n", SMT->offset);*/
-    /* this switches the address of the array to the end so it can grow "up" */:
-    asm_out("\tadd\t$%d, $%d, %d\t#base_reg + offset, line: %d\n", base_reg, base_reg, SMT->offset, linenumber);
+    /* this switches the address of the array to the end so it can grow "up" */
+    asm_out("\tadd\t$%d, $%d, %d\t#base_reg + offset, line: %d\n", base_reg, base_reg, SMT->symtab_u.st_arr->size, linenumber);
 
 
     /* res_reg = res_reg + base_addr */
