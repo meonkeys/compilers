@@ -1820,18 +1820,12 @@ asm_emit_array_access (var_ref * a, int width)
     else{
         asm_out ("\tla\t$%d, %d($fp)\t#line %d\n", base_reg, SMT->offset, linenumber);
     }
-<<<<<<< HEAD:hw_06/src/functions.c
     /*
     fprintf(stderr, "array offset = %d\n", SMT->offset);
     fprintf(stderr, "array size = %d\n", SMT->symtab_u.st_arr->size * width);
     */
     /* this switches the address of the array to the end so it can grow "up" */
     asm_out("\tadd\t$%d, $%d, %d\t#base_reg + offset, line: %d\n", base_reg, base_reg, SMT->symtab_u.st_arr->size * width, linenumber);
-=======
-    /*fprintf(stderr, "array offset = %d\n", SMT->offset);*/
-    /* this switches the address of the array to the end so it can grow "up" */
-    asm_out("\tadd\t$%d, $%d, %d\t#base_reg + offset, line: %d\n", base_reg, base_reg, SMT->offset, linenumber);
->>>>>>> 53ab2fa529e17bf9e49d791c8042394a4d98f067:hw_06/src/functions.c
 
 
     /* res_reg = res_reg + base_addr */
