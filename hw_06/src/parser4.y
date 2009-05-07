@@ -658,6 +658,7 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 			IS_RETURN=1;
 		}
 		| RETURN relop_expr MK_SEMICOLON{
+			int reg;
 			if((func_return==ERROR_)||($2->type==ERROR_))
 				$$=ZERO_;
 			else if(func_return!=$2->type){
@@ -692,7 +693,9 @@ stmt		: MK_LBRACE {scope++;}block {delete_scope(scope);scope--;}MK_RBRACE{$$=$3;
 						asm_out("\tmove\t$v0, $%d\t# line %d\n", $2->place, linenumber);
 					}
 				}else if(FLOAT_ == $2->type){
-					asm_out("\tmov.s\t$f0, $f%d\t# line %d\n", $2->place, linenumber);
+					reg = get_result_reg();
+					reg = asm_emit_load_float(reg, $2);
+					asm_out("\tmov.s\t$f0, $f%d\t# line %d\n",  reg, linenumber);
 				}
 				$$=ZERO_;
 				asm_out("j _end_%s\t# return statement, line %d\n", current_func_name, linenumber);

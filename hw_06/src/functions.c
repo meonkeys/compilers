@@ -339,8 +339,15 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                         asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                     }
                 }
-                else if (1 == b->is_return
-                         || (b->place >= 8 && b->place < MAX_REG))
+                else if (1 == b->is_return)
+                {
+                    /*
+                    reg = b->place;
+                    */
+                    reg = get_result_reg();
+                    asm_out("\tmove $%d, $%d\t# line %d\n", reg, b->place, linenumber);
+                }
+                else if(b->place >= 8 && b->place < MAX_REG)
                 {
                     reg = b->place;
                 }
@@ -461,7 +468,11 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else if (1 == b->is_return)
                 {
+                    /*
                     reg = b->place;
+                    */
+                    reg = get_result_reg();
+                    asm_out("\tmove $%d, $%d\t# line %d\n", reg, b->place, linenumber);
                 }
                 else if (0 == b->place)
                 {
@@ -2206,7 +2217,6 @@ asm_emit_load_int (int reg, var_ref * v)
 {
     symtab *ptr = NULL;
 
-    asm_out ("\t# loading an int from type: %s\n", printtype(v->type));
     if(INT_ == v->type){
         if (NULL != v->name)
         {
@@ -2220,6 +2230,9 @@ asm_emit_load_int (int reg, var_ref * v)
                 {
                     asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
                              ptr->offset, linenumber);
+                }
+                else if(1 == v->is_return){
+                    asm_out("\tmove $%d, $%d\t# line %d\n", reg, v->place, linenumber);
                 }
                 else
                 {
@@ -2262,7 +2275,6 @@ asm_emit_load_float (int reg, var_ref * v)
 {
     symtab *ptr = NULL;
 
-    asm_out ("\t# loading a float from type: %s\n", printtype(v->type));
     if(FLOAT_ == v->type){
         /* if it's null it's a constant */
         if (NULL != v->name)
@@ -2280,7 +2292,7 @@ asm_emit_load_float (int reg, var_ref * v)
                 }
                 else if (1 == v->is_return)
                 {
-                    reg = v->place;
+                    asm_out("\tmove $%d, $%d\t# line %d\n", reg, v->place, linenumber);
                 }
                 else if (0 == ptr->place)
                 {
@@ -2299,11 +2311,11 @@ asm_emit_load_float (int reg, var_ref * v)
         {
             if (0 == v->place)
             {
-            asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", reg, cur_const_val,
-                     linenumber);
-            frame_data_out ("\t_f_%d: .float %f\t# line %d\n", cur_const_val,
-                            v->tmp_val_u.tmp_fval, linenumber);
-            cur_const_val++;
+                asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", reg, cur_const_val,
+                         linenumber);
+                frame_data_out ("\t_f_%d: .float %f\t# line %d\n", cur_const_val,
+                                v->tmp_val_u.tmp_fval, linenumber);
+                cur_const_val++;
             }
             else{
                 reg = v->place;

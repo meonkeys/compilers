@@ -302,6 +302,7 @@ void eval_relop_expr (var_ref * a, var_ref b, int op);
 
 int get_reg (var_ref * vr);
 int get_result_reg (void);
+int get_return_reg(var_ref* v);
 
 void frame_data_out (char const *fmt, ...);
 

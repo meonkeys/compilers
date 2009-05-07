@@ -15,6 +15,7 @@ typedef enum
 /* regtable[REG_COUNT];*/
 
 reg_status reg_costs[REG_COUNT];
+reg_status return_reg_costs[4];
 
 int
 get_reg (var_ref * vr)
@@ -73,6 +74,77 @@ get_result_reg (void)
 
     /* The spill case!  We return the stack pointer */
     return 29;
+}
+
+int
+get_return_reg(var_ref* v){
+    int i;
+
+    if(FLOAT_ == v->type){
+        /* grab the first free one */
+
+        for (i = 0; i < 2; i++)
+        {
+            if (return_reg_costs[i] == FREE)
+            {
+                return_reg_costs[i] = NOTSAVED;
+                return i;
+            }
+        }
+
+        /* no free ones, grab the first saved one */
+        for (i = 0; i < 2; i++)
+        {
+            if (return_reg_costs[i] == NOTSAVED)
+            {
+                /* FIXME: don't set SAVED */
+                return_reg_costs[i] = SAVED;
+                return i;
+            }
+        }
+
+        for (i = 0; i < 2; i++)
+        {
+            if (return_reg_costs[i] == SAVED)
+            {
+                return i;
+            }
+        }
+    }
+    else if(INT_ == v->type){
+        /* grab the first free one */
+
+        for (i = 2; i < 4; i++)
+        {
+            if (return_reg_costs[i] == FREE)
+            {
+                return_reg_costs[i] = NOTSAVED;
+                return i;
+            }
+        }
+
+        /* no free ones, grab the first saved one */
+        for (i = 2; i < 4; i++)
+        {
+            if (return_reg_costs[i] == NOTSAVED)
+            {
+                /* FIXME: don't set SAVED */
+                return_reg_costs[i] = SAVED;
+                return i;
+            }
+        }
+
+        for (i = 2; i < 4; i++)
+        {
+            if (return_reg_costs[i] == SAVED)
+            {
+                return i;
+            }
+        }
+    }
+
+    /* bad things */
+    return 0;
 }
 
 void
