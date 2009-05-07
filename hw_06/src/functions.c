@@ -2084,11 +2084,17 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        regA = asm_emit_load_int (regA, a);
+        if(a->type == b->type){
+            regA = asm_emit_load_int (regA, a);
 
-        if (regB != regA)
-        {
-            regB = asm_emit_load_int (regB, b);
+            if (regB != regA)
+            {
+                regB = asm_emit_load_int (regB, b);
+            }
+        }
+        else{
+            regA = asm_emit_load_float (regA, a);
+            regB = asm_emit_load_float (regB, b);
         }
     }
     else
@@ -2102,7 +2108,7 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
 
     if (OP_PLUS == opval)
     {
-        if (INT_ == a->type)
+        if (INT_ == a->type && INT_ == b->type)
         {
             asm_out ("\tadd\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
                      linenumber);
@@ -2152,11 +2158,18 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        regA = asm_emit_load_int (regA, a);
+        if(a->type == b->type){
+            regA = asm_emit_load_int (regA, a);
 
-        if (regB != regA)
-        {
-            regB = asm_emit_load_int (regB, b);
+            if (regB != regA)
+            {
+                regB = asm_emit_load_int (regB, b);
+            }
+        }
+        else{
+            fprintf(stderr, "BOOM!\n");
+            regA = asm_emit_load_float (regA, a);
+            regB = asm_emit_load_float (regB, b);
         }
     }
     else
@@ -2184,7 +2197,7 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
     }
     else if (OP_DIVIDE == opval)
     {
-        if (INT_ == a->type)
+        if (INT_ == a->type && INT_ == b->type)
         {
             asm_out ("\tdiv\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
                      linenumber);

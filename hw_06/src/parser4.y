@@ -836,8 +836,9 @@ term		: term mul_op factor{
 				$1->type=ERROR_;
 			}
 			else{
-				$1->type=($1->type==FLOAT_||$3->type==FLOAT_)?FLOAT_:INT_;
+				/*$1->type=($1->type==FLOAT_||$3->type==FLOAT_)?FLOAT_:INT_;*/
 				$1->place = asm_emit_term($1, $3, $2);
+				$1->type=($1->type==FLOAT_||$3->type==FLOAT_)?FLOAT_:INT_;
 			}
 			$1->name=NULL;
 			$$=$1;
@@ -925,14 +926,19 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 		}
 		/* function call used as a subexpression - return value is used */
 		| ID MK_LPAREN relop_expr_list MK_RPAREN {
+			int reg;
 			$$=check_function($1,$3);
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
 				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
 				/* set location for return value */
 				if(INT_ == $$->type){
-					$$->place = 2; /* indicates $v0 */
+					reg = get_result_reg();
+					asm_out("\tmove $%d, $v0\t# line %d\n", reg, linenumber);
+					$$->place = reg; /* indicates $v0 */
 				}else if(FLOAT_ == $$->type){
-					$$->place = 0; /* indicates $f0 */
+					reg = get_result_reg();
+					asm_out("\tmov.s $f%d, $f0\t# line %d\n", reg, linenumber);
+					$$->place = reg; /* indicates $f0 */
 				}
 				$$->is_return = 1;
 			}
