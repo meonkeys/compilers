@@ -379,24 +379,9 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 {
                     /*ptrA->place = reg; */
                     ptrA->place = -1;
-<<<<<<< HEAD:hw_06/src/functions.c
-                    /*
-=======
->>>>>>> c2f78e97e9b74a00894c5d1971a0d9cd0cd549dc:hw_06/src/functions.c
-                    res_reg = get_result_reg ();
-                    asm_out ("\tla\t$%d, _%s\t# line %d\n", res_reg, a->name,
-<<<<<<< HEAD:hw_06/src/functions.c
-=======
-                             linenumber);
-                    asm_out ("\tsw\t$%d, 0($%d)\t# line %d\n", reg, res_reg,
->>>>>>> c2f78e97e9b74a00894c5d1971a0d9cd0cd549dc:hw_06/src/functions.c
-                             linenumber);
-<<<<<<< HEAD:hw_06/src/functions.c
-                    */
+
                     asm_out ("\tsw\t$%d, _%s\t# line %d\n", reg, a->name,
                              linenumber);
-=======
->>>>>>> c2f78e97e9b74a00894c5d1971a0d9cd0cd549dc:hw_06/src/functions.c
                     free_reg (reg);
                     free_reg (arr_reg);
                 }
@@ -2298,11 +2283,7 @@ asm_emit_load_float (int reg, var_ref * v)
         ptr = lookup (v->name);
         assert (NULL != ptr);
 
-<<<<<<< HEAD:hw_06/src/functions.c
         if (ARR_ != ptr->type)
-=======
-        if (ARR_ == ptr->type)
->>>>>>> c2f78e97e9b74a00894c5d1971a0d9cd0cd549dc:hw_06/src/functions.c
         {
             /*  FIXME: I don't think this is right */
             if (ptr->scope > 0)
