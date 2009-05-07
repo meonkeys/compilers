@@ -2284,7 +2284,7 @@ asm_emit_write (TypeList * idl)
     }
     if (INT_ == idl->P_var_r->type)
     {
-        asm_out ("\tli\t$v0, 1\n");
+        asm_out ("\tli\t$v0, 1\t# print int\n");
         if (NULL != symptr)
         {
             if(ARR_ != symptr->type){
@@ -2311,7 +2311,7 @@ asm_emit_write (TypeList * idl)
     }
     else if (FLOAT_ == idl->P_var_r->type)
     {
-        asm_out ("\tli\t$v0, 2\n");
+        asm_out ("\tli\t$v0, 2\t# print float\n");
         if (NULL != symptr)
         {
             if(ARR_ != symptr->type){
@@ -2331,7 +2331,7 @@ asm_emit_write (TypeList * idl)
     }
     else
     {                           /* string */
-        asm_out ("\tli\t$v0, 4\n");
+        asm_out ("\tli\t$v0, 4\t# print string\n");
         /* this might require scope? */
         frame_data_out ("\t_sConst%d: .asciiz %s\n", cur_const_val,
                         idl->P_var_r->tmp_val_u.tmp_str);
@@ -2344,14 +2344,14 @@ asm_emit_write (TypeList * idl)
 void
 asm_emit_read ()
 {
-    asm_out ("\tli\t$v0, 5\n");
+    asm_out ("\tli\t$v0, 5\t# read int\n");
     asm_out ("\tsyscall\n");
 }
 
 void
 asm_emit_fread ()
 {
-    asm_out ("\tli\t$v0, 6\n");
+    asm_out ("\tli\t$v0, 6\t# read float\n");
     asm_out ("\tsyscall\n");
 }
 
