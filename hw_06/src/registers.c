@@ -25,13 +25,13 @@ get_reg (var_ref * vr)
     }
     else if (NULL != vr && vr->place < MAX_REG && vr->place > 1)
     {
-        /*fprintf(stderr, "get_reg = %d\n", vr->place);*/
+        /*fprintf(stderr, "get_reg = %d\n", vr->place); */
         reg_costs[vr->place] = NOTSAVED;        /* I think this is the right cost to set */
         return vr->place;
     }
     else
     {                           /* this should never happen */
-        assert(0);
+        assert (0);
         return 8;
     }
 }
@@ -46,7 +46,7 @@ get_result_reg (void)
     {
         if (reg_costs[i] == FREE)
         {
-            /*fprintf(stderr, "$%d is stealing regs\n", i);*/
+            /*fprintf(stderr, "$%d is stealing regs\n", i); */
             reg_costs[i] = NOTSAVED;
             return i;
         }
@@ -78,8 +78,9 @@ get_result_reg (void)
 void
 free_reg (int r)
 {
-    if(r >=8 && r < MAX_REG){
-        /*fprintf(stderr, "freeing $%d\n", r);*/
+    if (r >= 8 && r < MAX_REG)
+    {
+        /*fprintf(stderr, "freeing $%d\n", r); */
         reg_costs[r] = FREE;
     }
 }
@@ -87,7 +88,7 @@ free_reg (int r)
 void
 ns_reg (int r)
 {
-    /*fprintf(stderr, "setting as ns $%d\n", r);*/
+    /*fprintf(stderr, "setting as ns $%d\n", r); */
     reg_costs[r] = NOTSAVED;
 }
 
@@ -98,13 +99,15 @@ save_reg (int r)
 }
 
 void
-print_regs(){
+print_regs ()
+{
     int i;
 
-    for(i = 8; i < MAX_REG; i++){
-        fprintf(stderr, "%d:%d ", i,reg_costs[i]);
+    for (i = 8; i < MAX_REG; i++)
+    {
+        fprintf (stderr, "%d:%d ", i, reg_costs[i]);
     }
-    fprintf(stderr, "\n");
+    fprintf (stderr, "\n");
 }
 
 /*
