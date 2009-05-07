@@ -17,6 +17,7 @@ int ceil(float num)
  float dumb;
  if (num > 0) /* convert from int to float */
   {
+	  /*
 	  write("num: ");
 	  write(num);
 	  write("\n");
@@ -27,12 +28,13 @@ int ceil(float num)
 	  write("dumb: ");
 	  write(dumb);
 	  write("\n");
-
+		*/
     temp = num + delta;
+	/*
 	  write("temp: ");
 	  write(temp);
 	  write("\n");
-
+	*/
 		
   }
  else 

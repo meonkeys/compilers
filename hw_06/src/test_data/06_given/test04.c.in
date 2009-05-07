@@ -53,7 +53,7 @@ int main()
 	  a[i][j] = read();
 	}
     }
-  write("Enter matrix 2 of dim 4 x 4: \n");
+  write("Enter matrix 2 of dim 4 x 4 : \n");
   for (i = 0; i < dim; i = i +1)
     {
       for (j = 0; j < dim; j = j +1)

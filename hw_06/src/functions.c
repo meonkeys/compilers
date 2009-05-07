@@ -274,17 +274,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
         case INT_:
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
-            /*
-             * FIXME: I think I need to do some sort of LHS array access here
-             if(ARR_ == ptrA->type){
-             arr_offset = 4 * a->var_ref_u.arr_info->dim_limit[0];
-             fprintf(stderr, "array dim = %d\n", a->var_ref_u.arr_info->dim);
-             fprintf(stderr, "array assign to limit[%d]\n", a->var_ref_u.arr_info->dim_limit[0]);
-             }
-             else{
-             arr_offset = 0;
-             }
-             */
+            /* I don't know why this offset is here */
             offsetA = ptrA->offset + arr_offset;
 
             /* if it's null it's a constant */
@@ -292,17 +282,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 ptrB = lookup (b->name);
                 assert (NULL != ptrB);
-                /*
-                   if (ARR_ == ptrB->type)
-                   {
-                   arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
-                   fprintf(stderr, "array assign to limit[%d]\n", b->var_ref_u.arr_info->dim_limit[0]);
-                   }
-                   else
-                   {
-                   arr_offset = 0;
-                   }
-                 */
                 offsetB = ptrB->offset + arr_offset;
             }
 
@@ -2227,6 +2206,7 @@ asm_emit_load_int (int reg, var_ref * v)
 {
     symtab *ptr = NULL;
 
+    asm_out ("\t# loading an int from type: %s\n", printtype(v->type));
     if(INT_ == v->type){
         if (NULL != v->name)
         {
@@ -2269,9 +2249,9 @@ asm_emit_load_int (int reg, var_ref * v)
     }
     else{
         reg = asm_emit_load_float(reg, v);
-        asm_out("\tfloor.w.s\t$f%d, $f%d\t# line %d\b", reg, reg, linenumber);
-        asm_out("\tcvt.w.s\t$f%d, $f%d\t# line %d\b", reg, reg, linenumber);
-        asm_out("\tmove\t$%d, $f%d\t# line %d\n", reg, reg, linenumber);
+        /*asm_out("\tfloor.w.s\t$f%d, $f%d\t# line %d\n", reg, reg, linenumber);*/
+        asm_out("\tcvt.w.s\t$f%d, $f%d\t# line %d\n", reg, reg, linenumber);
+        asm_out("\tmfc1\t$%d, $f%d\t# line %d\n", reg, reg, linenumber);
     }
 
     return reg;
@@ -2282,6 +2262,7 @@ asm_emit_load_float (int reg, var_ref * v)
 {
     symtab *ptr = NULL;
 
+    asm_out ("\t# loading a float from type: %s\n", printtype(v->type));
     if(FLOAT_ == v->type){
         /* if it's null it's a constant */
         if (NULL != v->name)
@@ -2316,18 +2297,24 @@ asm_emit_load_float (int reg, var_ref * v)
         }
         else
         {
-            /*asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name, linenumber); */
+            if (0 == v->place)
+            {
             asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", reg, cur_const_val,
                      linenumber);
             frame_data_out ("\t_f_%d: .float %f\t# line %d\n", cur_const_val,
                             v->tmp_val_u.tmp_fval, linenumber);
             cur_const_val++;
+            }
+            else{
+                reg = v->place;
+            }
         }
     }
     else{
         reg = asm_emit_load_int(reg, v);
-        asm_out("\tmove\t$f%d, $%d\t# line %d\n", reg, reg, linenumber);
-        asm_out("\tcvt.s.w\t$f%d, $f%d\t# line %d\b", reg, reg, linenumber);
+        /*asm_out("\tmove\t$f%d, $%d\t# line %d\n", reg, reg, linenumber);*/
+        asm_out("\tmtc1\t$%d, $f%d\t# line %d\n", reg, reg, linenumber);
+        asm_out("\tcvt.s.w\t$f%d, $f%d\t# line %d\n", reg, reg, linenumber);
     }
 
     return reg;
@@ -2345,7 +2332,6 @@ asm_emit_write (TypeList * idl)
     }
     if (INT_ == idl->P_var_r->type)
     {
-        asm_out ("\tli\t$v0, 1\t# print int\n");
         if (NULL != symptr)
         {
             if (ARR_ != symptr->type)
@@ -2370,10 +2356,10 @@ asm_emit_write (TypeList * idl)
         {
             asm_out ("\tmove\t$a0, $%d\n", idl->P_var_r->place);
         }
+        asm_out ("\tli\t$v0, 1\t# print int\n");
     }
     else if (FLOAT_ == idl->P_var_r->type)
     {
-        asm_out ("\tli\t$v0, 2\t# print float\n");
         if (NULL != symptr)
         {
             if (ARR_ != symptr->type)
@@ -2396,6 +2382,7 @@ asm_emit_write (TypeList * idl)
         {
             asm_out ("\tmov.s\t$f12, $f%d\n", idl->P_var_r->place);
         }
+        asm_out ("\tli\t$v0, 2\t# print float\n");
     }
     else
     {                           /* string */
@@ -2449,7 +2436,7 @@ gen_prologue (const char *name)
         {
             asm_out ("\tsub\t$sp, $sp, 4\t#push $s%d\n", i);
             asm_out ("\tsw\t$s%d, ($sp)\n", i);
-            free_reg (i);
+            free_reg (i+16); /* needs this to offset from i */
         }
     }
 
@@ -2463,6 +2450,10 @@ gen_epilogue (const char *name)
 {
     int i;
     asm_out ("\n_end_%s:\t# line %d\n", name, linenumber);
+
+    for(i = 8; i < MAX_REG; i++){
+        free_reg(i);
+    }
 
     /* restore $s0-7 in reverse order (due to stack) */
     if (0 != strcmp (name, "main"))
