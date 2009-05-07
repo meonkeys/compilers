@@ -2013,6 +2013,10 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         /* if b is null, this is an expr-to-relop_factor reduction */
         if (NULL != b)
         {
+            if (FLOAT_ == b->type)
+            {
+                a->tmp_val_u.tmp_fval = a->tmp_val_u.tmp_intval;
+            }
             regB = asm_emit_load_int (regB, b);
         }
     }
@@ -2023,6 +2027,10 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         /* if b is null, this is an expr-to-relop_factor reduction */
         if (NULL != b)
         {
+            if (FLOAT_ == b->type)
+            {
+                b->tmp_val_u.tmp_fval = b->tmp_val_u.tmp_intval;
+            }
             regB = asm_emit_load_float (regB, b);
         }
     }
