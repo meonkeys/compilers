@@ -16,7 +16,15 @@ int ceil(float num)
  int temp;
  if (num > 0) /* convert from int to float */
   {
+	  write("num: ");
+	  write(num);
+	  write("\n");
     temp = num + delta;
+	  write("temp: ");
+	  write(temp);
+	  write("\n");
+
+		
   }
  else 
    {

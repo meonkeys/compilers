@@ -283,7 +283,7 @@ void asm_emit_fread (void);
 int set_var_decl_list_offsets (var_decl * v, int offset);
 void set_param_list_offsets (param_list * pl);
 int set_var_decl_offset (var_decl * v);
-void set_global_array_offsets(var_decl * v);
+void set_global_array_offsets (var_decl * v);
 
 id_list *reverse_id_list (id_list * p);
 
@@ -309,7 +309,7 @@ void free_reg (int r);
 void ns_reg (int r);
 void save_reg (int r);
 
-void print_regs();
+void print_regs ();
 #endif
 
 /*
