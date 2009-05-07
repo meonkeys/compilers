@@ -1045,6 +1045,7 @@ var_ref		: ID{
 					else{
 						$1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1] 
 							= asm_emit_load_int(get_result_reg(), $2);
+						/*fprintf(stderr, "setting dim_place i=%d to %d\n", i, $1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1]);*/
 					}
 					i=--$1->var_ref_u.arr_info->dim;
 

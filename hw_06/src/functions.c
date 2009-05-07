@@ -237,6 +237,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
     int arr_offset = 0;
     int reg;
     int arr_reg = 0;
+    int res_reg = 0;
 
     /*fprintf (stderr, "IS_ARRAY %d vs. %d\n", a->is_array, b->is_array); */
     if ((a->type == ERROR_) || (b->type == ERROR_))
@@ -378,7 +379,9 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 {
                     /*ptrA->place = reg;*/
                     ptrA->place = -1;
-                    asm_out ("\tsw\t$%d, %d($fp)\t# line %d\n", reg, offsetA,
+                    res_reg = get_result_reg();
+                    asm_out("\tla\t$%d, _%s\t# line %d\n", res_reg, a->name, linenumber);
+                    asm_out ("\tsw\t$%d, 0($%d)\t# line %d\n", reg, res_reg,
                              linenumber);
                     free_reg(reg);
                     free_reg(arr_reg);
@@ -1762,43 +1765,62 @@ asm_emit_array_access (var_ref * a, int width)
     /* delay base_reg load until necessary */
 
     /* FIXME: clean this up */
-    for (i = 0; i < SMT->symtab_u.st_arr->dim - 1; i++)
-    {
-        /* res_reg = dim_access[i] * dim_lim[i+1] */
-        if (a->var_ref_u.arr_info->dim_place[i] == -1)
+    if(SMT->symtab_u.st_arr->dim > 1){
+        for (i = 0; i < SMT->symtab_u.st_arr->dim - 1; i++)
         {
-            access_reg = get_result_reg ();
-            asm_out ("\tli\t$%d, %d\t\t\t#access_reg = dim_access[i] * dim_lim[i+1], line: %d\n", access_reg,
-                     a->var_ref_u.arr_info->dim_limit[i]), linenumber;
-        }
-        else
-        {
-            /*asm_out("\t#access_reg = dim_place[i]\n");*/
-            access_reg = a->var_ref_u.arr_info->dim_place[i];
-        }
+            /* res_reg = dim_access[i] * dim_lim[i+1] */
+            if (a->var_ref_u.arr_info->dim_place[i] == -1)
+            {
+                access_reg = get_result_reg ();
+                asm_out ("\tli\t$%d, %d\t\t\t#access_reg = dim_access[i] * dim_lim[i+1], line: %d\n", access_reg,
+                         a->var_ref_u.arr_info->dim_limit[i]), linenumber;
+            }
+            else
+            {
+                /*asm_out("\t#access_reg = dim_place[i]\n");*/
+                access_reg = a->var_ref_u.arr_info->dim_place[i];
+                /*fprintf(stderr, "setting access_reg to %d\n", access_reg);*/
+            }
 
-        dim_reg = get_result_reg();
-        /*fprintf(stderr, "first mul: access_reg: %d\tdim_reg: %d\n", access_reg, dim_reg);*/
-        asm_out ("\tli\t$%d, %d\t\t\t#dim_reg = dim_lim[i+1], line %d\n", dim_reg, SMT->symtab_u.st_arr->dim_limit[i + 1], linenumber);
-        asm_out ("\tmul\t$%d, $%d, $%d\t#res_reg = access_reg * dim_reg, line %d\n", res_reg, access_reg, dim_reg, linenumber);
-        free_reg (access_reg);
-        free_reg(dim_reg);
+            dim_reg = get_result_reg();
+            /*fprintf(stderr, "first mul: access_reg: %d\tdim_reg: %d\n", access_reg, dim_reg);*/
+            asm_out ("\tli\t$%d, %d\t\t\t#dim_reg = dim_lim[i+1], line %d\n", dim_reg, SMT->symtab_u.st_arr->dim_limit[i + 1], linenumber);
+            asm_out ("\tmul\t$%d, $%d, $%d\t#res_reg = access_reg * dim_reg, line %d\n", res_reg, access_reg, dim_reg, linenumber);
+            free_reg (access_reg);
+            free_reg(dim_reg);
 
-        /* res_reg = res_reg + dim_access[i+1] */
-        if (a->var_ref_u.arr_info->dim_place[i + 1] == -1)
-        {
-            access_reg = get_result_reg ();
-            asm_out ("\tli\t$%d, %d\t\t\t#access_reg = dim_lim[i+1], line %d\n", access_reg,
-                     a->var_ref_u.arr_info->dim_limit[i + 1], linenumber);
+            /* res_reg = res_reg + dim_access[i+1] */
+            if (a->var_ref_u.arr_info->dim_place[i + 1] == -1)
+            {
+                access_reg = get_result_reg ();
+                asm_out ("\tli\t$%d, %d\t\t\t#access_reg = dim_lim[i+1], line %d\n", access_reg,
+                         a->var_ref_u.arr_info->dim_limit[i + 1], linenumber);
+            }
+            else
+            {
+                /*asm_out("\t#access_reg = dim_place[i+1]\n");*/
+                access_reg = a->var_ref_u.arr_info->dim_place[i + 1];
+            }
+            /*fprintf(stderr, "first add: access_reg: %d\tres_reg: %d\n", access_reg, res_reg);*/
+            asm_out ("\tadd\t$%d, $%d, $%d\t#res_reg=access_reg + res_reg, line %d\n", res_reg, access_reg, res_reg, linenumber);
+            free_reg (access_reg);
         }
-        else
-        {
-            /*asm_out("\t#access_reg = dim_place[i+1]\n");*/
-            access_reg = a->var_ref_u.arr_info->dim_place[i + 1];
-        }
-        /*fprintf(stderr, "first add: access_reg: %d\tres_reg: %d\n", access_reg, res_reg);*/
-        asm_out ("\tadd\t$%d, $%d, $%d\t#res_reg=access_reg + res_reg, line %d\n", res_reg, access_reg, res_reg, linenumber);
-        free_reg (access_reg);
+    }
+    /* we already know the access point should go into res_reg */
+    else{
+            /* res_reg = dim_access[i] * dim_lim[i+1] */
+            if (a->var_ref_u.arr_info->dim_place[0] == -1)
+            {
+                asm_out ("\tli\t$%d, %d\t\t\t#res_reg = dim_access[0], line: %d\n", res_reg,
+                         a->var_ref_u.arr_info->dim_limit[i]), linenumber;
+            }
+            else
+            {
+                /*asm_out("\t#access_reg = dim_place[i]\n");*/
+                res_reg = a->var_ref_u.arr_info->dim_place[0];
+                /*fprintf(stderr, "setting res_reg to %d\n", res_reg);*/
+            }
+
     }
 
     /*
@@ -2172,16 +2194,20 @@ asm_emit_load_int (int reg, var_ref * v)
         assert (NULL != ptr);
 
         /*  FIXME: I don't think this is right */
-        if (ptr->scope > 0)
-        {
-            asm_out("#fooooooooooo\n");
-            asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
-                     ptr->offset, linenumber);
+        if(ARR_ != ptr->type){
+            if (ptr->scope > 0)
+            {
+                asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
+                         ptr->offset, linenumber);
+            }
+            else
+            {
+                asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, v->name, linenumber);
+            }
         }
-        else
-        {
-            asm_out("#pppppppppppp\n");
-            asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, v->name, linenumber);
+        else{
+            reg = asm_emit_array_access(v, 4);
+            asm_out ("\tlw\t$%d, 0($%d)\t# loading array access, line %d\n", reg, reg, linenumber);
         }
     }
     else
@@ -2211,20 +2237,26 @@ asm_emit_load_float (int reg, var_ref * v)
         ptr = lookup (v->name);
         assert (NULL != ptr);
 
-        /*  FIXME: I don't think this is right */
-        if (ptr->scope > 0)
-        {
-            asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", reg,
-                     ptr->offset, linenumber);
+        if(ARR_ == ptr->type){
+            /*  FIXME: I don't think this is right */
+            if (ptr->scope > 0)
+            {
+                asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", reg,
+                         ptr->offset, linenumber);
+            }
+            else if (1 == v->is_return)
+            {
+                reg = v->place;
+            }
+            else if (0 == ptr->place)
+            {
+                asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", reg, v->name,
+                         linenumber);
+            }
         }
-        else if (1 == v->is_return)
-        {
-            reg = v->place;
-        }
-        else if (0 == ptr->place)
-        {
-            asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", reg, v->name,
-                     linenumber);
+        else{
+            reg = asm_emit_array_access(v, 4);
+            asm_out ("\tlw\t$%d, 0($%d)# loading array access, line %d\n", reg, reg, linenumber);
         }
     }
     else
