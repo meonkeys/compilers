@@ -239,21 +239,18 @@ stmt_assign_ex (var_ref * a, var_ref * b)
     int arr_reg = 0;
 
     /*fprintf (stderr, "IS_ARRAY %d vs. %d\n", a->is_array, b->is_array); */
-    if ((a->type == ERROR_) || (b->type == ERROR_))
+    if ((a->type == ERROR_) || (b->type == ERROR_)){
         return ERROR_;
-    if (a->type != b->type)
-    {
-        if ((a->type == INT_ || a->type == FLOAT_)
-            && (b->type == INT_ || b->type == FLOAT_))
-            return ZERO_;
-        else
-        {
+    }
+
+    if ((a->type != b->type) && 
+            !((a->type == INT_ || a->type == FLOAT_)
+                && (b->type == INT_ || b->type == FLOAT_))){
             printf ("error %d: incompatible assignment, %s %s to %s %s\n",
                     linenumber, printtype (b->type),
                     (b->name) ? (b->name) : "", printtype (a->type),
                     (a->name) ? a->name : "");
             return ERROR_;
-        }
     }
     else
         switch (a->type)
@@ -2012,7 +2009,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         {
             if (FLOAT_ == b->type)
             {
-                a->tmp_val_u.tmp_fval = a->tmp_val_u.tmp_intval;
+                a->tmp_val_u.tmp_fval = a->tmp_val_u.tmp_intval*1.0;
             }
             regB = asm_emit_load_int (regB, b);
         }
@@ -2024,7 +2021,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
         /* if b is null, this is an expr-to-relop_factor reduction */
         if (NULL != b)
         {
-            if (FLOAT_ == b->type)
+            if (INT_ == b->type)
             {
                 b->tmp_val_u.tmp_fval = b->tmp_val_u.tmp_intval;
             }
@@ -2230,43 +2227,51 @@ asm_emit_load_int (int reg, var_ref * v)
 {
     symtab *ptr = NULL;
 
-    if (NULL != v->name)
-    {
-        ptr = lookup (v->name);
-        assert (NULL != ptr);
-
-        /*  FIXME: I don't think this is right */
-        if (ARR_ != ptr->type)
+    if(INT_ == v->type){
+        if (NULL != v->name)
         {
-            if (ptr->scope > 0)
+            ptr = lookup (v->name);
+            assert (NULL != ptr);
+
+            /*  FIXME: I don't think this is right */
+            if (ARR_ != ptr->type)
             {
-                asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
-                         ptr->offset, linenumber);
+                if (ptr->scope > 0)
+                {
+                    asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg,
+                             ptr->offset, linenumber);
+                }
+                else
+                {
+                    asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, v->name,
+                             linenumber);
+                }
             }
             else
             {
-                asm_out ("\tlw\t$%d, _%s\t# line %d\n", reg, v->name,
-                         linenumber);
+                reg = asm_emit_array_access (v, 4);
+                asm_out ("\tlw\t$%d, 0($%d)\t# loading array access, line %d\n",
+                         reg, reg, linenumber);
             }
         }
         else
         {
-            reg = asm_emit_array_access (v, 4);
-            asm_out ("\tlw\t$%d, 0($%d)\t# loading array access, line %d\n",
-                     reg, reg, linenumber);
+            if (0 == v->place)
+            {
+                asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
+                         v->tmp_val_u.tmp_intval, linenumber);
+            }
+            else
+            {
+                reg = v->place;
+            }
         }
     }
-    else
-    {
-        if (0 == v->place)
-        {
-            asm_out ("\tli\t$%d, %d\t# line %d\n", reg,
-                     v->tmp_val_u.tmp_intval, linenumber);
-        }
-        else
-        {
-            reg = v->place;
-        }
+    else{
+        reg = asm_emit_load_float(reg, v);
+        asm_out("\tfloor.w.s\t$f%d, $f%d\t# line %d\b", reg, reg, linenumber);
+        asm_out("\tcvt.w.s\t$f%d, $f%d\t# line %d\b", reg, reg, linenumber);
+        asm_out("\tmove\t$%d, $f%d\t# line %d\n", reg, reg, linenumber);
     }
 
     return reg;
@@ -2277,45 +2282,52 @@ asm_emit_load_float (int reg, var_ref * v)
 {
     symtab *ptr = NULL;
 
-    /* if it's null it's a constant */
-    if (NULL != v->name)
-    {
-        ptr = lookup (v->name);
-        assert (NULL != ptr);
-
-        if (ARR_ != ptr->type)
+    if(FLOAT_ == v->type){
+        /* if it's null it's a constant */
+        if (NULL != v->name)
         {
-            /*  FIXME: I don't think this is right */
-            if (ptr->scope > 0)
+            ptr = lookup (v->name);
+            assert (NULL != ptr);
+
+            if (ARR_ != ptr->type)
             {
-                asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", reg,
-                         ptr->offset, linenumber);
+                /*  FIXME: I don't think this is right */
+                if (ptr->scope > 0)
+                {
+                    asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", reg,
+                             ptr->offset, linenumber);
+                }
+                else if (1 == v->is_return)
+                {
+                    reg = v->place;
+                }
+                else if (0 == ptr->place)
+                {
+                    asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", reg, v->name,
+                             linenumber);
+                }
             }
-            else if (1 == v->is_return)
+            else
             {
-                reg = v->place;
-            }
-            else if (0 == ptr->place)
-            {
-                asm_out ("\tl.s\t$f%d, _%s\t# line %d\n", reg, v->name,
-                         linenumber);
+                reg = asm_emit_array_access (v, 4);
+                asm_out ("\tlw\t$%d, 0($%d)# loading array access, line %d\n",
+                         reg, reg, linenumber);
             }
         }
         else
         {
-            reg = asm_emit_array_access (v, 4);
-            asm_out ("\tlw\t$%d, 0($%d)# loading array access, line %d\n",
-                     reg, reg, linenumber);
+            /*asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name, linenumber); */
+            asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", reg, cur_const_val,
+                     linenumber);
+            frame_data_out ("\t_f_%d: .float %f\t# line %d\n", cur_const_val,
+                            v->tmp_val_u.tmp_fval, linenumber);
+            cur_const_val++;
         }
     }
-    else
-    {
-        /*asm_out ("\tlw\t$%d, _%s\t# line %d\n", regB, b->name, linenumber); */
-        asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", reg, cur_const_val,
-                 linenumber);
-        frame_data_out ("\t_f_%d: .float %f\t# line %d\n", cur_const_val,
-                        v->tmp_val_u.tmp_fval, linenumber);
-        cur_const_val++;
+    else{
+        reg = asm_emit_load_int(reg, v);
+        asm_out("\tmove\t$f%d, $%d\t# line %d\n", reg, reg, linenumber);
+        asm_out("\tcvt.s.w\t$f%d, $f%d\t# line %d\b", reg, reg, linenumber);
     }
 
     return reg;
@@ -2366,7 +2378,12 @@ asm_emit_write (TypeList * idl)
         {
             if (ARR_ != symptr->type)
             {
-                asm_out ("\tl.s\t$f12, %d($fp)\n", symptr->offset);
+                if(symptr->scope > 0){
+                    asm_out ("\tl.s\t$f12, %d($fp)\n", symptr->offset);
+                }
+                else{
+                    asm_out("\tl.s\t$f12, _%s\t# line %d\n", symptr->lexeme, linenumber);
+                }
             }
             else
             {

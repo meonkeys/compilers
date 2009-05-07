@@ -14,11 +14,20 @@ int floor(float num)
 int ceil(float num)
 {
  int temp;
+ float dumb;
  if (num > 0) /* convert from int to float */
   {
 	  write("num: ");
 	  write(num);
 	  write("\n");
+	  write("delta: ");
+	  write(delta);
+	  write("\n");
+	  dumb = num + delta;
+	  write("dumb: ");
+	  write(dumb);
+	  write("\n");
+
     temp = num + delta;
 	  write("temp: ");
 	  write(temp);
