@@ -7,7 +7,10 @@ int c[4];
 
 void print(int k)
 {
-  int i,j;
+	int i,j;
+	write("k: ");
+		write(k);
+		write("\n");
       for (j = 0; j < dim; j = j + 1)
 	{
 	  write(a[k][j]);
@@ -36,6 +39,9 @@ void arraymult()
     }
   for (i = 0; i < dim; i = i + 1)
     {
+		write("i: ");
+		write(i);
+		write("\n");
       print(c[i]);
     }
 }

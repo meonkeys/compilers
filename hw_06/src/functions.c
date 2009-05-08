@@ -317,7 +317,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 if (NULL != b->name)
                 {
-                    /*  FIXME: I don't think this is right */
                     if (b->is_array != 1)
                     {
                         reg = get_reg (b);
@@ -334,18 +333,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     }
                     else
                     {
-                        /*fprintf(stderr, "calling RHS array access\n"); */
                         reg = asm_emit_array_access (b, 4);
                         asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                     }
                 }
-                /*
-                else if (1 == b->is_return)
-                {
-                    reg = get_result_reg();
-                    asm_out("\tmove $%d, $%d\t# line %d\n", reg, b->place, linenumber);
-                }
-                */
                 else if(b->place >= 8 && b->place < MAX_REG)
                 {
                     reg = b->place;
@@ -359,7 +350,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
                 if (ARR_ != ptrA->type)
                 {
-                    /*ptrA->place = reg; */
                     ptrA->place = -1;
 
                     asm_out ("\tsw\t$%d, _%s\t# line %d\n", reg, a->name,
@@ -369,7 +359,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else
                 {
-                    /* FIXME: asm_emit_array_write? */
                     arr_reg = asm_emit_array_access (a, 4);
                     asm_out ("\tsw\t$%d, 0($%d)\t# line%d\n", reg, arr_reg,
                              linenumber);
@@ -383,7 +372,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
             offsetA = ptrA->offset;
-            /*reg = get_reg (b); */
 
             /* if it's null it's a constant */
             if (NULL != b->name)
@@ -1363,6 +1351,10 @@ check_function (char *a, TypeList * b)
                 else
                 {
                     reg = PVR1->place;
+                    if(PVR1->is_array){
+                        reg = asm_emit_array_access (PVR1, 4);
+                        asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
+                    }
                 }
                 asm_out ("\tsw\t$%d, ($sp)\t# line %d\n", reg, linenumber);
                 free_reg (reg);
@@ -1389,6 +1381,10 @@ check_function (char *a, TypeList * b)
                     else
                     {
                         reg = PVR1->place;
+                        if(PVR1->is_array){
+                            reg = asm_emit_array_access (PVR1, 4);
+                            asm_out ("\tlw\t$f%d, 0($f%d)\n", reg, reg);
+                        }
                     }
                     asm_out ("\ts.s\t$f%d, ($sp)\t# line %d\n", reg,
                              linenumber);
@@ -1549,6 +1545,7 @@ asm_out (char const *fmt, ...)
 void
 asm_emit_global_decls_start (void)
 {
+    asm_out ("j main\n");
     asm_out ("# 'line #' comments printed at line endings correspond to\n");
     asm_out ("# the location in the original C-- source code when\n");
     asm_out ("# the line of MIPS assembly code was generated\n\n");
@@ -1782,8 +1779,7 @@ asm_emit_array_access (var_ref * a, int width)
                 access_reg = get_result_reg ();
                 asm_out
                     ("\tli\t$%d, %d\t\t\t#access_reg = dim_access[i] * dim_lim[i+1], line: %d\n",
-                     access_reg, a->var_ref_u.arr_info->dim_limit[i]),
-                    linenumber;
+                     access_reg, a->var_ref_u.arr_info->dim_limit[i], linenumber);
             }
             else
             {
@@ -1830,9 +1826,10 @@ asm_emit_array_access (var_ref * a, int width)
         /* res_reg = dim_access[i] * dim_lim[i+1] */
         if (a->var_ref_u.arr_info->dim_place[0] == -1)
         {
+            /*fprintf(stderr, "accessing at %d\n", a->var_ref_u.arr_info->dim_limit[0]);*/
             asm_out
                 ("\tli\t$%d, %d\t\t\t#res_reg = dim_access[0], line: %d\n",
-                 res_reg, a->var_ref_u.arr_info->dim_limit[i]), linenumber;
+                 res_reg, a->var_ref_u.arr_info->dim_limit[0], linenumber);
         }
         else
         {

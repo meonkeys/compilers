@@ -1023,7 +1023,7 @@ var_ref		: ID{
 					PTA->arrtype=STP->symtab_u.st_arr->arrtype;
 					PTA->type_name=STP->symtab_u.st_arr->type_name;
 					$$->var_ref_u.arr_info=PTA;
-				$$->place = get_reg($$);
+					$$->place = get_reg($$); /* really? */
 				}
 			}
 		}
@@ -1053,8 +1053,9 @@ var_ref		: ID{
 					/*fprintf(stderr, "i: %d\tplace: %d\n", i, $2->place);*/
 					/*if($2->place < 2 || $2->place > 25){*/
 					if(NULL == $2->name){
-						$1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim - 1] = $2->tmp_val_u.tmp_intval;
+						$1->var_ref_u.arr_info->dim_limit[$1->var_ref_u.arr_info->dim-1] = $2->tmp_val_u.tmp_intval;
 						$1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1] = -1;
+						/*fprintf(stderr, "setting dim_limit i=%d to %d\t dim_place = %d\n", $1->var_ref_u.arr_info->dim - 1, $2->tmp_val_u.tmp_intval, $1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1]);*/
 					}
 					else{
 						$1->var_ref_u.arr_info->dim_place[$1->var_ref_u.arr_info->dim-1] 
