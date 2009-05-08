@@ -339,14 +339,13 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                         asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                     }
                 }
+                /*
                 else if (1 == b->is_return)
                 {
-                    /*
-                    reg = b->place;
-                    */
                     reg = get_result_reg();
                     asm_out("\tmove $%d, $%d\t# line %d\n", reg, b->place, linenumber);
                 }
+                */
                 else if(b->place >= 8 && b->place < MAX_REG)
                 {
                     reg = b->place;
@@ -397,25 +396,32 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                    arr_offset = 4 * b->var_ref_u.arr_info->dim_limit[0];
                    }
                  */
-                fprintf(stderr, "B offset = %d\tplace = %d\ttmpval: %.16f\n", ptrB->offset, ptrB->place, b->tmp_val_u.tmp_fval);
                 offsetB = ptrB->offset + arr_offset;
             }
 
             if (ptrA->scope > 0)
             {
-                /* constant */
-                if (NULL == b->name)
+                /*fprintf(stderr, "B2: %s offset = %d\tplace = %d\ttmpval: %.16f\n", b->name, ptrB->offset, ptrB->place, b->tmp_val_u.tmp_fval);*/
+                /* local */
+                if (NULL != b->name)
                 {
-
-                    fprintf(stderr, "A\n");
-                    /*asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg, offsetB, linenumber); */
-                    reg = get_result_reg ();
-                    asm_out ("\tl.s\t$f%d, _%s_%d\t# line %d\n", reg, b->name,
-                             cur_const_val, linenumber);
-                    frame_data_out ("\t_%s_%d: .float %f\t# line %d\n",
-                                    b->name, cur_const_val,
-                                    b->tmp_val_u.tmp_fval, linenumber);
-                    cur_const_val++;
+                    if(ptrB->offset < 0){
+                        fprintf(stderr, "A\n");
+                        /*asm_out ("\tlw\t$%d, %d($fp)\t# line %d\n", reg, offsetB, linenumber); */
+                        reg = get_result_reg ();
+                        asm_out ("\tl.s\t$f%d, _%s_%d\t# line %d\n", reg, b->name,
+                                 cur_const_val, linenumber);
+                        frame_data_out ("\t_%s_%d: .float %f\t# line %d\n",
+                                        b->name, cur_const_val,
+                                        b->tmp_val_u.tmp_fval, linenumber);
+                        cur_const_val++;
+                    }
+                                    /* parameter */
+                    else if (ptrB->offset > 0){
+                        reg = get_result_reg ();
+                        asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", reg,
+                                 ptrB->offset, linenumber);
+                    }
                 }
                 else if (0 <= b->place && REG_COUNT > b->place)
                 {
@@ -423,24 +429,16 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                      * if 0 <= place < REG_COUNT, then it was stored in $fN 
                      * so we need to store from $fN
                      */
+                    /*
                     if (b->is_return)
                     {
-                        fprintf(stderr, "B\n");
-                        /* if tmp isn't set, it's a read */
-                        /*asm_out("\tmfc1\t$%d, $f%d\t# line %d\n", reg, b->place, linenumber); */
                         reg = get_result_reg();
                         asm_out("\tmove $%d, $%d\t# line %d\n", reg, b->place, linenumber);
                     }
-                    /* parameter */
-                    else if (ptrB->offset > 0){
-                        reg = get_result_reg ();
-                        asm_out ("\tl.s\t$f%d, %d($fp)\t# line %d\n", reg,
-                                 ptrB->offset, linenumber);
-                    }
-                    else if (0.0 != b->tmp_val_u.tmp_fval && b->place == 0)
+                    */
+                    if (0.0 != b->tmp_val_u.tmp_fval && b->place == 0)
                     {
 
-                        fprintf(stderr,"is this happening????\n");
                         reg = get_result_reg ();
                         asm_out ("\tl.s\t$f%d, _f_%d\t# line %d\n", reg,
                                  cur_const_val, linenumber);
@@ -451,7 +449,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     }
                     else
                     {
-                        fprintf(stderr, "C\n");
                         reg = b->place;
                     }
                 }
@@ -1348,7 +1345,6 @@ check_function (char *a, TypeList * b)
             PVR1 = t->P_var_r;
             if ((y->PPAR == NULL) || (PVR1->type == ERROR_))
             {
-                fprintf (stderr, "what?\n");
                 y = y->next;
                 t = t->next;
                 PVR->type = ERROR_;
@@ -2135,7 +2131,7 @@ asm_emit_expr (var_ref * a, var_ref * b, int opval)
     }
     else if (OP_MINUS == opval)
     {
-        if (INT_ == a->type)
+        if (INT_ == a->type && INT_ == b->type)
         {
             asm_out ("\tsub\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
                      linenumber);
@@ -2197,7 +2193,7 @@ asm_emit_term (var_ref * a, var_ref * b, int opval)
 
     if (OP_TIMES == opval)
     {
-        if (INT_ == a->type)
+        if (INT_ == a->type && INT_ == b->type)
         {
             asm_out ("\tmul\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
                      linenumber);

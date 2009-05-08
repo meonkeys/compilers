@@ -38,13 +38,7 @@ float absf(float num)
     }
   else
     {
-		write("\nnum: ");
-	  write(num);
-	  write("\n");
       temp = num;
-	   write("temp: ");
-	  write(temp);
-	  write("\n");
     }
   return temp;
 }

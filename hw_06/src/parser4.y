@@ -809,8 +809,8 @@ expr		: expr add_op term{
 				$1->type=ERROR_;
 			}
 			else{
-				$1->type=(($1->type==FLOAT_)||($3->type==FLOAT_))?FLOAT_:INT_;
 				$1->place = asm_emit_expr($1, $3, $2);
+				$1->type=(($1->type==FLOAT_)||($3->type==FLOAT_))?FLOAT_:INT_;
 			}
 			$$=$1;
 			$$->name=NULL;
@@ -930,6 +930,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 			$$=check_function($1,$3);
 			if(0 != strcmp($1, "write") && 0 != strcmp($1, "read") && 0 != strcmp($1, "fread")){
 				asm_out("\tjal\t%s\t# line %d\n", $1, linenumber);
+			}
 				/* set location for return value */
 				if(INT_ == $$->type){
 					reg = get_result_reg();
@@ -941,7 +942,7 @@ factor		: MK_LPAREN relop_expr MK_RPAREN{$$=$2;}
 					$$->place = reg; /* indicates $f0 */
 				}
 				$$->is_return = 1;
-			}
+			/*}*/
 
 		}
 		| OP_MINUS ID MK_LPAREN relop_expr_list MK_RPAREN{
@@ -998,8 +999,6 @@ var_ref		: ID{
 				$$->type=STP->type;
 				$$->name=$1;
 
-				/*fprintf(stderr, "reffed %s w/ type %s\n", $1, printtype($$->type));*/
-
 				if($$->type==STR_VAR_){
 					$$->var_ref_u.type_name=STP->symtab_u.type_name;
 				}
@@ -1040,10 +1039,6 @@ var_ref		: ID{
 				}
 				else{
 					int i;
-					/*	
-					fprintf(stderr, "var_ref tmp_intval = %d\n", $2->tmp_val_u.tmp_intval);
-					fprintf(stderr, "setting arr[%d] to %d\n", $1->var_ref_u.arr_info->dim, $2->tmp_val_u.tmp_intval);
-					*/
 					/* must be const access */
 					/*fprintf(stderr, "i: %d\tplace: %d\n", i, $2->place);*/
 					/*if($2->place < 2 || $2->place > 25){*/
