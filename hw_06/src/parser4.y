@@ -723,17 +723,19 @@ test            : {
 			gen_control_start ($<label_num>$);
 		} assign_expr {
 			$$=$2;
-			if (0 == $$->place)
+			if (0 == $2->place)
 			{
+				/* assign_expr is a constant */
 				$$->place = asm_emit_relop_factor($2, NULL, 0);
 			}
+			/* emit branching code based on test result */
 			gen_control_test ($2, $<label_num>1);
 			$$->label_num = $<label_num>1;
 		}
                 ;
 
 		/* assignment in initializer of "for loop" control expression */
-assign_expr     : ID OP_ASSIGN relop_expr 
+assign_expr     : ID OP_ASSIGN relop_expr
 			{
 				$$=assign_ex($1,$3);
 				free_reg($3->place);
@@ -761,7 +763,15 @@ relop_factor	: expr{$$=$1;}
 				$1->type=ERROR_;
 			}
 			else{
-				$1->type=INT_;
+				if (FLOAT_ == $1->type || FLOAT_ == $3->type)
+				{
+					$1->type=FLOAT_;
+				}
+				else
+				{
+					$1->type=INT_;
+				}
+				/* emit comparison code */
 				$1->place = asm_emit_relop_factor($1, $3, $2);
 			}
 			$$=$1;

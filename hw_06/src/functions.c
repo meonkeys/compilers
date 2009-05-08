@@ -401,8 +401,7 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
             if (ptrA->scope > 0)
             {
-                /*fprintf(stderr, "B2: %s offset = %d\tplace = %d\ttmpval: %.16f\n", b->name, ptrB->offset, ptrB->place, b->tmp_val_u.tmp_fval);*/
-                /* local */
+                /* constant */
                 if (NULL != b->name)
                 {
                     if(ptrB->offset < 0){
@@ -1981,6 +1980,10 @@ asm_emit_scoped_decl_list (var_decl * v)
     while ((PIL = PIL->next));
 }
 
+/* floating point operations are not comprehensive, this is a hack to provide,
+ * for instance, !=.  If 1, we should use bc1f instead of bc1t. */
+int is_reverse_cond = 0;
+
 /* Return value is the register holding the result of the expr */
 int
 asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
@@ -1988,6 +1991,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     int regA = get_reg (a);
     int regB = -9999;
     int res_reg;
+    TYPE op_type = INT_;
 
     if (NULL == b)
     {
@@ -2002,16 +2006,25 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
     /* TODO: the parser enforces identical typing? */
     if (INT_ == a->type)
     {
-        regA = asm_emit_load_int (regA, a);
-
         /* if b is null, this is an expr-to-relop_factor reduction */
-        if (NULL != b)
+        if (NULL == b)
+        {
+            regA = asm_emit_load_int (regA, a);
+        }
+        else
         {
             if (FLOAT_ == b->type)
             {
                 a->tmp_val_u.tmp_fval = a->tmp_val_u.tmp_intval*1.0;
+                regA = asm_emit_load_float (regA, a);
+                regB = asm_emit_load_float (regB, b);
+                op_type = FLOAT_;
             }
-            regB = asm_emit_load_int (regB, b);
+            else
+            {
+                regA = asm_emit_load_int (regA, a);
+                regB = asm_emit_load_int (regB, b);
+            }
         }
     }
     else
@@ -2026,6 +2039,7 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
                 b->tmp_val_u.tmp_fval = b->tmp_val_u.tmp_intval;
             }
             regB = asm_emit_load_float (regB, b);
+            op_type = FLOAT_;
         }
     }
 
@@ -2033,35 +2047,76 @@ asm_emit_relop_factor (var_ref * a, var_ref * b, int opval)
 
     if (NULL != b)
     {
-        switch (opval)
+        if (FLOAT_ == op_type)
         {
-        case OP_GT:
-            asm_out ("\tsgt\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
-                     linenumber);
-            break;
-        case OP_GE:
-            asm_out ("\tsge\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
-                     linenumber);
-            break;
-        case OP_LT:
-            asm_out ("\tslt\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
-                     linenumber);
-            break;
-        case OP_LE:
-            asm_out ("\tsle\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
-                     linenumber);
-            break;
-        case OP_NE:
-            asm_out ("\tsne\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
-                     linenumber);
-            break;
-        case OP_EQ:
-            asm_out ("\tseq\t$%d, $%d, $%d\t# line %d\n", res_reg, regA, regB,
-                     linenumber);
-            break;
-        default:
-            fprintf (stderr, "don't know how to handle relop: %d\n", opval);
-            assert (0);
+            switch (opval)
+            {
+            case OP_GT:
+                asm_out ("\tc.le.s\t$f%d, $f%d\t# line %d\n", regA, regB,
+                        linenumber);
+                is_reverse_cond = 1; /* opposite of <= is > */
+                break;
+            case OP_GE:
+                asm_out ("\tc.lt.s\t$f%d, $f%d\t# line %d\n", regA, regB,
+                        linenumber);
+                is_reverse_cond = 1; /* opposite of < is >= */
+                break;
+            case OP_LT:
+                asm_out ("\tc.lt.s\t$f%d, $f%d\t# line %d\n", regA, regB,
+                        linenumber);
+                break;
+            case OP_LE:
+                asm_out ("\tc.le.s\t$f%d, $f%d\t# line %d\n", regA, regB,
+                        linenumber);
+                break;
+            case OP_NE:
+                asm_out ("\tc.eq.s\t$f%d, $f%d\t# line %d\n", regA, regB,
+                        linenumber);
+                is_reverse_cond = 1; /* opposite of == is != */
+                break;
+            case OP_EQ:
+                asm_out ("\tc.eq.s\t$f%d, $f%d\t# line %d\n", regA, regB,
+                        linenumber);
+                break;
+            default:
+                fprintf (stderr, "don't know how to handle relop: %d\n",
+                        opval);
+                assert (0);
+            }
+        }
+        else
+        {
+            switch (opval)
+            {
+            case OP_GT:
+                asm_out ("\tsgt\t$%d, $%d, $%d\t# line %d\n", res_reg, regA,
+                        regB, linenumber);
+                break;
+            case OP_GE:
+                asm_out ("\tsge\t$%d, $%d, $%d\t# line %d\n", res_reg, regA,
+                        regB, linenumber);
+                break;
+            case OP_LT:
+                asm_out ("\tslt\t$%d, $%d, $%d\t# line %d\n", res_reg, regA,
+                        regB, linenumber);
+                break;
+            case OP_LE:
+                asm_out ("\tsle\t$%d, $%d, $%d\t# line %d\n", res_reg, regA,
+                        regB, linenumber);
+                break;
+            case OP_NE:
+                asm_out ("\tsne\t$%d, $%d, $%d\t# line %d\n", res_reg, regA,
+                        regB, linenumber);
+                break;
+            case OP_EQ:
+                asm_out ("\tseq\t$%d, $%d, $%d\t# line %d\n", res_reg, regA,
+                        regB, linenumber);
+                break;
+            default:
+                fprintf (stderr, "don't know how to handle relop: %d\n",
+                        opval);
+                assert (0);
+            }
         }
     }
 
@@ -2556,6 +2611,7 @@ gen_control_test (var_ref * a, int exit_label_num)
 {
     if (NULL == a->name)
     {
+        /* emit branching code based on a constant */
         int reg = get_reg (NULL);
         switch (a->type)
         {
@@ -2584,10 +2640,32 @@ gen_control_test (var_ref * a, int exit_label_num)
     }
     else if (a->place > 0 && a->place < REG_COUNT)      /* FIXME: this is a bad way to check if place is initialized */
     {
+        /* emit branching code based value in a register */
         int testreg = get_reg (NULL);
-        asm_out ("\tmove\t$%d, $%d\t# line %d\n", testreg, a->place,
-                 linenumber);
-        asm_out ("\tbeqz\t$%d, _Lexit%d\n", testreg, exit_label_num);
+        {
+            switch (a->type)
+            {
+            case INT_:
+                asm_out ("\tmove\t$%d, $%d\t# line %d\n", testreg, a->place,
+                         linenumber);
+                asm_out ("\tbeqz\t$%d, _Lexit%d\n", testreg, exit_label_num);
+                break;
+            case FLOAT_:
+                if (is_reverse_cond)
+                {
+                    asm_out ("\tbc1t\t_Lexit%d\t# line \n", exit_label_num,
+                            linenumber);
+                }
+                else
+                {
+                    asm_out ("\tbc1f\t_Lexit%d\n", exit_label_num);
+                }
+                is_reverse_cond = 0;
+                break;
+            default:
+                assert (0);
+            }
+        }
         free_reg (testreg);
     }
     else
