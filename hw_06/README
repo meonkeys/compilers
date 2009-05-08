@@ -33,6 +33,10 @@ EXECUTION DETAILS
 
     The code has been tested and works on Ubuntu 8.04.2 and Ubuntu 8.10.
 
+BUGS
+
+    Test 9 and 11 are disabled due to infinite loops.
+
 ASSIGNMENT DESCRIPTION
 
     http://www-users.itlabs.umn.edu/classes/Spring-2009/csci5161/index.php?page=./handouts/assign5
