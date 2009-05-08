@@ -317,7 +317,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             {
                 if (NULL != b->name)
                 {
-                    /*  FIXME: I don't think this is right */
                     if (b->is_array != 1)
                     {
                         reg = get_reg (b);
@@ -334,18 +333,10 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                     }
                     else
                     {
-                        /*fprintf(stderr, "calling RHS array access\n"); */
                         reg = asm_emit_array_access (b, 4);
                         asm_out ("\tlw\t$%d, 0($%d)\n", reg, reg);
                     }
                 }
-                /*
-                else if (1 == b->is_return)
-                {
-                    reg = get_result_reg();
-                    asm_out("\tmove $%d, $%d\t# line %d\n", reg, b->place, linenumber);
-                }
-                */
                 else if(b->place >= 8 && b->place < MAX_REG)
                 {
                     reg = b->place;
@@ -359,7 +350,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
 
                 if (ARR_ != ptrA->type)
                 {
-                    /*ptrA->place = reg; */
                     ptrA->place = -1;
 
                     asm_out ("\tsw\t$%d, _%s\t# line %d\n", reg, a->name,
@@ -369,7 +359,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
                 }
                 else
                 {
-                    /* FIXME: asm_emit_array_write? */
                     arr_reg = asm_emit_array_access (a, 4);
                     asm_out ("\tsw\t$%d, 0($%d)\t# line%d\n", reg, arr_reg,
                              linenumber);
@@ -383,7 +372,6 @@ stmt_assign_ex (var_ref * a, var_ref * b)
             ptrA = lookup (a->name);
             assert (NULL != ptrA);
             offsetA = ptrA->offset;
-            /*reg = get_reg (b); */
 
             /* if it's null it's a constant */
             if (NULL != b->name)
